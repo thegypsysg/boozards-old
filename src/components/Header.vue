@@ -603,7 +603,7 @@ const handleTrendingChange = (item) => {
             $route.name == 'Trending-co-working'
           "
           class="d-md-none mx-auto pt-md-0 px-4 medium:px-20"
-          style="max-width: 1200px; overflow-x: auto"
+          style="max-width: 1200px; overflow-x: hidden"
         >
           <div
             class="d-flex justify-center ga-6 my-5"
@@ -614,7 +614,7 @@ const handleTrendingChange = (item) => {
                 @click="goToPath(n)"
                 elevation="0"
                 class="pa-2"
-                style="min-width: 100px; min-height: 70px"
+                style="min-width: 100px; min-height: 70px;"
               >
                 <div class="d-flex flex-column align-center ga-3 text-caption">
                   <v-responsive>
