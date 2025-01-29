@@ -1,8 +1,12 @@
 <template>
   <div class="hero-container" :class="{ 'hero-container-mobile': isSmall }">
     <!-- Background image -->
-    <v-img :src="boozardsBackground" :class="['zoom-effect', { zoomed: isZoomed }]" class="hero-background"
-      cover></v-img>
+    <v-img
+      :src="boozardsBackground"
+      :class="['zoom-effect', { zoomed: isZoomed }]"
+      class="hero-background"
+      cover
+    ></v-img>
 
     <!-- Overlay -->
     <div class="hero-overlay"></div>
@@ -11,19 +15,37 @@
     <v-container class="hero-content">
       <v-row align="center" justify="start">
         <v-col cols="12" md="8" lg="6">
-          <div class="hero-text-container" :class="{ 'hero-text-mobile': isSmall }">
-            <div :data-aos="!isSmall ? 'fade-left' : 'fade-right'" data-aos-offset="200" data-aos-duration="2000"
-              data-aos-easing="ease-in-sine">
-              <v-col cols="12" class="d-flex flex-column align-start" style="padding-left: 20px">
-                <h1 :style="{ 
-                  color: '#fff', 
-                  fontSize: isSmall ? '30px' : '46px', 
-                  fontWeight: 'bold' 
-                }">
-                  <span class="text-orange">Welcome !!!</span><br /> <span class="text-white">What's your brand ?</span>
+          <div
+            class="hero-text-container"
+            :class="{ 'hero-text-mobile': isSmall }"
+          >
+            <div
+              :data-aos="!isSmall ? 'fade-left' : 'fade-right'"
+              data-aos-offset="200"
+              data-aos-duration="2000"
+              data-aos-easing="ease-in-sine"
+            >
+              <v-col
+                cols="12"
+                class="d-flex flex-column align-start"
+                style="padding-left: 20px"
+              >
+                <h1
+                  :style="{
+                    color: '#fff',
+                    fontSize: isSmall ? '30px' : '46px',
+                    fontWeight: 'bold',
+                  }"
+                >
+                  <span class="text-orange">Welcome !!!</span><br />
+                  <span class="text-white">What's your brand ?</span>
                 </h1>
 
-                <v-btn color="orange" size="large" class="text-uppercase text-white mt-4">
+                <v-btn
+                  color="orange"
+                  size="large"
+                  class="text-uppercase text-white mt-4"
+                >
                   View Price List
                 </v-btn>
               </v-col>
@@ -32,14 +54,12 @@
         </v-col>
       </v-row>
     </v-container>
-
-   
   </div>
 
   <div class="main-content">
+    <ExploreOurMenu class="d-none d-md-block" />
     <v-container class="mx-auto px-4 medium:px-16" style="max-width: 1200px">
-      <ExploreOurMenu class="d-none d-md-block" />
-      <Whisky id="ourBooze"  />
+      <Whisky id="ourBooze" />
       <Whisky title="Gin" />
       <SelectCountry />
       <OurBrands />
@@ -55,9 +75,7 @@ import Happening from "./DesktopView/Happening/Happening.vue";
 import { eventBus } from "@/util/bus";
 import axios from "@/util/axios";
 import AOS from "aos";
-import boozardsBackground from "@/assets/images/boozards/boozard-whiskycc.jpg"
-
-
+import boozardsBackground from "@/assets/images/boozards/boozard-whiskycc.jpg";
 
 const isZoomed = ref(false);
 const listData = ref([]);
@@ -147,9 +165,9 @@ onMounted(() => {
 const props = defineProps({
   isSmall: {
     type: Boolean,
-    default: false
-  }
-})
+    default: false,
+  },
+});
 </script>
 
 <style scoped>
@@ -162,7 +180,6 @@ const props = defineProps({
   z-index: 1;
   overflow: hidden;
 }
-
 
 .hero-background {
   position: absolute;
@@ -194,7 +211,7 @@ const props = defineProps({
   width: 100%;
   /* padding: 20px; */
   /* background-color: #fff; */
-  height: 100%; 
+  height: 100%;
 }
 
 .hero-text-mobile {
@@ -204,17 +221,15 @@ const props = defineProps({
 .hero-title {
   font-weight: bold;
   line-height: 1.2;
-
 }
 
 @media (max-width: 599px) {
   .hero-container {
-  top: 30vh !important;
- min-height: 60vh !important;
- height: auto !important;
-overflow: visible !important;
-
-}
+    top: 30vh !important;
+    min-height: 60vh !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
 
   .hero-title {
     padding-top: 16px;
@@ -229,7 +244,6 @@ overflow: visible !important;
   .hero-text-container {
     margin-top: 5rem !important;
     height: auto;
-   
   }
 }
 
@@ -251,7 +265,9 @@ overflow: visible !important;
 .fade-in-up {
   opacity: 0;
   transform: translateY(200px);
-  transition: opacity 2s ease, transform 2s ease;
+  transition:
+    opacity 2s ease,
+    transform 2s ease;
 }
 
 .fade-in-up.visible {

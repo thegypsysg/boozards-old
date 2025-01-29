@@ -1,41 +1,44 @@
 <script setup>
-import { onMounted, ref, nextTick } from 'vue';
-import axios from '@/util/axios';
-import { Splide, SplideSlide } from '@splidejs/vue-splide';
-import '@splidejs/vue-splide/css';
+import { onMounted, ref, nextTick } from "vue";
+import axios from "@/util/axios";
+import { Splide, SplideSlide } from "@splidejs/vue-splide";
+import "@splidejs/vue-splide/css";
+import { appId, fileURL } from "../main";
 
 defineProps({
-  desktop: Boolean
-})
+  desktop: Boolean,
+});
 
 const splideOptions = {
-  perPage: 6,
-  arrows: false,
+  perPage: 7,
+  arrows: true,
   pagination: false,
-  gap: '2rem',
+  gap: "2rem",
   breakpoints: {
     640: {
-      perPage: 2,
+      perPage: 3,
     },
     960: {
-      perPage: 4,
+      perPage: 5,
     },
     1200: {
-      perPage: 6,
+      perPage: 7,
     },
-  }
-}
+  },
+};
 
 const splideRef = ref(null);
 const isBeginning = ref(true);
 const isEnd = ref(false);
 
+const menuLists = ref([]);
+
 const goNext = () => {
-  splideRef.value?.splide?.go('+1');
+  splideRef.value?.splide?.go("+1");
 };
 
 const goPrev = () => {
-  splideRef.value?.splide?.go('-1');
+  splideRef.value?.splide?.go("-1");
 };
 
 const handleSlideMove = () => {
@@ -46,113 +49,95 @@ const handleSlideMove = () => {
   }
 };
 
+const getMenuListData = () => {
+  axios
+    .get(`/categories/active-website/app/${appId}`)
+    .then((response) => {
+      const data = response.data.data;
+      menuLists.value = data
+        .sort(function (a, b) {
+          return a.category_id - b.category_id;
+        })
+        .filter((item) => item.active == "Y");
+      console.log(menuLists.value);
+      // let itemFinal = [];
+    })
+    .catch((error) => {
+      // eslint-disable-next-line
+
+      throw error;
+    });
+};
+
 onMounted(() => {
   nextTick(() => {
     const splide = splideRef.value?.splide;
     if (splide) {
-      splide.on('moved mounted', handleSlideMove);
+      splide.on("moved mounted", handleSlideMove);
       handleSlideMove();
     }
   });
+  getMenuListData();
 });
-
-const menuLists = ref([
-  {
-    img: 'https://images.unsplash.com/photo-1600628421055-4d30de868b8f?q=80&w=2070&auto=format&fit=crop',
-    title: 'Beer',
-    id: 'Beer'
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?q=80&w=2070&auto=format&fit=crop',
-    title: 'Wine',
-    id: 'Wine'
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop',
-    title: 'Vodka',
-    id: 'Vodka'
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1527281400683-1aae777175f8?q=80&w=2070&auto=format&fit=crop',
-    title: 'Whisky',
-    id: 'Whisky'
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1581006852262-e4307cf6283a?q=80&w=2070&auto=format&fit=crop',
-    title: 'Soda',
-    id: 'Soda'
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop',
-    title: 'Gin',
-    id: 'Gin'
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop',
-    title: 'Tequila',
-    id: 'Tequila'
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop',
-    title: 'Irish Cream',
-    id: 'Irish Cream'
-  }
-  ]);
 </script>
 
 <template>
-  <div v-if="!desktop" class="d-flex ga-6 overflow-x-auto flex-row scroll-menu">
-    <div v-for="(menu, i) in menuLists" :key="i" class="d-flex align-center ga-4 flex-column">
-      <a @click="console.log(menu.id)" class="d-flex border-black pa-2 rounded-lg">
-        <v-avatar :size="40">
-          <v-img aspect-ratio="1" cover :src="menu.img"></v-img>
+  <div
+    v-if="!desktop"
+    class="d-flex ga-6 overflow-x-auto flex-row scroll-menu scroll-cont"
+  >
+    <div
+      v-for="menu in menuLists"
+      :key="menu.category_id"
+      class="d-flex align-center ga-4 flex-column"
+    >
+      <a class="d-flex flex-column align-center border-black pa-2 rounded-lg">
+        <v-avatar :size="70">
+          <v-img aspect-ratio="1" cover :src="fileURL + menu.image"></v-img>
         </v-avatar>
-        <p class="text-no-wrap d-flex align-center pl-2 text-caption">{{ menu.title }}</p>
+        <p class="text-no-wrap d-flex align-center mt-2 text-caption">
+          {{ menu.category_name }}
+        </p>
       </a>
     </div>
   </div>
-  
-  <div v-if="desktop" class="explore-section">
-    <v-container>
-      <div class="position-relative">
-        <v-btn
-          v-if="!isBeginning"
-          icon
-          class="custom-arrow prev-arrow"
-          @click="goPrev"
-        >
-          <span class="arrow-icon">←</span>
-        </v-btn>
 
-        <Splide ref="splideRef" :options="splideOptions">
-          <SplideSlide v-for="(menu, i) in menuLists" :key="i">
-            <v-card class="card-wrapper" elevation="3">
-              <v-avatar :size="100">
-                <v-img aspect-ratio="1" cover :src="menu.img"></v-img>
-              </v-avatar>
-              <div class="card-title">
-                <span class="text-center">{{ menu.title }}</span>
-              </div>
-            </v-card>
-          </SplideSlide>
-        </Splide>
+  <div v-if="desktop" class="explore-section d-none d-md-block">
+    <!-- <v-container> -->
+    <div class="position-relative">
+      <!-- <v-btn
+        v-if="!isBeginning"
+        icon
+        class="custom-arrow prev-arrow"
+        @click="goPrev"
+      >
+        <span class="arrow-icon">←</span>
+      </v-btn> -->
 
-        <v-btn
-          v-if="!isEnd"
-          icon
-          class="custom-arrow next-arrow"
-          @click="goNext"
-        >
-          <span class="arrow-icon">→</span>
-        </v-btn>
-      </div>
-    </v-container>
+      <Splide ref="splideRef" :options="splideOptions">
+        <SplideSlide v-for="menu in menuLists" :key="menu.category_id">
+          <v-card class="card-wrapper" elevation="3">
+            <v-avatar :size="80">
+              <v-img aspect-ratio="1" cover :src="fileURL + menu.image"></v-img>
+            </v-avatar>
+            <div class="card-title">
+              <span class="text-center">{{ menu.category_name }}</span>
+            </div>
+          </v-card>
+        </SplideSlide>
+      </Splide>
+
+      <!-- <v-btn v-if="!isEnd" icon class="custom-arrow next-arrow" @click="goNext">
+        <span class="arrow-icon">→</span>
+      </v-btn> -->
+    </div>
+    <!-- </v-container> -->
   </div>
 </template>
 
 <style scoped>
 .explore-section {
-  padding: 2rem 0;
+  padding: 2rem;
 }
 
 .card-wrapper {
@@ -182,7 +167,7 @@ const menuLists = ref([
   transform: translateY(-50%);
   z-index: 2;
   background: white !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .prev-arrow {
@@ -197,8 +182,14 @@ const menuLists = ref([
   font-size: 24px;
   line-height: 1;
 }
+
+.scroll-cont::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scroll-cont {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
 </style>
-
-
-
-
