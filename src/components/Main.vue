@@ -58,9 +58,18 @@
 
   <div class="main-content">
     <ExploreOurMenu class="d-none d-md-block" />
-    <v-container class="mx-auto px-4 medium:px-16" style="max-width: 1200px">
-      <Whisky id="ourBooze" />
-      <Whisky title="Gin" />
+    <v-container
+      id="ourBooze"
+      class="mx-auto px-4 medium:px-16"
+      style="max-width: 1200px"
+    >
+      <Whisky
+        v-for="item in productCategories"
+        :key="item?.category_id"
+        :title="item?.category_name"
+        :brands="item?.brands"
+        :countries="item?.countries"
+      />
       <SelectCountry />
       <OurBrands />
       <Partners />
@@ -71,7 +80,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue"; // Ensure these are imported
-import Happening from "./DesktopView/Happening/Happening.vue";
+import { appId } from "../main";
 import { eventBus } from "@/util/bus";
 import axios from "@/util/axios";
 import AOS from "aos";
@@ -81,6 +90,7 @@ const isZoomed = ref(false);
 const listData = ref([]);
 const listDataCommercial = ref([]);
 const listMainCategories = ref([]);
+const productCategories = ref([]);
 const isLoading = ref(true);
 function scrollToSection() {
   eventBus.scrollToSection = "happeningTarget"; // Ganti dengan ID section yang diinginkan
@@ -148,6 +158,44 @@ const getListMainCategories = async () => {
   isLoading.value = false;
 };
 
+const getProductCategoryListData = () => {
+  isLoading.value = true;
+  axios
+    .get(`/categories-with-products/app/${appId}`)
+    .then((response) => {
+      const data = response.data.data;
+      productCategories.value = data
+        .sort((a, b) => a.category_id - b.category_id)
+        .map((item) => {
+          return {
+            category_id: item.category_id,
+            category_name: item.category_name,
+            brands: item.brands.map((brand) => {
+              return {
+                ...brand,
+                isCount: false,
+                count: 1,
+              };
+            }),
+            countries: item.countries.map((country) => {
+              return {
+                ...country,
+              };
+            }),
+          };
+        });
+      console.log(productCategories.value);
+    })
+    .catch((error) => {
+      // eslint-disable-next-line
+
+      throw error;
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
+};
+
 onMounted(() => {
   const observer = new IntersectionObserver(handleIntersection, {
     threshold: 0.1, // Trigger when 10% of the element is visible
@@ -161,6 +209,7 @@ onMounted(() => {
   get4WallsPropertyData();
   getListMainCategories();
   get4WallsPropertyDataCommercial();
+  getProductCategoryListData();
 });
 const props = defineProps({
   isSmall: {

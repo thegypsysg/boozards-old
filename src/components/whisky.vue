@@ -1,32 +1,42 @@
 <script setup>
-import { onMounted, ref, nextTick, onUnmounted, computed } from 'vue';
-import axios from '@/util/axios';
-import { Splide, SplideSlide } from '@splidejs/vue-splide';
-import '@splidejs/vue-splide/css';
+import { onMounted, ref, nextTick, onUnmounted, computed } from "vue";
+import axios from "@/util/axios";
+import { fileURL } from "@/main";
+import { Splide, SplideSlide } from "@splidejs/vue-splide";
+import "@splidejs/vue-splide/css";
 
-defineProps({
+const props = defineProps({
   desktop: Boolean,
   title: {
     type: String,
-    default: 'Whisky'
+    default: "Whisky",
+  },
+  brands: {
+    type: Array,
+    default: () => [],
+  },
+  countries: {
+    type: Array,
+    default: () => [],
   },
   viewAll: {
     type: Boolean,
-    default: false
-  }
-})
+    default: false,
+  },
+});
 
+const selected = ref(null);
 const splideRef = ref(null);
 const isBeginning = ref(true);
 const isEnd = ref(false);
 const isMobile = ref(false);
 
 const splideOptions = computed(() => ({
-  type: isMobile.value ? 'loop' : 'slide',
+  type: isMobile.value ? "loop" : "slide",
   perPage: isMobile.value ? 1.5 : 4,
   arrows: false,
   pagination: false,
-  gap: isMobile.value ? '1rem' : '2rem',
+  gap: isMobile.value ? "1rem" : "2rem",
   drag: true,
   snap: true,
   rewind: false,
@@ -41,7 +51,7 @@ const splideOptions = computed(() => ({
   breakpoints: {
     640: {
       perPage: 1.5,
-      gap: '1rem',
+      gap: "1rem",
       padding: { left: 0, right: 0 },
       focus: 0,
       drag: true,
@@ -54,15 +64,23 @@ const splideOptions = computed(() => ({
     1200: {
       perPage: 4,
     },
-  }
+  },
 }));
 
+const filteredBrands = computed(() => {
+  if (selected.value) {
+    return props.brands.filter((brand) => brand.country_id === selected.value);
+  } else {
+    return props.brands;
+  }
+});
+
 const goNext = () => {
-  splideRef.value?.splide?.go('+1');
+  splideRef.value?.splide?.go("+1");
 };
 
 const goPrev = () => {
-  splideRef.value?.splide?.go('-1');
+  splideRef.value?.splide?.go("-1");
 };
 
 const handleSlideMove = () => {
@@ -76,53 +94,37 @@ const handleSlideMove = () => {
 function scrollToSection(id) {
   const section = document.getElementById(id);
   if (section) {
-    section.scrollIntoView({ behavior: 'smooth' });
+    section.scrollIntoView({ behavior: "smooth" });
   }
 }
 
-const menuLists =[
+const menuLists = [
   {
-    img: 'https://images.unsplash.com/photo-1608270586620-248524c67de9?q=80&w=2070&auto=format&fit=crop',
-    title: 'Monkey Shoulders',
-    id: 'Monkey Shoulders'
-
+    img: "https://images.unsplash.com/photo-1608270586620-248524c67de9?q=80&w=2070&auto=format&fit=crop",
+    title: "Monkey Shoulders",
+    id: "Monkey Shoulders",
   },
   {
-    img: 'https://images.unsplash.com/photo-1584225064785-c62a8b43d148?q=80&w=2067&auto=format&fit=crop',
-    title: 'Chivas Regal',
-    id: 'Chivas Regal'
+    img: "https://images.unsplash.com/photo-1584225064785-c62a8b43d148?q=80&w=2067&auto=format&fit=crop",
+    title: "Chivas Regal",
+    id: "Chivas Regal",
   },
   {
-    img: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?q=80&w=1887&auto=format&fit=crop',
-    title: 'Johnnie Walker',
-    id: 'Johnnie Walker'
+    img: "https://images.unsplash.com/photo-1569529465841-dfecdab7503b?q=80&w=1887&auto=format&fit=crop",
+    title: "Johnnie Walker",
+    id: "Johnnie Walker",
   },
   {
-    img: 'https://images.unsplash.com/photo-1527281400683-1aae777175f8?q=80&w=2070&auto=format&fit=crop',
-    title: 'Ballantines',
-    id: 'Ballantines'
+    img: "https://images.unsplash.com/photo-1527281400683-1aae777175f8?q=80&w=2070&auto=format&fit=crop",
+    title: "Ballantines",
+    id: "Ballantines",
   },
   {
-    img: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?q=80&w=2070&auto=format&fit=crop',
-    title: 'Jameson',
-    id: 'Jameson'
+    img: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?q=80&w=2070&auto=format&fit=crop",
+    title: "Jameson",
+    id: "Jameson",
   },
-
-]
-
-// onMounted(() => {
-//   getMenuList();
-// });
-
-// async function getMenuList() {
-//   const res = await axios.get('/list-biryani-main-categories');
-//   menuLists.value = res.data.data.map((item) => ({
-//     title: item.category_name,
-//     img: item.main_image,
-//     id: item.category_name
-//   }));
-//   console.log(menuLists.value);
-// }
+];
 
 function checkMobile() {
   isMobile.value = window.innerWidth <= 640;
@@ -139,35 +141,80 @@ const handleMoved = () => {
   }
 };
 
+const increment = (count) => {
+  count++;
+};
+
+const decrement = (count) => {
+  if (count > 0) count--;
+};
+
 onMounted(() => {
   checkMobile();
-  window.addEventListener('resize', checkMobile);
+  window.addEventListener("resize", checkMobile);
   nextTick(() => {
     const splide = splideRef.value?.splide;
     if (splide) {
-      splide.on('moved mounted', handleSlideMove);
-      splide.on('moved', handleMoved);
+      splide.on("moved mounted", handleSlideMove);
+      splide.on("moved", handleMoved);
       handleSlideMove();
     }
   });
 });
 
 onUnmounted(() => {
-  window.removeEventListener('resize', checkMobile);  // Clean up the event listener
+  window.removeEventListener("resize", checkMobile); // Clean up the event listener
 });
-
 </script>
 
 <template>
   <div class="nursing-section mt-md-10 mt-sm-2">
     <div class="d-flex justify-space-between align-center mb-4">
-      <h2 class="text-h6 font-weight-bold">{{title}}</h2>
-      <v-btn 
-        class="text-capitalize font-weight-bold" 
+      <div class="d-flex align-center">
+        <span class="text-h6 font-weight-bold">{{ props.title }}</span>
+        <v-select
+          style="min-width: 250px"
+          variant="outlined"
+          v-model="selected"
+          :items="[
+            { country_name: 'Show All', country_id: 0 },
+            ...props.countries,
+          ]"
+          item-value="country_id"
+          :item-title="
+            (item) =>
+              item.country_id == 0
+                ? `${item.country_name}`
+                : `${item.country_name} ( ${item.brand_count} Brands )`
+          "
+          placeholder="Country of origin"
+        >
+          <template v-slot:selection="{ props, item }">
+            <span v-bind="props">{{ `${item.raw.country_name} ` }}</span>
+            <span v-if="item.raw.country_id != 0" class="font-weight-bold">
+              (
+              <span class="text-red">{{ item.raw.brand_count }}</span> Brands
+              )</span
+            >
+          </template>
+          <!-- <template v-slot:item="{ props, item }">
+            <v-list-item v-bind="props">
+              <span>{{ item.raw.country_name }}</span>
+              <span v-if="item.raw.country_id != 0" class="font-weight-bold">
+                (
+                <span class="text-red">{{ item.raw.brand_count }}</span> Brands
+                )</span
+              >
+            </v-list-item>
+          </template> -->
+        </v-select>
+      </div>
+      <v-btn
+        class="text-capitalize font-weight-bold"
         variant="text"
         height="40"
       >
-        <span style="color: #00A4E4">View all</span>
+        <span style="color: #00a4e4">View all</span>
       </v-btn>
     </div>
 
@@ -181,20 +228,73 @@ onUnmounted(() => {
         <span class="arrow-icon">←</span>
       </v-btn>
 
-      <Splide 
-        ref="splideRef" 
-        :options="splideOptions"
-      >
-        <SplideSlide v-for="(menu, i) in menuLists" :key="i">
+      <Splide ref="splideRef" :options="splideOptions">
+        <SplideSlide v-for="menu in filteredBrands" :key="menu?.brand_id">
           <v-card class="card-wrapper" elevation="3">
             <v-img
-              :src="menu.img"
+              :src="fileURL + menu?.products[0]?.image"
               height="180"
               cover
-              
             ></v-img>
-            <div class="card-title">
-              <span class="text-center">{{ menu.title }}</span>
+            <div class="card-title d-flex flex-column ga-2">
+              <p class="text-red-darken-4 font-weight-bold">
+                {{ menu?.brand_name }}
+              </p>
+              <p class="font-weight-bold">
+                {{ menu?.products[0]?.product_name }}
+              </p>
+              <div class="d-flex align-center ga-1 my-2">
+                <v-btn
+                  v-for="item in menu?.products[0]?.ranges"
+                  :key="item.pq_id"
+                  size="xs"
+                  color="black"
+                  class="text-caption pa-1 rounded-lg"
+                  variant="outlined"
+                  >{{ item?.quantity?.quantity_name }}</v-btn
+                >
+              </div>
+              <div class="d-flex justify-space-between align-center">
+                <span class="text-red-darken-1 font-weight-bold">
+                  S$ 59.00
+                </span>
+                <v-btn
+                  v-if="!menu.isCount"
+                  @click="menu.isCount = true"
+                  size="xs"
+                  color="black"
+                  class="text-caption py-1 px-8"
+                  variant="flat"
+                  >Add</v-btn
+                >
+                <div v-if="menu.isCount" class="d-flex align-center ga-2">
+                  <v-btn
+                    size="xs"
+                    color="black"
+                    class="text-caption pa-1 rounded-0"
+                    variant="flat"
+                    icon
+                    @click="if (menu.count > 1) menu.count--;"
+                  >
+                    <v-icon>mdi-minus</v-icon>
+                  </v-btn>
+
+                  <span>
+                    {{ menu.count }}
+                  </span>
+
+                  <v-btn
+                    size="xs"
+                    color="black"
+                    class="text-caption pa-1 rounded-0"
+                    variant="flat"
+                    icon
+                    @click="menu.count++"
+                  >
+                    <v-icon>mdi-plus</v-icon>
+                  </v-btn>
+                </div>
+              </div>
             </div>
           </v-card>
         </SplideSlide>
@@ -230,9 +330,7 @@ onUnmounted(() => {
 
 .card-title {
   padding: 1rem;
-  text-align: center;
   font-weight: 500;
-  color: #00A4E4;  /* Using the blue color from your design */
 }
 
 .custom-arrow {
@@ -241,7 +339,7 @@ onUnmounted(() => {
   transform: translateY(-50%);
   z-index: 2;
   background: white !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .prev-arrow {
@@ -270,23 +368,26 @@ onUnmounted(() => {
   .custom-arrow {
     display: none !important;
   }
-  
+
   .splide-container {
     overflow: visible;
     cursor: grab;
     margin: 0;
     padding: 0;
   }
-  
+
   .splide-container:active {
     cursor: grabbing;
   }
-  
+
   .splide__track {
     overflow: visible;
-    -webkit-mask-image: -webkit-radial-gradient(white, black); /* Helps with flickering */
+    -webkit-mask-image: -webkit-radial-gradient(
+      white,
+      black
+    ); /* Helps with flickering */
   }
-  
+
   .splide__list {
     transform-style: preserve-3d;
     backface-visibility: hidden;

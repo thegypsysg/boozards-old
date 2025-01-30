@@ -10,19 +10,19 @@ defineProps({
 });
 
 const splideOptions = {
-  perPage: 7,
+  perPage: 10,
   arrows: true,
   pagination: false,
   gap: "2rem",
   breakpoints: {
     640: {
-      perPage: 3,
+      perPage: 4,
     },
     960: {
-      perPage: 5,
+      perPage: 7,
     },
     1200: {
-      perPage: 7,
+      perPage: 10,
     },
   },
 };
@@ -117,7 +117,7 @@ onMounted(() => {
       <Splide ref="splideRef" :options="splideOptions">
         <SplideSlide v-for="menu in menuLists" :key="menu.category_id">
           <v-card class="card-wrapper" elevation="3">
-            <v-avatar :size="80">
+            <v-avatar :size="100">
               <v-img aspect-ratio="1" cover :src="fileURL + menu.image"></v-img>
             </v-avatar>
             <div class="card-title">
