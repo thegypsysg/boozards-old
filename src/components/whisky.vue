@@ -11,7 +11,7 @@ const props = defineProps({
     type: String,
     default: "Whisky",
   },
-  brands: {
+  products: {
     type: Array,
     default: () => [],
   },
@@ -28,6 +28,7 @@ const props = defineProps({
 const selected = ref(null);
 const splideRef = ref(null);
 const isBeginning = ref(true);
+const isBestViewed = ref(false);
 const isEnd = ref(false);
 const isMobile = ref(false);
 
@@ -67,13 +68,37 @@ const splideOptions = computed(() => ({
   },
 }));
 
-const filteredBrands = computed(() => {
+const filteredProducts = computed(() => {
   if (selected.value) {
-    return props.brands.filter((brand) => brand.country_id === selected.value);
+    return props.products
+      .filter((product) => product.country_id === selected.value)
+      .map((item) => {
+        return {
+          ...item,
+          rangeItems: item.ranges.map((range) => {
+            return {
+              ...range,
+              selected: ref(false),
+            };
+          }),
+        };
+      });
   } else {
-    return props.brands;
+    return props.products.map((item) => {
+      return {
+        ...item,
+        rangeItems: item.ranges.map((range) => {
+          return {
+            ...range,
+            selected: ref(false),
+          };
+        }),
+      };
+    });
   }
 });
+
+const formatName = (name) => name.toLowerCase().replace(/\s+/g, "");
 
 const goNext = () => {
   splideRef.value?.splide?.go("+1");
@@ -91,41 +116,6 @@ const handleSlideMove = () => {
   }
 };
 
-function scrollToSection(id) {
-  const section = document.getElementById(id);
-  if (section) {
-    section.scrollIntoView({ behavior: "smooth" });
-  }
-}
-
-const menuLists = [
-  {
-    img: "https://images.unsplash.com/photo-1608270586620-248524c67de9?q=80&w=2070&auto=format&fit=crop",
-    title: "Monkey Shoulders",
-    id: "Monkey Shoulders",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1584225064785-c62a8b43d148?q=80&w=2067&auto=format&fit=crop",
-    title: "Chivas Regal",
-    id: "Chivas Regal",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1569529465841-dfecdab7503b?q=80&w=1887&auto=format&fit=crop",
-    title: "Johnnie Walker",
-    id: "Johnnie Walker",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1527281400683-1aae777175f8?q=80&w=2070&auto=format&fit=crop",
-    title: "Ballantines",
-    id: "Ballantines",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?q=80&w=2070&auto=format&fit=crop",
-    title: "Jameson",
-    id: "Jameson",
-  },
-];
-
 function checkMobile() {
   isMobile.value = window.innerWidth <= 640;
   nextTick(() => {
@@ -139,14 +129,6 @@ const handleMoved = () => {
       splideRef.value?.splide?.refresh();
     });
   }
-};
-
-const increment = (count) => {
-  count++;
-};
-
-const decrement = (count) => {
-  if (count > 0) count--;
 };
 
 onMounted(() => {
@@ -168,12 +150,15 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="nursing-section mt-md-10 mt-sm-2">
+  <div
+    :id="`${formatName(props.title)}`"
+    class="nursing-section mt-md-10 mt-sm-2"
+  >
     <div class="d-flex justify-space-between align-center mb-4">
       <div class="d-flex align-center">
         <span class="text-h6 font-weight-bold">{{ props.title }}</span>
         <v-select
-          style="min-width: 250px"
+          style="min-width: 200px"
           variant="outlined"
           v-model="selected"
           :items="[
@@ -197,22 +182,13 @@ onUnmounted(() => {
               )</span
             >
           </template>
-          <!-- <template v-slot:item="{ props, item }">
-            <v-list-item v-bind="props">
-              <span>{{ item.raw.country_name }}</span>
-              <span v-if="item.raw.country_id != 0" class="font-weight-bold">
-                (
-                <span class="text-red">{{ item.raw.brand_count }}</span> Brands
-                )</span
-              >
-            </v-list-item>
-          </template> -->
         </v-select>
       </div>
       <v-btn
         class="text-capitalize font-weight-bold"
         variant="text"
         height="40"
+        @click="isMobile ? undefined : (isBestViewed = true)"
       >
         <span style="color: #00a4e4">View all</span>
       </v-btn>
@@ -229,30 +205,33 @@ onUnmounted(() => {
       </v-btn>
 
       <Splide ref="splideRef" :options="splideOptions">
-        <SplideSlide v-for="menu in filteredBrands" :key="menu?.brand_id">
-          <v-card class="card-wrapper" elevation="3">
-            <v-img
-              :src="fileURL + menu?.products[0]?.image"
-              height="180"
-              cover
-            ></v-img>
-            <div class="card-title d-flex flex-column ga-2">
-              <p class="text-red-darken-4 font-weight-bold">
-                {{ menu?.brand_name }}
-              </p>
-              <p class="font-weight-bold">
-                {{ menu?.products[0]?.product_name }}
-              </p>
+        <SplideSlide v-for="menu in filteredProducts" :key="menu.product_id">
+          <!-- :key="menu?.product_id" -->
+          <v-card class="card-wrapper" height="370" elevation="3">
+            <v-img :src="fileURL + menu?.image" height="200" cover></v-img>
+            <div
+              class="card-title d-flex flex-column justify-space-between"
+              style="height: 170px"
+            >
+              <div class="">
+                <p class="text-red-darken-4 font-weight-bold text-body-2">
+                  {{ menu?.brand_name }}
+                </p>
+                <p class="font-weight-bold text-body-2 mt-1">
+                  {{ menu?.product_name }}
+                </p>
+              </div>
               <div class="d-flex align-center ga-1 my-2">
-                <v-btn
-                  v-for="item in menu?.products[0]?.ranges"
-                  :key="item.pq_id"
-                  size="xs"
-                  color="black"
-                  class="text-caption pa-1 rounded-lg"
-                  variant="outlined"
-                  >{{ item?.quantity?.quantity_name }}</v-btn
-                >
+                <template v-for="item in menu?.rangeItems" :key="item.pq_id">
+                  <v-btn
+                    size="xs"
+                    color="black"
+                    class="text-caption pa-1 rounded-lg"
+                    @click="item.selected.value = !item.selected.value"
+                    :variant="item.selected.value ? 'flat' : 'outlined'"
+                    >{{ item?.quantity?.quantity_name }}</v-btn
+                  >
+                </template>
               </div>
               <div class="d-flex justify-space-between align-center">
                 <span class="text-red-darken-1 font-weight-bold">
@@ -310,6 +289,16 @@ onUnmounted(() => {
       </v-btn>
     </div>
   </div>
+  <v-dialog v-model="isBestViewed" persistent width="auto">
+    <v-card width="350">
+      <v-card-text class="">
+        <h4 class="mt-4 mb-8 text-center">Best Viewed on Mobile</h4>
+        <v-btn class="mb-4 w-100 bg-primary" @click="isBestViewed = false">
+          OK
+        </v-btn>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <style scoped>

@@ -59,17 +59,18 @@
   <div class="main-content">
     <ExploreOurMenu class="d-none d-md-block" />
     <v-container
+      v-if="!isLoading"
       id="ourBooze"
       class="mx-auto px-4 medium:px-16"
       style="max-width: 1200px"
     >
-      <Whisky
-        v-for="item in productCategories"
-        :key="item?.category_id"
-        :title="item?.category_name"
-        :brands="item?.brands"
-        :countries="item?.countries"
-      />
+      <template v-for="item in productCategories" :key="item?.category_id">
+        <Whisky
+          :title="item?.category_name"
+          :products="item?.products"
+          :countries="item?.countries"
+        />
+      </template>
       <SelectCountry />
       <OurBrands />
       <Partners />
@@ -158,42 +159,37 @@ const getListMainCategories = async () => {
   isLoading.value = false;
 };
 
-const getProductCategoryListData = () => {
+const getProductCategoryListData = async () => {
   isLoading.value = true;
-  axios
-    .get(`/categories-with-products/app/${appId}`)
-    .then((response) => {
-      const data = response.data.data;
-      productCategories.value = data
-        .sort((a, b) => a.category_id - b.category_id)
-        .map((item) => {
-          return {
-            category_id: item.category_id,
-            category_name: item.category_name,
-            brands: item.brands.map((brand) => {
-              return {
-                ...brand,
-                isCount: false,
-                count: 1,
-              };
-            }),
-            countries: item.countries.map((country) => {
-              return {
-                ...country,
-              };
-            }),
-          };
-        });
-      console.log(productCategories.value);
-    })
-    .catch((error) => {
-      // eslint-disable-next-line
+  try {
+    const response = await axios.get(`/categories-with-products/app/${appId}`);
+    const data = response.data.data;
 
-      throw error;
-    })
-    .finally(() => {
-      isLoading.value = false;
-    });
+    productCategories.value = data
+      .sort((a, b) => a.category_id - b.category_id)
+      .map((category) => ({
+        category_id: category.category_id,
+        category_name: category.category_name,
+        countries: category.countries,
+        products: category.brands.flatMap((brand) =>
+          brand.products.map((product) => ({
+            ...product,
+            brand_id: brand.brand_id,
+            brand_name: brand.brand_name,
+            category_id: category.category_id,
+            country_id: brand.country_id,
+            isCount: false,
+            count: 1,
+          })),
+        ),
+      }));
+
+    console.log("Transformed Data:", productCategories.value);
+  } catch (error) {
+    console.error("Error fetching product categories:", error);
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 onMounted(() => {

@@ -33,6 +33,36 @@ const isEnd = ref(false);
 
 const menuLists = ref([]);
 
+const formatName = (name) => name.toLowerCase().replace(/\s+/g, "");
+
+// const scrollToSection = (sectionId) => {
+//   console.log(sectionId);
+//   const element = document.getElementById(sectionId);
+//   if (element) {
+//     element.scrollIntoView({ behavior: "smooth" });
+//   }
+// };
+
+function scrollToSection(sectionId, mobile) {
+  const cardSection = document.getElementById(sectionId);
+
+  // this.$nextTick(() => {
+  if (cardSection) {
+    const cardRect = cardSection.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const offset = mobile
+      ? cardRect.top + scrollTop - 300
+      : cardRect.top + scrollTop - 50; // Nilai offset yang diinginkan, dalam piksel
+
+    window.scrollTo({
+      top: offset,
+      behavior: "smooth",
+    });
+  }
+  // });
+  // window.scrollBy(0, -scrollOffset);
+}
+
 const goNext = () => {
   splideRef.value?.splide?.go("+1");
 };
@@ -90,6 +120,7 @@ onMounted(() => {
       v-for="menu in menuLists"
       :key="menu.category_id"
       class="d-flex align-center ga-4 flex-column"
+      @click="scrollToSection(formatName(menu.category_name), true)"
     >
       <a class="d-flex flex-column align-center border-black pa-2 rounded-lg">
         <v-avatar :size="70">
@@ -116,7 +147,11 @@ onMounted(() => {
 
       <Splide ref="splideRef" :options="splideOptions">
         <SplideSlide v-for="menu in menuLists" :key="menu.category_id">
-          <v-card class="card-wrapper" elevation="3">
+          <v-card
+            @click="scrollToSection(formatName(menu.category_name), false)"
+            class="card-wrapper"
+            elevation="3"
+          >
             <v-avatar :size="100">
               <v-img aspect-ratio="1" cover :src="fileURL + menu.image"></v-img>
             </v-avatar>
