@@ -178,8 +178,8 @@ const getProductCategoryListData = async () => {
             brand_name: brand.brand_name,
             category_id: category.category_id,
             country_id: brand.country_id,
-            isCount: false,
-            count: 1,
+            //isCount: false,
+            //count: 1,
           })),
         ),
       }));

@@ -75,6 +75,9 @@ const filteredProducts = computed(() => {
       .map((item) => {
         return {
           ...item,
+          selectedImage: ref(item.image),
+          isCount: ref(false),
+          count: ref(1),
           rangeItems: item.ranges.map((range) => {
             return {
               ...range,
@@ -87,6 +90,9 @@ const filteredProducts = computed(() => {
     return props.products.map((item) => {
       return {
         ...item,
+        selectedImage: ref(item.image),
+        isCount: ref(false),
+        count: ref(1),
         rangeItems: item.ranges.map((range) => {
           return {
             ...range,
@@ -130,6 +136,27 @@ const handleMoved = () => {
     });
   }
 };
+
+function handleSelectRange(menu, selectedItem) {
+  const isAlreadySelected = selectedItem.selected.value;
+
+  // Set semua item menjadi false
+  menu.rangeItems.forEach((item) => {
+    item.selected.value = false;
+  });
+
+  // Jika item yang sudah dipilih diklik lagi, semua tetap false
+  if (!isAlreadySelected) {
+    selectedItem.selected.value = true;
+    if (selectedItem.image_1) {
+      menu.selectedImage.value = selectedItem.image_1;
+    } else {
+      menu.selectedImage.value = menu.image;
+    }
+  } else {
+    menu.selectedImage.value = menu.image;
+  }
+}
 
 onMounted(() => {
   checkMobile();
@@ -208,7 +235,11 @@ onUnmounted(() => {
         <SplideSlide v-for="menu in filteredProducts" :key="menu.product_id">
           <!-- :key="menu?.product_id" -->
           <v-card class="card-wrapper" height="370" elevation="3">
-            <v-img :src="fileURL + menu?.image" height="200" cover></v-img>
+            <v-img
+              :src="fileURL + menu?.selectedImage.value"
+              height="200"
+              cover
+            ></v-img>
             <div
               class="card-title d-flex flex-column justify-space-between"
               style="height: 170px"
@@ -227,10 +258,11 @@ onUnmounted(() => {
                     size="xs"
                     color="black"
                     class="text-caption pa-1 rounded-lg"
-                    @click="item.selected.value = !item.selected.value"
+                    @click="handleSelectRange(menu, item)"
                     :variant="item.selected.value ? 'flat' : 'outlined'"
                     >{{ item?.quantity?.quantity_name }}</v-btn
                   >
+                  <!-- @click="item.selected.value = !item.selected.value" -->
                 </template>
               </div>
               <div class="d-flex justify-space-between align-center">
@@ -238,28 +270,31 @@ onUnmounted(() => {
                   S$ 59.00
                 </span>
                 <v-btn
-                  v-if="!menu.isCount"
-                  @click="menu.isCount = true"
+                  v-if="menu.isCount.value == false"
+                  @click="menu.isCount.value = true"
                   size="xs"
                   color="black"
                   class="text-caption py-1 px-8"
                   variant="flat"
                   >Add</v-btn
                 >
-                <div v-if="menu.isCount" class="d-flex align-center ga-2">
+                <div
+                  v-if="menu.isCount.value == true"
+                  class="d-flex align-center ga-2"
+                >
                   <v-btn
                     size="xs"
                     color="black"
                     class="text-caption pa-1 rounded-0"
                     variant="flat"
                     icon
-                    @click="if (menu.count > 1) menu.count--;"
+                    @click="if (menu.count.value > 1) menu.count.value--;"
                   >
                     <v-icon>mdi-minus</v-icon>
                   </v-btn>
 
                   <span>
-                    {{ menu.count }}
+                    {{ menu.count.value }}
                   </span>
 
                   <v-btn
@@ -268,7 +303,7 @@ onUnmounted(() => {
                     class="text-caption pa-1 rounded-0"
                     variant="flat"
                     icon
-                    @click="menu.count++"
+                    @click="menu.count.value++"
                   >
                     <v-icon>mdi-plus</v-icon>
                   </v-btn>
