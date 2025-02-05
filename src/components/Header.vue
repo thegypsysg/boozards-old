@@ -1,22 +1,23 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
-import { useStore } from 'vuex'
-import { useRouter, useRoute } from 'vue-router'
-import axios from "@/util/axios"
-import moment from "moment-timezone"
-import app from "@/util/eventBus"
+import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from "vue";
+import { useStore } from "vuex";
+import { useRouter, useRoute } from "vue-router";
+import axios from "@/util/axios";
+import moment from "moment-timezone";
+import app from "@/util/eventBus";
+import { appId } from "@/main";
 
 // Import images
-import boozardsLogo from "@/assets/images/logo/boozards-logo.png"
-import homeIcon from "@/assets/images/icons/home.png"
-import shopperIcon from "@/assets/images/icons/menu-shopper.png"
-import shopIcon from "@/assets/images/icons/shop.png"
-import userIcon from "@/assets/images/icons/user_icon.png"
-import facebookIcon from "@/assets/images/icons/facebook.png"
-import instaIcon from "@/assets/images/icons/insta.png"
-import tiktokIcon from "@/assets/images/icons/tiktok.png"
-import whatsappIcon from "@/assets/whatsapp.svg"
-import ExploreOurMenuList from './explore-our-menu-list.vue'
+import boozardsLogo from "@/assets/images/logo/boozards-logo.png";
+import homeIcon from "@/assets/images/icons/home.png";
+import shopperIcon from "@/assets/images/icons/menu-shopper.png";
+import shopIcon from "@/assets/images/icons/shop.png";
+import userIcon from "@/assets/images/icons/user_icon.png";
+import facebookIcon from "@/assets/images/icons/facebook.png";
+import instaIcon from "@/assets/images/icons/insta.png";
+import tiktokIcon from "@/assets/images/icons/tiktok.png";
+import whatsappIcon from "@/assets/whatsapp.svg";
+import ExploreOurMenuList from "./explore-our-menu-list.vue";
 
 // Make images available to template
 const images = {
@@ -28,8 +29,8 @@ const images = {
   facebook: facebookIcon,
   instagram: instaIcon,
   tiktok: tiktokIcon,
-  whatsapp: whatsappIcon
-}
+  whatsapp: whatsappIcon,
+};
 
 // Props
 const props = defineProps({
@@ -38,75 +39,75 @@ const props = defineProps({
   isDesktop: Boolean,
   isProfile: Boolean,
   isSignin: Boolean,
-  isBatamProperties: Boolean
-})
+  isBatamProperties: Boolean,
+});
 
 // Store, router setup
-const store = useStore()
-const router = useRouter()
-const route = useRoute()
+const store = useStore();
+const router = useRouter();
+const route = useRoute();
 
 // Essential reactive data
-const drawer = ref(false)
-const dialog2 = ref(false)
-const search = ref(null)
-const userImage = ref(null)
-const userName = ref(null)
-const userDated = ref(null)
-const currentTime = ref('')
-const screenWidth = ref(window.innerWidth)
-const activeMalls = ref([])
-const isLoading = ref(false)
+const drawer = ref(false);
+const dialog2 = ref(false);
+const search = ref(null);
+const userImage = ref(null);
+const userName = ref(null);
+const userDated = ref(null);
+const currentTime = ref("");
+const screenWidth = ref(window.innerWidth);
+const activeMalls = ref([]);
+const isLoading = ref(false);
 
 // Location data
 const selectedLocation = ref({
-  country: 'Singapore',
-  city: 'Singapore City'
-})
+  country: "Singapore",
+  city: "Singapore City",
+});
 
 const locationDropdown = ref([
   {
-    country: 'Singapore',
-    flagUrl: 'https://flagcdn.com/w40/sg.png',
+    country: "Singapore",
+    flagUrl: "https://flagcdn.com/w40/sg.png",
     properties: 1,
     cities: [
       {
-        name: 'Singapore City',
-        imageUrl: 'https://example.com/singapore-city.jpg'
-      }
-    ]
+        name: "Singapore City",
+        imageUrl: "https://example.com/singapore-city.jpg",
+      },
+    ],
   },
   {
-    country: 'Indonesia',
-    flagUrl: 'https://flagcdn.com/w40/id.png',
+    country: "Indonesia",
+    flagUrl: "https://flagcdn.com/w40/id.png",
     properties: 1,
     cities: [
       {
-        name: 'Batam',
-        imageUrl: 'https://example.com/batam.jpg'
-      }
-    ]
+        name: "Batam",
+        imageUrl: "https://example.com/batam.jpg",
+      },
+    ],
   },
   {
-    country: 'India',
-    flagUrl: 'https://flagcdn.com/w40/in.png',
+    country: "India",
+    flagUrl: "https://flagcdn.com/w40/in.png",
     properties: 3,
     cities: [
       {
-        name: 'Mumbai',
-        imageUrl: 'https://example.com/mumbai.jpg'
+        name: "Mumbai",
+        imageUrl: "https://example.com/mumbai.jpg",
       },
       {
-        name: 'Goa - Margao',
-        imageUrl: 'https://example.com/goa-margao.jpg'
+        name: "Goa - Margao",
+        imageUrl: "https://example.com/goa-margao.jpg",
       },
       {
-        name: 'Goa - Panjim',
-        imageUrl: 'https://example.com/goa-panjim.jpg'
-      }
-    ]
-  }
-])
+        name: "Goa - Panjim",
+        imageUrl: "https://example.com/goa-panjim.jpg",
+      },
+    ],
+  },
+]);
 
 // Computed properties
 const isSmall = computed(() => {
@@ -114,90 +115,122 @@ const isSmall = computed(() => {
 });
 
 const filteredMalls = computed(() => {
-  if (!search.value) return activeMalls.value
-  const searchTextLower = search.value.toLowerCase()
-  return activeMalls.value.filter(item => 
-    item.name.toLowerCase().includes(searchTextLower)
-  )
-})
+  if (!search.value) return activeMalls.value;
+  const searchTextLower = search.value.toLowerCase();
+  return activeMalls.value.filter((item) =>
+    item.brand_name.toLowerCase().includes(searchTextLower),
+  );
+});
 
 // Methods
 const selectLocation = (country, city) => {
   selectedLocation.value = {
     country: country.country,
-    city: city.name
-  }
-}
+    city: city.name,
+  };
+};
 
 const handleResize = () => {
   screenWidth.value = window.innerWidth;
-}
+};
 
 const updateTime = () => {
-  const singaporeTime = moment().tz("Asia/Singapore")
-  currentTime.value = singaporeTime.format("HH:mm:ss")
-}
+  const singaporeTime = moment().tz("Asia/Singapore");
+  currentTime.value = singaporeTime.format("HH:mm:ss");
+};
 
 const logout = () => {
-  const token = localStorage.getItem("token")
-  axios.get(`/gypsy-logout`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-  .then(() => {
-    localStorage.removeItem("name")
-    localStorage.removeItem("userName")
-    localStorage.removeItem("g_id")
-    localStorage.removeItem("user_image")
-    localStorage.removeItem("token")
-    window.location.href = "/"
-  })
-  .catch(console.error)
-}
+  const token = localStorage.getItem("token");
+  axios
+    .get(`/gypsy-logout`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then(() => {
+      localStorage.removeItem("name");
+      localStorage.removeItem("userName");
+      localStorage.removeItem("g_id");
+      localStorage.removeItem("user_image");
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    })
+    .catch(console.error);
+};
 
 const gotoMallDetail = (item) => {
-  dialog2.value = false
-  router.push(`/mall-id/${item?.id}`)
-  localStorage.setItem("mallDetailData", JSON.stringify(item))
-}
+  dialog2.value = false;
+  router.push(`/mall-id/${item?.id}`);
+  localStorage.setItem("mallDetailData", JSON.stringify(item));
+};
 
 const gotoMerchantDetail = (item) => {
-  dialog2.value = false
-  router.push(`/merchant-id/${item?.merchant_id}`)
-  localStorage.setItem("merchantDetailData", JSON.stringify(item))
-}
+  dialog2.value = false;
+  router.push(`/merchant-id/${item?.merchant_id}`);
+  localStorage.setItem("merchantDetailData", JSON.stringify(item));
+};
+
+const getProductCategoryListData = async () => {
+  isLoading.value = true;
+  try {
+    const response = await axios.get(`/categories-with-products/app/${appId}`);
+    const data = response.data.data;
+
+    const initialData = data
+      .sort((a, b) => a.category_id - b.category_id)
+      .map((category) => ({
+        category_id: category.category_id,
+        category_name: category.category_name,
+        countries: category.countries,
+        products: category.brands.flatMap((brand) =>
+          brand.products.map((product) => ({
+            ...product,
+            brand_id: brand.brand_id,
+            brand_name: brand.brand_name,
+            category_id: category.category_id,
+            country_id: brand.country_id,
+            //isCount: false,
+            //count: 1,
+          })),
+        ),
+      }));
+
+    activeMalls.value = initialData.flatMap((category) => category.products);
+
+    console.log("Transformed Data:", activeMalls.value);
+  } catch (error) {
+    console.error("Error fetching product categories:", error);
+  } finally {
+    isLoading.value = false;
+  }
+};
 
 // Lifecycle hooks
 onMounted(() => {
   handleResize();
   // Set initial screen width
   // screenWidth.value = window.innerWidth;
-  
+
   // Add resize listener
   window.addEventListener("resize", handleResize);
   setInterval(updateTime, 1000);
-  
+
   // Set default location
   const defaultCountry = locationDropdown.value[0];
   const defaultCity = defaultCountry.cities[0];
   selectLocation(defaultCountry, defaultCity);
-})
-
+  getProductCategoryListData();
+});
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize);
+  window.removeEventListener("resize", handleResize);
 });
-const filterList = ref([
-  'View All',
-  'Europe',
-  'Asia',
-])
+const filterList = ref(["View All", "Europe", "Asia"]);
 
 const handleTrendingChange = (item) => {
-  console.log('Selected filter:', item)
+  console.log("Selected filter:", item);
   // Add your filter logic here
-}
+};
 </script>
 
 <template>
@@ -216,7 +249,6 @@ const handleTrendingChange = (item) => {
           class="logo-img"
           :src="images.logo"
           height="35"
-        
           eager
           transition="fade-transition"
         >
@@ -238,8 +270,12 @@ const handleTrendingChange = (item) => {
         >
           <div class="d-flex align-center gap-2">
             <v-avatar size="24" v-if="selectedLocation.country">
-              <v-img 
-                :src="locationDropdown.find(l => l.country === selectedLocation.country)?.flagUrl" 
+              <v-img
+                :src="
+                  locationDropdown.find(
+                    (l) => l.country === selectedLocation.country,
+                  )?.flagUrl
+                "
                 cover
               ></v-img>
             </v-avatar>
@@ -292,7 +328,7 @@ const handleTrendingChange = (item) => {
 
     <div
       v-if="isHeader || isProfile"
-      class="ml-6 d-flex flex-column  navbar-header"
+      class="ml-6 d-flex flex-column navbar-header"
       :class="{ 'navbar-header-mobile': !isDesktop && isProfile }"
     >
       <div class="divider" :class="{ 'd-none': !isDesktop && isProfile }" />
@@ -309,8 +345,8 @@ const handleTrendingChange = (item) => {
         id="product_name"
         v-model="search"
         class="form-control mr-sm-2 ml-md-n3 search-input"
-        item-title="name"
-        item-value="name"
+        item-title="brand_name"
+        item-value="brand_name"
         :items="activeMalls"
         style="font-style: italic"
         placeholder="Type your brands... Chivas,Monkey,Roku,"
@@ -318,31 +354,64 @@ const handleTrendingChange = (item) => {
         color="blue-grey-lighten-2"
       >
         <template #item="{ props, item }">
-          <div class="mb-2" v-bind="props">
+          <div
+            v-if="item.raw.ranges.length > 0"
+            class="mb-4 px-2"
+            v-bind="props"
+          >
             <router-link
               class="text-decoration-none text-black font-weight-bold"
               to="#"
             >
-              <div class="d-flex align-center w-100">
-                <div class="w-25 py-1">
-                  <div style="width: 60px">
-                    <v-img height="40" :src="item?.raw?.mainImage">
+              <p
+                style="font-size: 12px"
+                class="font-weight-bold text-red-darken-4 mb-2"
+              >
+                {{ item.raw.brand_name }}
+              </p>
+              <div
+                v-for="range in item.raw.ranges"
+                class="d-flex align-center w-100 mb-2"
+              >
+                <div style="width: 15%" class="mr-2">
+                  <div
+                    style="
+                      height: 45px;
+                      width: 100%;
+                      object-fit: cover;
+                      object-position: center;
+                    "
+                  >
+                    <v-img
+                      height="45"
+                      cover
+                      :src="
+                        range.image_1
+                          ? $fileURL + range.image_1
+                          : $fileURL + item.raw.image
+                      "
+                    >
                       <template #placeholder>
-                        <v-skeleton-loader type="image"></v-skeleton-loader>
+                        <div class="skeleton" />
                       </template>
                     </v-img>
                   </div>
                 </div>
-                <div class="w-75" style="font-size: 12px">
-                  <p class="mb-1">
-                    {{ `${item?.raw?.name} (${item?.raw?.subIndustryName})` }}
-                  </p>
-                  <p class="text-grey">
-                    <span>{{ `${item?.raw?.town}` }}</span> (<span
-                      class="text-red"
-                      >{{ `${item?.raw?.distanceText}` }}</span
-                    ><span class="text-black"> away</span>)
-                  </p>
+                <div
+                  class="d-flex align-center justify-space-between"
+                  style="font-size: 12px; width: 85%"
+                >
+                  <div class="">
+                    <p class="mb-1 font-weight-regular">
+                      {{ `${item?.raw?.product_name}` }}
+                    </p>
+                    <p class="font-weight-regular">
+                      <span>{{
+                        `${range?.quantity?.quantity_name} | 40%`
+                      }}</span>
+                    </p>
+                  </div>
+                  <p class="font-weight-bold text-red-darken-4">S$ 67.50</p>
                 </div>
               </div>
             </router-link>
@@ -353,8 +422,6 @@ const handleTrendingChange = (item) => {
         <v-icon color="white"> mdi-magnify </v-icon>
       </button>
     </form>
-
-    
 
     <!-- <div v-if="isBatamProperties" class="d-none d-md-flex ga-2 w-100">
       <div class="text-h4 font-weight-black text-no-wrap">
@@ -384,7 +451,10 @@ const handleTrendingChange = (item) => {
       </div>
     </div> -->
 
-    <div v-if="!isHeader && !isProfile && !userName && !isSmall" class="btn_sign__up-cont">
+    <div
+      v-if="!isHeader && !isProfile && !userName && !isSmall"
+      class="btn_sign__up-cont"
+    >
       <v-btn elevation="0" class="btn_sign__up" to="">
         <span> Sign Up / Sign In</span>
       </v-btn>
@@ -506,25 +576,32 @@ const handleTrendingChange = (item) => {
             type="list-item-two-line"
           ></v-skeleton-loader>
         </template>
-        <div v-if="!isHeader && !isProfile && !userName && isSmall" class="btn_sign__up-cont mx-auto my-4">
+        <div
+          v-if="!isHeader && !isProfile && !userName && isSmall"
+          class="btn_sign__up-cont mx-auto my-4"
+        >
           <v-btn elevation="0" class="btn_sign__up d-flex align-center" to="">
             <span> Sign Up / Sign In</span>
           </v-btn>
           <div class="btn_sign__up-hover" />
         </div>
-        <v-btn v-if="!isHeader && !isProfile && !isSmall && userName" elevation="0" class="btn_log__out"
-          :class="{ 'mr-6': tokenStart }" @click="logout">
+        <v-btn
+          v-if="!isHeader && !isProfile && !isSmall && userName"
+          elevation="0"
+          class="btn_log__out"
+          :class="{ 'mr-6': tokenStart }"
+          @click="logout"
+        >
           Logout
         </v-btn>
-
 
         <form class="navbar__search navbar__search__mobile mx-auto">
           <v-autocomplete
             id="product_name"
             v-model="search"
             class="form-control mr-sm-2 ml-md-n3 search-input"
-            item-title="name"
-            item-value="name"
+            item-title="brand_name"
+            item-value="brand_name"
             :items="activeMalls"
             style="font-style: italic"
             placeholder="Type your brands... Chivas,Monkey,Roku,"
@@ -532,34 +609,64 @@ const handleTrendingChange = (item) => {
             color="blue-grey-lighten-2"
           >
             <template #item="{ props, item }">
-              <div class="mb-2" v-bind="props">
+              <div
+                v-if="item.raw.ranges.length > 0"
+                class="mb-4 px-2"
+                v-bind="props"
+              >
                 <router-link
                   class="text-decoration-none text-black font-weight-bold"
-                  style="font-size: 12px"
                   to="#"
                 >
-                  <div class="d-flex align-center" style="width: 100%">
-                    <div style="width: 30% !important" class="py-1">
-                      <div style="width: 100px">
-                        <v-img height="40" :src="item?.raw?.mainImage">
+                  <p
+                    style="font-size: 12px"
+                    class="font-weight-bold text-red-darken-4 mb-2"
+                  >
+                    {{ item.raw.brand_name }}
+                  </p>
+                  <div
+                    v-for="range in item.raw.ranges"
+                    class="d-flex align-center w-100 mb-2"
+                  >
+                    <div style="width: 15%" class="mr-2">
+                      <div
+                        style="
+                          height: 45px;
+                          width: 100%;
+                          object-fit: cover;
+                          object-position: center;
+                        "
+                      >
+                        <v-img
+                          height="45"
+                          cover
+                          :src="
+                            range.image_1
+                              ? $fileURL + range.image_1
+                              : $fileURL + item.raw.image
+                          "
+                        >
                           <template #placeholder>
-                            <v-skeleton-loader type="image"></v-skeleton-loader>
+                            <div class="skeleton" />
                           </template>
                         </v-img>
                       </div>
                     </div>
-                    <div style="width: 70% !important" class="pl-2">
-                      <p class="mb-1">
-                        {{
-                          `${item?.raw?.name} (${item?.raw?.subIndustryName})`
-                        }}
-                      </p>
-                      <p class="text-grey">
-                        <span>{{ `${item?.raw?.town}` }}</span> (<span
-                          class="text-red"
-                          >{{ `${item?.raw?.distanceText}` }}</span
-                        ><span class="text-black"> away</span>)
-                      </p>
+                    <div
+                      class="d-flex align-center justify-space-between"
+                      style="font-size: 12px; width: 85%"
+                    >
+                      <div class="">
+                        <p class="mb-1 font-weight-regular">
+                          {{ `${item?.raw?.product_name}` }}
+                        </p>
+                        <p class="font-weight-regular">
+                          <span>{{
+                            `${range?.quantity?.quantity_name} | 40%`
+                          }}</span>
+                        </p>
+                      </div>
+                      <p class="font-weight-bold text-red-darken-4">S$ 67.50</p>
                     </div>
                   </div>
                 </router-link>
@@ -572,8 +679,8 @@ const handleTrendingChange = (item) => {
         </form>
 
         <!-- FILTER LIST -->
-     <!-- to do: this should be added to the header on small screens and used to display the overflowing section -->
-    <!-- <div class="d-md-none" id="trending-filter-container">
+        <!-- to do: this should be added to the header on small screens and used to display the overflowing section -->
+        <!-- <div class="d-md-none" id="trending-filter-container">
       <div id="trending-item" class="d-flex ga-2 py-3 w-100 px-2">
         <div class="flex-fill d-flex ga-2" id="scroll-trending">
           <template v-for="(item, index) in filterList" :key="index">
@@ -585,10 +692,9 @@ const handleTrendingChange = (item) => {
       </div>
     </div> -->
 
-    <div v-if="isSmall" class="ma-4">
-      <ExploreOurMenuList :desktop="false" />
-    </div>
-
+        <div v-if="isSmall" class="ma-4">
+          <ExploreOurMenuList :desktop="false" />
+        </div>
 
         <div id="trending-container" class="d-sm-none"></div>
 
@@ -614,7 +720,7 @@ const handleTrendingChange = (item) => {
                 @click="goToPath(n)"
                 elevation="0"
                 class="pa-2"
-                style="min-width: 100px; min-height: 70px;"
+                style="min-width: 100px; min-height: 70px"
               >
                 <div class="d-flex flex-column align-center ga-3 text-caption">
                   <v-responsive>
@@ -643,11 +749,7 @@ const handleTrendingChange = (item) => {
       class="drawer__top"
       :class="{ 'py-6': userName == null, 'py-2': userName != null }"
     >
-      <router-link
-        v-if="userName == null"
-        class="text-decoration-none"
-        to=""
-      >
+      <router-link v-if="userName == null" class="text-decoration-none" to="">
         <span style="font-size: 1.125rem; color: white">Sign up / Sign In</span>
       </router-link>
       <div v-else class="d-flex align-center">
@@ -686,7 +788,11 @@ const handleTrendingChange = (item) => {
     </div>
     <div class="drawer__heading">
       <div class="drawer-logo">
-        <v-img height="35" width="80" src="@/assets/images/logo/boozards-logo.png" />
+        <v-img
+          height="35"
+          width="80"
+          src="@/assets/images/logo/boozards-logo.png"
+        />
       </div>
       <v-menu contained style="z-index: 1000">
         <template #activator="{ props }">
@@ -823,30 +929,17 @@ const handleTrendingChange = (item) => {
         >
           <v-col cols="3" class="d-flex justify-end">
             <a :href="contactData?.facebook">
-              <v-img
-                :src="images.facebook"
-                height="40"
-                width="32"
-              />
+              <v-img :src="images.facebook" height="40" width="32" />
             </a>
           </v-col>
           <v-col class="d-flex justify-center" cols="3">
             <a :href="contactData?.instagram">
-              <v-img
-                :src="images.instagram"
-                height="40"
-                width="32"
-              />
+              <v-img :src="images.instagram" height="40" width="32" />
             </a>
           </v-col>
           <v-col class="d-flex justify-start" cols="3">
             <a :href="contactData?.tiktok">
-              <v-img
-                :src="images.tiktok"
-                class="mt-1"
-                height="35"
-                width="35"
-              />
+              <v-img :src="images.tiktok" class="mt-1" height="35" width="35" />
             </a>
           </v-col>
           <v-col
@@ -1031,7 +1124,6 @@ const handleTrendingChange = (item) => {
       </v-card-text>
     </v-card>
   </v-dialog>
-  
 </template>
 
 <style scoped>
@@ -1177,12 +1269,10 @@ header.v-sheet.v-app-bar {
   #scroll-trending .v-btn {
     padding: 0 16px !important;
   }
-
 }
 
 /* Add media query for small screens */
 @media (max-width: 599px) {
-
   .btn_sign__up {
     width: 100%; /* Make button full width */
   }
