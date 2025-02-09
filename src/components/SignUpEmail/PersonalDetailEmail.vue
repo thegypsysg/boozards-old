@@ -637,7 +637,7 @@ export default {
 
     app.config.globalProperties.$eventBus.$emit(
       "changeHeaderWelcome",
-      "Sign-up by Email"
+      "Sign-up by Email",
     );
     this.email = localStorage.getItem("email")
       ? localStorage.getItem("email")
@@ -694,7 +694,7 @@ export default {
           .substring(0, Math.max(0, username.length - 6))
           .replace(/./g, "*");
         const visiblePart = username.substring(
-          Math.max(0, username.length - 6)
+          Math.max(0, username.length - 6),
         );
         return hiddenPart + visiblePart + email.substring(atIndex);
       } else {
@@ -797,10 +797,10 @@ export default {
                   error.response.data.message
                     ? `This Mobile Number ${this.mobile} already exist in our database using the email id `
                     : error.response.status == 422 &&
-                      error.response.data.email_id == null &&
-                      error.response.data.message
-                    ? `This Mobile Number ${this.mobile} already exists in our database`
-                    : "";
+                        error.response.data.email_id == null &&
+                        error.response.data.message
+                      ? `This Mobile Number ${this.mobile} already exists in our database`
+                      : "";
                 this.emailErrorPhone = error.response.data.email_id
                   ? error.response.data.email_id
                   : "";
@@ -810,8 +810,8 @@ export default {
                 const message = error.response.data.email_id
                   ? error.response.data.email_id[0]
                   : error.response.data.message === ""
-                  ? "Something Wrong!!!"
-                  : error.response.data.message;
+                    ? "Something Wrong!!!"
+                    : error.response.data.message;
                 this.errorMessage = message;
                 this.isError = true;
               }
@@ -881,7 +881,7 @@ export default {
 
 <style scoped>
 .login-container {
-  background-image: url("@/assets/header.png");
+  background-image: url("@/assets/background-sign-in.jpg");
   background-position: center;
   background-size: cover;
   background-color: #cccccc;
@@ -922,7 +922,9 @@ export default {
   background-color: #fff;
   background-clip: padding-box;
   border-radius: 0.25rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 }
 
 @media screen and (prefers-reduced-motion: reduce) {

@@ -247,7 +247,7 @@ export default {
     this.startCountdown();
     app.config.globalProperties.$eventBus.$emit(
       "changeHeaderWelcome",
-      "Sign-up by Email"
+      "Sign-up by Email",
     );
     this.email = localStorage.getItem("email")
       ? localStorage.getItem("email")
@@ -302,7 +302,7 @@ export default {
     backStep() {
       app.config.globalProperties.$eventBus.$emit(
         "changeHeaderWelcome",
-        "Sign-Up / Sign-in"
+        "Sign-Up / Sign-in",
       );
       this.$router.push("/sign-in");
     },
@@ -340,8 +340,8 @@ export default {
             const message = error.response.data.email_id
               ? error.response.data.email_id[0]
               : error.response.data.message
-              ? error.response.data.message
-              : "Something Wrong!!!";
+                ? error.response.data.message
+                : "Something Wrong!!!";
             this.errorMessage = message;
             this.isError = true;
             this.email = "";
@@ -381,8 +381,8 @@ export default {
             const message = error.response.data.email_id
               ? error.response.data.email_id[0]
               : error.response.data.message
-              ? error.response.data.message
-              : "Something Wrong!!!";
+                ? error.response.data.message
+                : "Something Wrong!!!";
             this.errorMessage = message;
             this.isError = true;
           })
@@ -397,7 +397,7 @@ export default {
 
 <style scoped>
 .login-container {
-  background-image: url("@/assets/header.png");
+  background-image: url("@/assets/background-sign-in.jpg");
   background-position: center;
   background-size: cover;
   background-color: #cccccc;
@@ -427,7 +427,9 @@ export default {
   background-color: #fff;
   background-clip: padding-box;
   border-radius: 0.25rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 }
 
 @media screen and (prefers-reduced-motion: reduce) {

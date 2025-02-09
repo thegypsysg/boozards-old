@@ -257,7 +257,7 @@ export default {
             // this.gender = "";
             app.config.globalProperties.$eventBus.$emit(
               "changeHeaderWelcome",
-              "Sign Up Completed"
+              "Sign Up Completed",
             );
             this.nextStep();
             // this.getUserData();
@@ -268,8 +268,8 @@ export default {
             const message = error.response.data.email_id
               ? error.response.data.email_id[0]
               : error.response.data.message === ""
-              ? "Something Wrong!!!"
-              : error.response.data.message;
+                ? "Something Wrong!!!"
+                : error.response.data.message;
             this.errorMessage = message;
             this.isError = true;
           })
@@ -284,7 +284,7 @@ export default {
 
 <style scoped>
 .login-container {
-  background-image: url("@/assets/header.png");
+  background-image: url("@/assets/background-sign-in.jpg");
   background-position: center;
   background-size: cover;
   background-color: #cccccc;
@@ -325,7 +325,9 @@ export default {
   background-color: #fff;
   background-clip: padding-box;
   border-radius: 0.25rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 }
 
 @media screen and (prefers-reduced-motion: reduce) {

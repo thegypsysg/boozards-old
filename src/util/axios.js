@@ -8,7 +8,6 @@ axios.interceptors.response.use(
     return response;
   },
   function (error) {
-    
     // if (error.response && error.response.status == 401) {
     //   axios.defaults.headers.common['Authorization'] = '';
     //   localStorage.clear();
@@ -17,12 +16,12 @@ axios.interceptors.response.use(
     // }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 // Fungsi untuk mengatur header Authorization
-// export function setAuthHeader(token) {
-//   axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-// }
+export function setAuthHeader(token) {
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+}
 
 export default axios;

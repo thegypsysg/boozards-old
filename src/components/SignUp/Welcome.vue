@@ -10,7 +10,7 @@
       }"
     >
       <v-container fluid>
-        <v-row class="d-flex align-center justify-end">
+        <v-row class="d-flex align-center justify-start">
           <v-col :cols="isSmall ? '12' : '6'">
             <v-card
               :elevation="!isSmall ? 1 : 0"
@@ -637,11 +637,11 @@ export default {
             } else {
               window.location.href = "/sign-in";
             }
-            // console.log("target_url", response.data.target_url);
+            console.log(response.data.target_url);
           })
           .catch((error) => {
             console.log(error);
-            // window.location.href = "/sign-in";
+            window.location.href = "/sign-in";
           });
       }
     },
@@ -826,6 +826,10 @@ export default {
               localStorage.setItem("social", "Email");
               const externalURL = `https://the-syringe.com?token=${data.token}`;
               window.location.href = externalURL;
+            } else if (this.appIdLogin == "3") {
+              localStorage.setItem("social", "Email");
+              const externalURL = `https://boozards.com?token=${data.token}`;
+              window.location.href = externalURL;
             } else if (this.appIdLogin == "2") {
               localStorage.setItem("social", "Email");
               const externalURL = `https://mall-e.in?token=${data.token}`;
@@ -859,6 +863,10 @@ export default {
       } else if (this.appIdLogin == "5") {
         localStorage.setItem("social", "Email");
         const externalURL = `https://the-syringe.com?token=${this.tokenLogin}`;
+        window.location.href = externalURL;
+      } else if (this.appIdLogin == "3") {
+        localStorage.setItem("social", "Email");
+        const externalURL = `https://boozards.com/?token=${this.tokenLogin}`;
         window.location.href = externalURL;
       } else if (this.appIdLogin == "2") {
         localStorage.setItem("social", "Email");

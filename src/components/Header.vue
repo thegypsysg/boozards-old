@@ -1,11 +1,1073 @@
-<script setup>
-import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from "vue";
-import { useStore } from "vuex";
-import { useRouter, useRoute } from "vue-router";
+<script>
+import { setAuthHeader } from "@/util/axios";
+import { mapState, mapMutations } from "vuex";
+import app from "@/util/eventBus";
+
+// import eventBus from "@/util/eventBus";
+// import eventBus from "@/util/eventBus";
 import axios from "@/util/axios";
 import moment from "moment-timezone";
-import app from "@/util/eventBus";
+
 import { appId } from "@/main";
+
+// Import images
+import boozardsLogo from "@/assets/images/logo/boozards-logo.png";
+import homeIcon from "@/assets/images/icons/home.png";
+import shopperIcon from "@/assets/images/icons/menu-shopper.png";
+import shopIcon from "@/assets/images/icons/shop.png";
+import userIcon from "@/assets/images/icons/user_icon.png";
+import facebookIcon from "@/assets/images/icons/facebook.png";
+import instaIcon from "@/assets/images/icons/insta.png";
+import tiktokIcon from "@/assets/images/icons/tiktok.png";
+import whatsappIcon from "@/assets/whatsapp.svg";
+import ExploreOurMenuList from "./explore-our-menu-list.vue";
+
+export default {
+  // eslint-disable-next-line vue/multi-word-component-names
+  name: "Header",
+  props: [
+    "isWelcome",
+    "titleHeader",
+    "isHeader",
+    "isDesktop",
+    "isProfile",
+    "isSignin",
+    "isBatamProperties",
+  ],
+  data() {
+    return {
+      isApply: false,
+      isEmployment: false,
+      isCheck: false,
+      path: "",
+      // selectedTag: null,
+      tokenStart: null,
+      footerData: {
+        company_name: "",
+        location: "",
+        mobile_number: "",
+        whats_app: "",
+        email_id: "",
+        copyright: "",
+        facebook: "",
+        twitter: "",
+        instagram: "",
+        youtube: "",
+      },
+      isLoading: false,
+      trendingBtn: [],
+      isDetail: false,
+      skillSlug: {},
+      countryId: null,
+      cityId: null,
+      search: null,
+      searchItems: [],
+
+      userImage: null,
+      userName: null,
+      userDated: null,
+      drawer: false,
+      // itemSelected: 'Singapore',
+      country: [],
+      countryRegistrable: [],
+      skillRegistrable: [],
+
+      trendingCard: [],
+
+      logo: "",
+      headerData: {},
+      currentTime: "",
+
+      selectedType: 0,
+      activeIndex: 1,
+      screenWidth: window.innerWidth,
+      // ---------------------------
+      dialog2: false,
+      activeMalls: [],
+      selectedLocation: {
+        country: "Singapore",
+        city: "Singapore City",
+      },
+      locationDropdown: [
+        {
+          country: "Singapore",
+          flagUrl: "https://flagcdn.com/w40/sg.png",
+          properties: 1,
+          cities: [
+            {
+              name: "Singapore City",
+              imageUrl: "https://example.com/singapore-city.jpg",
+            },
+          ],
+        },
+        {
+          country: "Indonesia",
+          flagUrl: "https://flagcdn.com/w40/id.png",
+          properties: 1,
+          cities: [
+            { name: "Batam", imageUrl: "https://example.com/batam.jpg" },
+          ],
+        },
+        {
+          country: "India",
+          flagUrl: "https://flagcdn.com/w40/in.png",
+          properties: 3,
+          cities: [
+            { name: "Mumbai", imageUrl: "https://example.com/mumbai.jpg" },
+            {
+              name: "Goa - Margao",
+              imageUrl: "https://example.com/goa-margao.jpg",
+            },
+            {
+              name: "Goa - Panjim",
+              imageUrl: "https://example.com/goa-panjim.jpg",
+            },
+          ],
+        },
+      ],
+      filterList: ["View All", "Europe", "Asia"],
+    };
+  },
+  watch: {
+    $route() {
+      this.search = null;
+    },
+  },
+  computed: {
+    ...mapState(["itemSelected"]),
+    ...mapState(["itemSelected2"]),
+    ...mapState(["itemSelectedComplete"]),
+    ...mapState(["itemSelected2Complete"]),
+    ...mapState(["detailHeader"]),
+    ...mapState(["countryRecognised"]),
+    ...mapState(["idCountryRecognised"]),
+    ...mapState(["skillRecognised"]),
+    ...mapState(["idSkillRecognised"]),
+    tokenProvider() {
+      // Mendapatkan URL dari browser
+      const url = new URL(window.location.href);
+
+      // Mendapatkan nilai token dari parameter query 'token'
+      const tokenParam = url.searchParams.get("token");
+      if (tokenParam) {
+        localStorage.setItem("token", tokenParam);
+      }
+
+      // Mengupdate data 'token' dalam komponen dengan nilai yang ditemukan
+      return tokenParam;
+    },
+    token() {
+      return localStorage.getItem("token");
+    },
+    isPrivacy() {
+      return this.$route.path == "/privacy-policy";
+    },
+    isTerms() {
+      return this.$route.path == "/our-terms";
+    },
+    isProfile() {
+      return (
+        this.$route.path == "/my-profile" ||
+        this.$route.path == "/resume-profile"
+      );
+    },
+    isMyProfile() {
+      return this.$route.path == "/my-profile";
+    },
+    isSignIn() {
+      return this.$route.path == "/social-sign-up";
+    },
+    isResumeProfile() {
+      return this.$route.path == "/resume-profile";
+    },
+    isSmall() {
+      return this.screenWidth < 640;
+    },
+    isHome() {
+      return this.$route.path === "/";
+    },
+    isSpecific() {
+      return this.$route.params.name;
+    },
+    isRecognised() {
+      return this.$route.path === "/recognised-qualifications";
+    },
+    isDetailPage() {
+      return this.$route.path.includes("detail");
+    },
+    ...mapState(["activeTag"]),
+    titleHeader() {
+      let path = this.$route.path;
+      let name = this.$route.path.split("/")[1];
+      let name2 = this.$route.params.name.split("-").join(" ");
+      let title = "";
+      if (path.includes("detail")) {
+        title = this.capitalizeFirstLetter(name2);
+      } else {
+        title = this.capitalizeFirstLetter(name);
+      }
+      return title;
+    },
+    filteredMalls() {
+      if (!this.search) return this.activeMalls;
+      return this.activeMalls.filter((item) =>
+        item.brand_name.toLowerCase().includes(this.search.toLowerCase()),
+      );
+    },
+  },
+  created() {
+    window.addEventListener("resize", this.handleResize);
+    setInterval(this.updateTime, 1000);
+  },
+  mounted() {
+    const token = localStorage.getItem("token");
+    if (this.tokenProvider != null) {
+      setAuthHeader(this.tokenProvider);
+      this.getHeaderUserData();
+    } else if (token) {
+      setAuthHeader(token);
+      this.getHeaderUserData();
+    }
+    this.search = null;
+    this.getLogo();
+    this.getCountry();
+    this.getAppContact();
+    //this.getCity();
+    this.getTrendingCardData();
+    this.getActiveSkills();
+    // app.config.globalProperties.$eventBus.$on(
+    //   'getHeaderDetail',
+    //   this.getHeaderDetail
+    // );
+
+    const defaultCountry = this.locationDropdown[0];
+    const defaultCity = defaultCountry.cities[0];
+    this.selectLocation(defaultCountry, defaultCity);
+    this.getProductCategoryListData();
+    app.config.globalProperties.$eventBus.$on("applyJob2", this.applyJob2);
+    app.config.globalProperties.$eventBus.$on(
+      "applyJobFalse2",
+      this.applyJobFalse2,
+    );
+    app.config.globalProperties.$eventBus.$on(
+      "employmentJob2",
+      this.employmentJob2,
+    );
+    app.config.globalProperties.$eventBus.$on(
+      "employmentJobFalse2",
+      this.employmentJobFalse2,
+    );
+    app.config.globalProperties.$eventBus.$on("checkJob2", this.checkJob2);
+    app.config.globalProperties.$eventBus.$on(
+      "checkJobFalse2",
+      this.checkJobFalse2,
+    );
+    app.config.globalProperties.$eventBus.$on(
+      "changeHeaderPath",
+      this.changeHeaderPath,
+    );
+    app.config.globalProperties.$eventBus.$on(
+      "getTokenStart",
+      this.getTokenStart,
+    );
+    app.config.globalProperties.$eventBus.$on(
+      "getTrendingCardData2",
+      this.getTrendingCardData2,
+    );
+    app.config.globalProperties.$eventBus.$on(
+      "changeHeaderImage",
+      this.changeHeaderImage,
+    );
+    app.config.globalProperties.$eventBus.$on(
+      "getHeaderUserData",
+      this.getHeaderUserData,
+    );
+    app.config.globalProperties.$eventBus.$on(
+      "getHeaderDetail",
+      this.getSkillBySlug,
+    );
+    app.config.globalProperties.$eventBus.$on(
+      "getRegistrableCountrySkills",
+      this.getRegistrableData,
+    );
+    app.config.globalProperties.$eventBus.$on(
+      "getHeaderLanding",
+      this.getTrendingCardData,
+    );
+    app.config.globalProperties.$eventBus.$on(
+      "removeDetail",
+      this.removeDetail,
+    );
+    app.config.globalProperties.$eventBus.$on(
+      "changeHeaderWelcome2",
+      this.changeHeaderWelcome2,
+    );
+    app.config.globalProperties.$eventBus.$on(
+      "changeHeaderWelcome3",
+      this.changeHeaderWelcome3,
+    );
+  },
+  beforeUnmount() {
+    // app.config.globalProperties.$eventBus.$off(
+    //   'getHeaderDetail',
+    //   this.getHeaderDetail
+    // );
+    app.config.globalProperties.$eventBus.$off("applyJob2", this.applyJob2);
+    app.config.globalProperties.$eventBus.$off(
+      "applyJobFalse2",
+      this.applyJobFalse2,
+    );
+    app.config.globalProperties.$eventBus.$off(
+      "employmentJob2",
+      this.employmentJob2,
+    );
+    app.config.globalProperties.$eventBus.$off(
+      "employmentJobFalse2",
+      this.employmentJobFalse2,
+    );
+    app.config.globalProperties.$eventBus.$off("checkJob2", this.checkJob2);
+    app.config.globalProperties.$eventBus.$off(
+      "checkJobFalse2",
+      this.checkJobFalse2,
+    );
+    app.config.globalProperties.$eventBus.$off(
+      "changeHeaderPath",
+      this.changeHeaderPath,
+    );
+    app.config.globalProperties.$eventBus.$off(
+      "getTokenStart",
+      this.getTokenStart,
+    );
+    app.config.globalProperties.$eventBus.$off(
+      "getTrendingCardData2",
+      this.getTrendingCardData2,
+    );
+    app.config.globalProperties.$eventBus.$off(
+      "changeHeaderImage",
+      this.changeHeaderImage,
+    );
+    app.config.globalProperties.$eventBus.$off(
+      "getHeaderUserData",
+      this.getHeaderUserData,
+    );
+    app.config.globalProperties.$eventBus.$off(
+      "getHeaderDetail",
+      this.getSkillBySlug,
+    );
+    app.config.globalProperties.$eventBus.$off(
+      "getRegistrableCountrySkills",
+      this.getRegistrableData,
+    );
+    app.config.globalProperties.$eventBus.$off(
+      "getHeaderLanding",
+      this.getTrendingCardData,
+    );
+    app.config.globalProperties.$eventBus.$on(
+      "removeDetail",
+      this.removeDetail,
+    );
+    app.config.globalProperties.$eventBus.$off(
+      "changeHeaderWelcome2",
+      this.changeHeaderWelcome2,
+    );
+    app.config.globalProperties.$eventBus.$off(
+      "changeHeaderWelcome3",
+      this.changeHeaderWelcome3,
+    );
+  },
+  unmounted() {
+    window.removeEventListener("resize", this.handleResize);
+  },
+  methods: {
+    applyJob() {
+      this.isLoading = true;
+      const token = localStorage.getItem("token");
+      axios
+        .get(`/gypsy-applicant`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          const data = response.data.data;
+          console.log(data);
+          if (data && data.basic_steps == null) {
+            this.tokenStart = token;
+            app.config.globalProperties.$eventBus.$emit("getTokenStart", token);
+            localStorage.setItem("applicant_data", JSON.stringify(data));
+            window.location.href = "/";
+          } else if (
+            data &&
+            data.basic_steps == "C" &&
+            data.qualifications_steps == null
+          ) {
+            app.config.globalProperties.$eventBus.$emit("applyJob");
+            app.config.globalProperties.$eventBus.$emit("applyJob2");
+          } else if (
+            data &&
+            data.basic_steps == "C" &&
+            data.qualifications_steps == "C" &&
+            data.employment_steps == null
+          ) {
+            app.config.globalProperties.$eventBus.$emit("employmentJob");
+            app.config.globalProperties.$eventBus.$emit("employmentJob2");
+          } else if (
+            data &&
+            data.basic_steps == "C" &&
+            data.qualifications_steps == "C" &&
+            data.employment_steps == "C"
+          ) {
+            //console.log('OK')
+            app.config.globalProperties.$eventBus.$emit("checkJob");
+            app.config.globalProperties.$eventBus.$emit("checkJob2");
+          } else if (data == null) {
+            app.config.globalProperties.$eventBus.$emit(
+              "changeHeaderPath",
+              "/",
+            );
+          }
+
+          if (data.slug) {
+            this.path = `/${data.slug}`;
+            app.config.globalProperties.$eventBus.$emit(
+              "changeHeaderPath",
+              `/${data.slug}`,
+            );
+          } else {
+            this.path = "/";
+            app.config.globalProperties.$eventBus.$emit(
+              "changeHeaderPath",
+              "/",
+            );
+          }
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+
+          // app.config.globalProperties.$eventBus.$emit('getTrendingCardData2');
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
+    applyJob2() {
+      this.isApply = true;
+    },
+    applyJobFalse2() {
+      this.isApply = false;
+    },
+    employmentJob2() {
+      this.isEmployment = true;
+    },
+    employmentJobFalse2() {
+      this.isEmployment = false;
+    },
+    checkJob2() {
+      this.isCheck = true;
+    },
+    checkJobFalse2() {
+      this.isCheck = false;
+    },
+    changeHeaderPath(path) {
+      //console.log(image)
+      this.path = path;
+    },
+    getTokenStart(tokenParam) {
+      this.tokenStart = tokenParam;
+      setAuthHeader(tokenParam);
+    },
+    getTrendingCardData2() {
+      this.tokenStart = null;
+    },
+    changeHeaderImage(image) {
+      //console.log(image)
+      this.userImage = this.$fileURL + image;
+    },
+    logout() {
+      const token = localStorage.getItem("token");
+      axios
+        .get(`/gypsy-logout`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          const data = response.data.data;
+          console.log(data);
+          localStorage.setItem("name", null);
+          localStorage.setItem("userName", null);
+          localStorage.setItem("g_id", null);
+          localStorage.setItem("user_image", null);
+          localStorage.setItem("token", null);
+          app.config.globalProperties.$eventBus.$emit("getUserName");
+          this.path = "/";
+          window.location.href = "/";
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        });
+    },
+    getHeaderUserData() {
+      this.isLoading = true;
+      //console.log(this.tokenProvider);
+      const token = localStorage.getItem("token");
+      axios
+        .get(`/gypsy-user`, {
+          headers: {
+            Authorization: `Bearer ${
+              this.tokenProvider ? this.tokenProvider : token
+            }`,
+          },
+        })
+        .then((response) => {
+          const data = response.data.data;
+          //console.log(data);
+
+          this.userName = data.name;
+          localStorage.setItem("userName", data.name);
+          this.userDated = data.last_login;
+          this.userImage =
+            data.image != null ? this.$fileURL + data.image : null;
+          app.config.globalProperties.$eventBus.$emit("getUserName");
+          // this.userImage = null;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error.response.status == 401);
+          if (error.response.status == 401) {
+            localStorage.setItem("name", null);
+            localStorage.setItem("userName", null);
+            localStorage.setItem("g_id", null);
+            localStorage.setItem("user_image", null);
+            localStorage.setItem("token", null);
+            app.config.globalProperties.$eventBus.$emit("getUserName");
+          }
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
+    getHeaderUserData2() {
+      this.isLoading = true;
+      const token = localStorage.getItem("token");
+      axios
+        .get(`/gypsy-user`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          const data = response.data.data;
+          //console.log(data);
+
+          this.userName = data.name;
+          this.userDated = data.last_login;
+          this.userImage =
+            data.image != null ? this.$fileURL + data.image : null;
+          // this.userImage = null;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
+    changeHeaderWelcome2() {
+      this.userName = localStorage.getItem("name");
+      this.userDated = localStorage.getItem("last_login");
+      this.userImage = this.$fileURL + localStorage.getItem("user_image");
+      console.log(this.userName);
+      console.log(this.userDated);
+      console.log(this.userImage);
+      this.getHeaderUserData();
+      // this.titleWelcome = title;
+    },
+    changeHeaderWelcome3() {
+      this.getHeaderUserData2();
+      // this.titleWelcome = title;
+    },
+    getAppContact() {
+      // this.isLoading = true;
+      axios
+        .get(`/app/contact/${this.$appId}`)
+        .then((response) => {
+          const data = response.data.data;
+          // console.log(data);
+          this.footerData = {
+            company_name: data.company_name || "",
+            location: data.location || "",
+            mobile_number: data.mobile_number || "",
+            whats_app: data.whats_app || "",
+            email_id: data.email_id || "",
+            copyright: data.copyright || "",
+            facebook: data.facebook || "",
+            twitter: data.twitter || "",
+            instagram: data.instagram || "",
+            youtube: data.youtube || "",
+          };
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        });
+      // .finally(() => {
+      //   this.isLoading = false;
+      // });
+    },
+    updateTime() {
+      // Ambil zona waktu Singapore
+      const singaporeTime = moment().tz("Asia/Singapore");
+      // Format waktu dalam hh:mm:ss
+      this.currentTime = singaporeTime.format("HH:mm:ss");
+    },
+    loginGypsy() {
+      this.$router.push("/sign-in");
+      //const externalURL = `https://www.the-gypsy.sg/sign-in?app_id=${this.$appId}`;
+      //window.location.href = externalURL;
+      //axios
+      //  .post(`/gypsy-login/google`, {
+      //    app_id: 5,
+      //  })
+      //  .then((response) => {
+      //    console.log(response);
+      //    //if (response) {
+      //    //  window.location.assign(response.data.target_url);
+      //    //} else {
+      //    //  window.location.href = "/sign-in";
+      //    //}
+      //    //console.log(response.data.target_url);
+      //  })
+      //  .catch((error) => {
+      //    console.log(error);
+      //    //window.location.href = "/sign-in";
+      //  });
+    },
+    getRegistrableData() {
+      this.getRegistrableCountry();
+      this.getRegistrableSkills();
+    },
+    getRegistrableCountry() {
+      this.isLoading = true;
+      axios
+        .get(`/registrable-country/country-skills`)
+        .then((response) => {
+          const data = response.data.data;
+          //console.log(data);
+          this.countryRegistrable = data.map((country) => {
+            return {
+              id: country.country_id,
+              title: country.country_name,
+              path: "#",
+            };
+          });
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
+    getRegistrableSkills() {
+      this.isLoading = true;
+      axios
+        .get(`/registrable-country/skills`)
+        .then((response) => {
+          const data = response.data.data;
+          //console.log(data);
+          this.skillRegistrable = data.map((skills) => {
+            return {
+              id: skills.skills_id,
+              title: skills.skills_name,
+              path: "#",
+            };
+          });
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
+    getActiveSkills() {
+      this.isLoading = true;
+      axios
+        .get(`/skills/active/app/${this.$appId}`)
+        .then((response) => {
+          const data = response.data.data;
+          // console.log(data);
+          this.searchItems = data.map((item) => {
+            return {
+              id: item.skills_id || 1,
+              name: item.skills_name || "",
+              image: this.$fileURL + item.image || "",
+              slug: item.slug || "",
+            };
+          });
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
+    getSkillBySlug() {
+      //console.log('ok')
+      this.isDetail = true;
+      const slug = this.$route.params.name;
+      this.isLoading = true;
+      axios
+        .get(`/skills/slug/${slug}`)
+        .then((response) => {
+          const data = response.data.data;
+          // console.log(data);
+          this.skillSlug = {
+            ...data,
+            name: `${data.skills_name} Jobs ` || "",
+          };
+          // console.log(this.skillSlug);
+          this.getCountrySkill();
+          this.getCitySkill();
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
+    getHeaderDetail(countryId) {
+      axios
+        .get(`/job-positions/${this.skillSlug.skills_id}/${countryId}`)
+        .then((response) => {
+          const data = response.data.data;
+          // console.log(data);
+          this.trendingBtn = data.map((group) => {
+            return {
+              id: group.position_id,
+              title: group.position_name,
+              tag: group.position_name,
+            };
+          });
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        });
+    },
+    getCountrySkill() {
+      this.isLoading = true;
+      axios
+        .get(`/jobs/get-countries/skills/${this.skillSlug.skills_id}`)
+        .then((response) => {
+          const data = response.data.data;
+          this.country = data.map((country) => {
+            return {
+              id: country.country_id,
+              title: country.country_name,
+              count: country.count,
+              oneCity: country.one_city == "Y" ? true : false,
+              path: "#",
+            };
+          });
+          //if (isSingapore.length > 0) {
+          //  this.setItemSelectedComplete(this.country[0]);
+          //  this.setItemSelected(this.country[0].title);
+          //} else {
+          //  this.setItemSelectedComplete(this.country[0]);
+          //  this.setItemSelected(this.country[0].title);
+          //}
+          this.getHeaderDetail(this.country[0].id);
+          this.setItemSelectedComplete(this.country[0]);
+          this.setItemSelected(this.country[0].title);
+          localStorage.setItem(
+            "itemSelectedObj",
+            JSON.stringify(this.country[0]),
+          );
+          localStorage.setItem("itemSelectedTit", this.country[0].title);
+          app.config.globalProperties.$eventBus.$emit("getSkillBySlugFirst");
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
+    getCitySkill() {
+      this.isLoading = true;
+      axios
+        .get(
+          `/jobs/get-country-cities/country/${
+            this.itemSelectedComplete?.id || this.countryId
+          }/skills/${this.skillSlug.skills_id}`,
+        )
+        .then((response) => {
+          const data = response.data.data;
+          //console.log(data);
+          this.city = data.map((city) => {
+            return {
+              id: city.city_id,
+              title: city.city_name,
+              count: city.count,
+              countryId: city.country_id,
+              path: "#",
+            };
+          });
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
+    capitalizeFirstLetter(sentence) {
+      const words = sentence.split(" ");
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        words[i] = word.charAt(0).toUpperCase() + word.slice(1);
+      }
+      const capitalizedSentence = words.join(" ");
+      return capitalizedSentence;
+    },
+    removeDetail() {
+      this.isDetail = false;
+    },
+    changeItemSelected(item) {
+      this.setItemSelected(item.title);
+      this.setItemSelectedComplete(item);
+      this.setItemSelected2("---Select City---");
+      this.setItemSelected2Complete(null);
+      this.getCitySkill();
+      //console.log(this.itemSelectedComplete);
+      app.config.globalProperties.$eventBus.$emit("getJobDetailSpecific1");
+    },
+    changeItemSelected2(item) {
+      this.setItemSelected2(item.title);
+      this.setItemSelected2Complete(item);
+      app.config.globalProperties.$eventBus.$emit("getJobDetailSpecific2");
+    },
+    changeCountryRecognised(item) {
+      this.setCountryRecognised(item.title);
+      this.setIdCountryRecognised(item.id);
+      app.config.globalProperties.$eventBus.$emit("getRegulatorInfo");
+      app.config.globalProperties.$eventBus.$emit("getQualificationInfo");
+      app.config.globalProperties.$eventBus.$emit("getCountry");
+    },
+    changeSkillRecognised(item) {
+      this.setSkillRecognised(item.title);
+      this.setIdSkillRecognised(item.id);
+      app.config.globalProperties.$eventBus.$emit("getRegulatorInfo");
+      app.config.globalProperties.$eventBus.$emit("getQualificationInfo");
+      app.config.globalProperties.$eventBus.$emit("getCountry");
+    },
+    ...mapMutations([
+      "setActiveTag",
+      "setItemSelected",
+      "setItemSelectedComplete",
+      "setItemSelected2",
+      "setItemSelected2Complete",
+      "setCountryRecognised",
+      "setSkillRecognised",
+      "setIdCountryRecognised",
+      "setIdSkillRecognised",
+    ]),
+    selectTag(tag) {
+      this.setActiveTag(tag); // Menetapkan tag yang dipilih sebagai tag aktif
+      // console.log('ok');
+
+      if (this.isSpecific) {
+        app.config.globalProperties.$eventBus.$emit("filterSpecificJobs", tag);
+      } else {
+        app.config.globalProperties.$eventBus.$emit("scrollToCardSection");
+      }
+    },
+    getTrendingCardData() {
+      // this.isLoading = true;
+      axios
+        .get(`/skillgroups/${this.$appId}`)
+        .then((response) => {
+          const data = response.data.data;
+          // console.log(data);
+          this.trendingCard = data.map((item) => {
+            return {
+              id: item.sgm_id || 1,
+              img: item.image || "",
+              title: item.group_name || "",
+              tag: item.group_name || "",
+              desc: item.description || "",
+            };
+          });
+          this.trendingBtn = data.map((item) => {
+            return {
+              id: item.sgm_id || 1,
+              title: item.group_name || "",
+              tag: item.group_name || "",
+            };
+          });
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        });
+      // .finally(() => {
+      //   this.isLoading = false;
+      // });
+    },
+    getLogo() {
+      axios
+        .get(`/app/logo/${this.$appId}`)
+        .then((response) => {
+          const data = response.data.data;
+          // console.log(data);
+          this.logo = data;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        });
+    },
+    getCountry() {
+      this.isLoading = true;
+      axios
+        .get(`/country`)
+        .then((response) => {
+          const data = response.data.data;
+          // console.log(data);
+          //this.country = data.map((country) => {
+          //  return {
+          //    id: country.country_id,
+          //    title: country.country_name,
+          //    oneCity: country.one_city == 'Y' ? true : false,
+          //    path: '#',
+          //  };
+          //});
+          this.countryId = data
+            .filter((d) => d.country_name == this.itemSelected)
+            .map((country) => country.country_id)[0];
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
+    getCity() {
+      this.isLoading = true;
+      axios
+        .get(`/cities/country/${this.itemSelectedComplete?.id}`)
+        .then((response) => {
+          const data = response.data.data;
+          // console.log(data);
+
+          this.cityId = data
+            .filter((d) => d.city_name == this.itemSelected2)
+            .map((city) => city.city_id)[0];
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        })
+        .finally(() => {
+          this.isLoading = false;
+        });
+    },
+    // emitFilterEvent(tag) {
+    //   this.$emit("filter-card", tag);
+    // },
+    // filterCards(tag) {
+    //   this.selectedTag = tag;
+    //   app.config.globalProperties.$eventBus.$emit("filter-card-header", tag);
+    //   // eventBus.emit("filter-card-header", tag);
+    // },
+    countCards(tag) {
+      const count = this.trendingCard.filter(
+        (trend) => trend.tag === tag,
+      ).length;
+      return count;
+    },
+    handleResize() {
+      this.screenWidth = window.innerWidth;
+    },
+    previousSlide() {
+      this.activeIndex--;
+    },
+    nextSlide() {
+      this.activeIndex++;
+    },
+    preventSubmit(event) {
+      event.preventDefault();
+    },
+    selectLocation(country, city) {
+      this.selectedLocation = { country: country.country, city: city.name };
+    },
+    gotoMallDetail(item) {
+      this.dialog2 = false;
+      this.$router.push(`/mall-id/${item?.id}`);
+      localStorage.setItem("mallDetailData", JSON.stringify(item));
+    },
+    gotoMerchantDetail(item) {
+      this.dialog2 = false;
+      this.$router.push(`/merchant-id/${item?.merchant_id}`);
+      localStorage.setItem("merchantDetailData", JSON.stringify(item));
+    },
+    async getProductCategoryListData() {
+      this.isLoading = true;
+      try {
+        const response = await axios.get(
+          `/categories-with-products/app/${appId}`,
+        );
+        const data = response.data.data;
+        this.activeMalls = data
+          .sort((a, b) => a.category_id - b.category_id)
+          .flatMap((category) =>
+            category.brands.flatMap((brand) =>
+              brand.products.map((product) => ({
+                ...product,
+                brand_id: brand.brand_id,
+                brand_name: brand.brand_name,
+                category_id: category.category_id,
+                country_id: brand.country_id,
+              })),
+            ),
+          );
+      } catch (error) {
+        console.error("Error fetching product categories:", error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    handleTrendingChange(item) {
+      console.log("Selected filter:", item);
+    },
+  },
+  components: { ExploreOurMenuList },
+};
+</script>
+
+<script setup>
+// import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from "vue";
+// import { useStore } from "vuex";
+// import { useRouter, useRoute } from "vue-router";
+// import axios from "@/util/axios";
+// import moment from "moment-timezone";
+// import app from "@/util/eventBus";
+// import { appId } from "@/main";
 
 // Import images
 import boozardsLogo from "@/assets/images/logo/boozards-logo.png";
@@ -32,205 +1094,205 @@ const images = {
   whatsapp: whatsappIcon,
 };
 
-// Props
-const props = defineProps({
-  titleHeader: String,
-  isHeader: Boolean,
-  isDesktop: Boolean,
-  isProfile: Boolean,
-  isSignin: Boolean,
-  isBatamProperties: Boolean,
-});
+// // Props
+// const props = defineProps({
+//   titleHeader: String,
+//   isHeader: Boolean,
+//   isDesktop: Boolean,
+//   isProfile: Boolean,
+//   isSignin: Boolean,
+//   isBatamProperties: Boolean,
+// });
 
-// Store, router setup
-const store = useStore();
-const router = useRouter();
-const route = useRoute();
+// // Store, router setup
+// const store = useStore();
+// const router = useRouter();
+// const route = useRoute();
 
-// Essential reactive data
-const drawer = ref(false);
-const dialog2 = ref(false);
-const search = ref(null);
-const userImage = ref(null);
-const userName = ref(null);
-const userDated = ref(null);
-const currentTime = ref("");
-const screenWidth = ref(window.innerWidth);
-const activeMalls = ref([]);
-const isLoading = ref(false);
+// // Essential reactive data
+// const drawer = ref(false);
+// const dialog2 = ref(false);
+// const search = ref(null);
+// const userImage = ref(null);
+// const userName = ref(null);
+// const userDated = ref(null);
+// const currentTime = ref("");
+// const screenWidth = ref(window.innerWidth);
+// const activeMalls = ref([]);
+// const isLoading = ref(false);
 
-// Location data
-const selectedLocation = ref({
-  country: "Singapore",
-  city: "Singapore City",
-});
+// // Location data
+// const selectedLocation = ref({
+//   country: "Singapore",
+//   city: "Singapore City",
+// });
 
-const locationDropdown = ref([
-  {
-    country: "Singapore",
-    flagUrl: "https://flagcdn.com/w40/sg.png",
-    properties: 1,
-    cities: [
-      {
-        name: "Singapore City",
-        imageUrl: "https://example.com/singapore-city.jpg",
-      },
-    ],
-  },
-  {
-    country: "Indonesia",
-    flagUrl: "https://flagcdn.com/w40/id.png",
-    properties: 1,
-    cities: [
-      {
-        name: "Batam",
-        imageUrl: "https://example.com/batam.jpg",
-      },
-    ],
-  },
-  {
-    country: "India",
-    flagUrl: "https://flagcdn.com/w40/in.png",
-    properties: 3,
-    cities: [
-      {
-        name: "Mumbai",
-        imageUrl: "https://example.com/mumbai.jpg",
-      },
-      {
-        name: "Goa - Margao",
-        imageUrl: "https://example.com/goa-margao.jpg",
-      },
-      {
-        name: "Goa - Panjim",
-        imageUrl: "https://example.com/goa-panjim.jpg",
-      },
-    ],
-  },
-]);
+// const locationDropdown = ref([
+//   {
+//     country: "Singapore",
+//     flagUrl: "https://flagcdn.com/w40/sg.png",
+//     properties: 1,
+//     cities: [
+//       {
+//         name: "Singapore City",
+//         imageUrl: "https://example.com/singapore-city.jpg",
+//       },
+//     ],
+//   },
+//   {
+//     country: "Indonesia",
+//     flagUrl: "https://flagcdn.com/w40/id.png",
+//     properties: 1,
+//     cities: [
+//       {
+//         name: "Batam",
+//         imageUrl: "https://example.com/batam.jpg",
+//       },
+//     ],
+//   },
+//   {
+//     country: "India",
+//     flagUrl: "https://flagcdn.com/w40/in.png",
+//     properties: 3,
+//     cities: [
+//       {
+//         name: "Mumbai",
+//         imageUrl: "https://example.com/mumbai.jpg",
+//       },
+//       {
+//         name: "Goa - Margao",
+//         imageUrl: "https://example.com/goa-margao.jpg",
+//       },
+//       {
+//         name: "Goa - Panjim",
+//         imageUrl: "https://example.com/goa-panjim.jpg",
+//       },
+//     ],
+//   },
+// ]);
 
-// Computed properties
-const isSmall = computed(() => {
-  return screenWidth.value < 640;
-});
+// // Computed properties
+// const isSmall = computed(() => {
+//   return screenWidth.value < 640;
+// });
 
-const filteredMalls = computed(() => {
-  if (!search.value) return activeMalls.value;
-  const searchTextLower = search.value.toLowerCase();
-  return activeMalls.value.filter((item) =>
-    item.brand_name.toLowerCase().includes(searchTextLower),
-  );
-});
+// const filteredMalls = computed(() => {
+//   if (!search.value) return activeMalls.value;
+//   const searchTextLower = search.value.toLowerCase();
+//   return activeMalls.value.filter((item) =>
+//     item.brand_name.toLowerCase().includes(searchTextLower),
+//   );
+// });
 
-// Methods
-const selectLocation = (country, city) => {
-  selectedLocation.value = {
-    country: country.country,
-    city: city.name,
-  };
-};
+// // Methods
+// const selectLocation = (country, city) => {
+//   selectedLocation.value = {
+//     country: country.country,
+//     city: city.name,
+//   };
+// };
 
-const handleResize = () => {
-  screenWidth.value = window.innerWidth;
-};
+// const handleResize = () => {
+//   screenWidth.value = window.innerWidth;
+// };
 
-const updateTime = () => {
-  const singaporeTime = moment().tz("Asia/Singapore");
-  currentTime.value = singaporeTime.format("HH:mm:ss");
-};
+// const updateTime = () => {
+//   const singaporeTime = moment().tz("Asia/Singapore");
+//   currentTime.value = singaporeTime.format("HH:mm:ss");
+// };
 
-const logout = () => {
-  const token = localStorage.getItem("token");
-  axios
-    .get(`/gypsy-logout`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then(() => {
-      localStorage.removeItem("name");
-      localStorage.removeItem("userName");
-      localStorage.removeItem("g_id");
-      localStorage.removeItem("user_image");
-      localStorage.removeItem("token");
-      window.location.href = "/";
-    })
-    .catch(console.error);
-};
+// const logout = () => {
+//   const token = localStorage.getItem("token");
+//   axios
+//     .get(`/gypsy-logout`, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     })
+//     .then(() => {
+//       localStorage.removeItem("name");
+//       localStorage.removeItem("userName");
+//       localStorage.removeItem("g_id");
+//       localStorage.removeItem("user_image");
+//       localStorage.removeItem("token");
+//       window.location.href = "/";
+//     })
+//     .catch(console.error);
+// };
 
-const gotoMallDetail = (item) => {
-  dialog2.value = false;
-  router.push(`/mall-id/${item?.id}`);
-  localStorage.setItem("mallDetailData", JSON.stringify(item));
-};
+// const gotoMallDetail = (item) => {
+//   dialog2.value = false;
+//   router.push(`/mall-id/${item?.id}`);
+//   localStorage.setItem("mallDetailData", JSON.stringify(item));
+// };
 
-const gotoMerchantDetail = (item) => {
-  dialog2.value = false;
-  router.push(`/merchant-id/${item?.merchant_id}`);
-  localStorage.setItem("merchantDetailData", JSON.stringify(item));
-};
+// const gotoMerchantDetail = (item) => {
+//   dialog2.value = false;
+//   router.push(`/merchant-id/${item?.merchant_id}`);
+//   localStorage.setItem("merchantDetailData", JSON.stringify(item));
+// };
 
-const getProductCategoryListData = async () => {
-  isLoading.value = true;
-  try {
-    const response = await axios.get(`/categories-with-products/app/${appId}`);
-    const data = response.data.data;
+// const getProductCategoryListData = async () => {
+//   isLoading.value = true;
+//   try {
+//     const response = await axios.get(`/categories-with-products/app/${appId}`);
+//     const data = response.data.data;
 
-    const initialData = data
-      .sort((a, b) => a.category_id - b.category_id)
-      .map((category) => ({
-        category_id: category.category_id,
-        category_name: category.category_name,
-        countries: category.countries,
-        products: category.brands.flatMap((brand) =>
-          brand.products.map((product) => ({
-            ...product,
-            brand_id: brand.brand_id,
-            brand_name: brand.brand_name,
-            category_id: category.category_id,
-            country_id: brand.country_id,
-            //isCount: false,
-            //count: 1,
-          })),
-        ),
-      }));
+//     const initialData = data
+//       .sort((a, b) => a.category_id - b.category_id)
+//       .map((category) => ({
+//         category_id: category.category_id,
+//         category_name: category.category_name,
+//         countries: category.countries,
+//         products: category.brands.flatMap((brand) =>
+//           brand.products.map((product) => ({
+//             ...product,
+//             brand_id: brand.brand_id,
+//             brand_name: brand.brand_name,
+//             category_id: category.category_id,
+//             country_id: brand.country_id,
+//             //isCount: false,
+//             //count: 1,
+//           })),
+//         ),
+//       }));
 
-    activeMalls.value = initialData.flatMap((category) => category.products);
+//     activeMalls.value = initialData.flatMap((category) => category.products);
 
-    console.log("Transformed Data:", activeMalls.value);
-  } catch (error) {
-    console.error("Error fetching product categories:", error);
-  } finally {
-    isLoading.value = false;
-  }
-};
+//     console.log("Transformed Data:", activeMalls.value);
+//   } catch (error) {
+//     console.error("Error fetching product categories:", error);
+//   } finally {
+//     isLoading.value = false;
+//   }
+// };
 
-// Lifecycle hooks
-onMounted(() => {
-  handleResize();
-  // Set initial screen width
-  // screenWidth.value = window.innerWidth;
+// // Lifecycle hooks
+// onMounted(() => {
+//   handleResize();
+//   // Set initial screen width
+//   // screenWidth.value = window.innerWidth;
 
-  // Add resize listener
-  window.addEventListener("resize", handleResize);
-  setInterval(updateTime, 1000);
+//   // Add resize listener
+//   window.addEventListener("resize", handleResize);
+//   setInterval(updateTime, 1000);
 
-  // Set default location
-  const defaultCountry = locationDropdown.value[0];
-  const defaultCity = defaultCountry.cities[0];
-  selectLocation(defaultCountry, defaultCity);
-  getProductCategoryListData();
-});
+//   // Set default location
+//   const defaultCountry = locationDropdown.value[0];
+//   const defaultCity = defaultCountry.cities[0];
+//   selectLocation(defaultCountry, defaultCity);
+//   getProductCategoryListData();
+// });
 
-onUnmounted(() => {
-  window.removeEventListener("resize", handleResize);
-});
-const filterList = ref(["View All", "Europe", "Asia"]);
+// onUnmounted(() => {
+//   window.removeEventListener("resize", handleResize);
+// });
+// const filterList = ref(["View All", "Europe", "Asia"]);
 
-const handleTrendingChange = (item) => {
-  console.log("Selected filter:", item);
-  // Add your filter logic here
-};
+// const handleTrendingChange = (item) => {
+//   console.log("Selected filter:", item);
+//   // Add your filter logic here
+// };
 </script>
 
 <template>
@@ -259,7 +1321,7 @@ const handleTrendingChange = (item) => {
       </div>
     </router-link>
 
-    <v-menu>
+    <v-menu v-if="!isSignin">
       <template #activator="{ props }">
         <v-btn
           class="ml-4 location-selector"
@@ -328,7 +1390,7 @@ const handleTrendingChange = (item) => {
 
     <div
       v-if="isHeader || isProfile"
-      class="ml-6 d-flex flex-column navbar-header"
+      class="ml-6 d-flex navbar-header"
       :class="{ 'navbar-header-mobile': !isDesktop && isProfile }"
     >
       <div class="divider" :class="{ 'd-none': !isDesktop && isProfile }" />
@@ -455,7 +1517,11 @@ const handleTrendingChange = (item) => {
       v-if="!isHeader && !isProfile && !userName && !isSmall"
       class="btn_sign__up-cont"
     >
-      <v-btn elevation="0" class="btn_sign__up" to="">
+      <v-btn
+        elevation="0"
+        class="btn_sign__up"
+        @click="router.push('/sign-in')"
+      >
         <span> Sign Up / Sign In</span>
       </v-btn>
       <div class="btn_sign__up-hover" />
@@ -471,7 +1537,7 @@ const handleTrendingChange = (item) => {
       Logout
     </v-btn>
     <div>
-      <div v-if="!isSmall" class="cart d-flex align-center">
+      <div v-if="!isSmall && !isSignin" class="cart d-flex align-center">
         <div class="cart-line mr-2" />
         <v-icon size="35" color="black"> mdi mdi-cart-variant </v-icon>
         <span>$ 0</span>
@@ -580,7 +1646,11 @@ const handleTrendingChange = (item) => {
           v-if="!isHeader && !isProfile && !userName && isSmall"
           class="btn_sign__up-cont mx-auto my-4"
         >
-          <v-btn elevation="0" class="btn_sign__up d-flex align-center" to="">
+          <v-btn
+            elevation="0"
+            class="btn_sign__up d-flex align-center"
+            @click="router.push('/sign-in')"
+          >
             <span> Sign Up / Sign In</span>
           </v-btn>
           <div class="btn_sign__up-hover" />
@@ -749,7 +1819,11 @@ const handleTrendingChange = (item) => {
       class="drawer__top"
       :class="{ 'py-6': userName == null, 'py-2': userName != null }"
     >
-      <router-link v-if="userName == null" class="text-decoration-none" to="">
+      <router-link
+        v-if="userName == null"
+        class="text-decoration-none"
+        to="/sign-in"
+      >
         <span style="font-size: 1.125rem; color: white">Sign up / Sign In</span>
       </router-link>
       <div v-else class="d-flex align-center">
