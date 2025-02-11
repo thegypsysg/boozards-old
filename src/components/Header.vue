@@ -1041,6 +1041,8 @@ export default {
                 ...product,
                 brand_id: brand.brand_id,
                 brand_name: brand.brand_name,
+                product_name: product.product_name,
+                product_id: product.product_id,
                 category_id: category.category_id,
                 country_id: brand.country_id,
               })),
@@ -1051,6 +1053,14 @@ export default {
       } finally {
         this.isLoading = false;
       }
+    },
+    filterMalls(value, query, item) {
+      if (!query) return true;
+      const text = query.toLowerCase();
+      return (
+        item.raw.brand_name.toLowerCase().includes(text) ||
+        item.raw.product_name.toLowerCase().includes(text)
+      );
     },
     handleTrendingChange(item) {
       console.log("Selected filter:", item);
@@ -1408,8 +1418,9 @@ const images = {
         v-model="search"
         class="form-control mr-sm-2 ml-md-n3 search-input"
         item-title="brand_name"
-        item-value="brand_name"
+        item-value="product_id"
         :items="activeMalls"
+        :custom-filter="filterMalls"
         style="font-style: italic"
         placeholder="Type your brands... Chivas,Monkey,Roku,"
         density="compact"
@@ -1671,8 +1682,9 @@ const images = {
             v-model="search"
             class="form-control mr-sm-2 ml-md-n3 search-input"
             item-title="brand_name"
-            item-value="brand_name"
+            item-value="product_id"
             :items="activeMalls"
+            :custom-filter="filterMalls"
             style="font-style: italic"
             placeholder="Type your brands... Chivas,Monkey,Roku,"
             density="compact"
