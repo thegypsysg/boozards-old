@@ -165,18 +165,18 @@ export default {
     isTerms() {
       return this.$route.path == "/our-terms";
     },
-    isProfile() {
-      return (
-        this.$route.path == "/my-profile" ||
-        this.$route.path == "/resume-profile"
-      );
-    },
+    // isProfile() {
+    //   return (
+    //     this.$route.path == "/my-profile" ||
+    //     this.$route.path == "/resume-profile"
+    //   );
+    // },
     isMyProfile() {
       return this.$route.path == "/my-profile";
     },
-    isSignIn() {
-      return this.$route.path == "/social-sign-up";
-    },
+    // isSignIn() {
+    //   return this.$route.path == "/social-sign-up";
+    // },
     isResumeProfile() {
       return this.$route.path == "/resume-profile";
     },
@@ -196,18 +196,18 @@ export default {
       return this.$route.path.includes("detail");
     },
     ...mapState(["activeTag"]),
-    titleHeader() {
-      let path = this.$route.path;
-      let name = this.$route.path.split("/")[1];
-      let name2 = this.$route.params.name.split("-").join(" ");
-      let title = "";
-      if (path.includes("detail")) {
-        title = this.capitalizeFirstLetter(name2);
-      } else {
-        title = this.capitalizeFirstLetter(name);
-      }
-      return title;
-    },
+    // titleHeader() {
+    //   let path = this.$route.path;
+    //   let name = this.$route.path.split("/")[1];
+    //   let name2 = this.$route.params.name.split("-").join(" ");
+    //   let title = "";
+    //   if (path.includes("detail")) {
+    //     title = this.capitalizeFirstLetter(name2);
+    //   } else {
+    //     title = this.capitalizeFirstLetter(name);
+    //   }
+    //   return title;
+    // },
     filteredMalls() {
       if (!this.search) return this.activeMalls;
       return this.activeMalls.filter((item) =>
@@ -1026,6 +1026,34 @@ export default {
       this.$router.push(`/merchant-id/${item?.merchant_id}`);
       localStorage.setItem("merchantDetailData", JSON.stringify(item));
     },
+    // async getProductCategoryListData() {
+    //   this.isLoading = true;
+    //   try {
+    //     const response = await axios.get(
+    //       `/categories-with-products/app/${appId}`,
+    //     );
+    //     const data = response.data.data;
+    //     this.activeMalls = data
+    //       .sort((a, b) => a.category_id - b.category_id)
+    //       .flatMap((category) =>
+    //         category.brands.flatMap((brand) =>
+    //           brand.products.map((product) => ({
+    //             ...product,
+    //             brand_id: brand.brand_id,
+    //             brand_name: brand.brand_name,
+    //             product_name: product.product_name,
+    //             product_id: product.product_id,
+    //             category_id: category.category_id,
+    //             country_id: brand.country_id,
+    //           })),
+    //         ),
+    //       );
+    //   } catch (error) {
+    //     console.error("Error fetching product categories:", error);
+    //   } finally {
+    //     this.isLoading = false;
+    //   }
+    // },
     async getProductCategoryListData() {
       this.isLoading = true;
       try {
@@ -1033,21 +1061,42 @@ export default {
           `/categories-with-products/app/${appId}`,
         );
         const data = response.data.data;
-        this.activeMalls = data
-          .sort((a, b) => a.category_id - b.category_id)
-          .flatMap((category) =>
-            category.brands.flatMap((brand) =>
-              brand.products.map((product) => ({
-                ...product,
-                brand_id: brand.brand_id,
-                brand_name: brand.brand_name,
-                product_name: product.product_name,
-                product_id: product.product_id,
-                category_id: category.category_id,
-                country_id: brand.country_id,
-              })),
-            ),
-          );
+
+        // Flatten data dan kelompokkan berdasarkan brand_id
+        const groupedBrands = {};
+        const processedMalls = [];
+
+        data.forEach((category) => {
+          category.brands.forEach((brand) => {
+            brand.products.forEach((product, index) => {
+              const key = brand.brand_id;
+              if (!groupedBrands[key]) {
+                groupedBrands[key] = true; // Tandai bahwa brand ini sudah muncul
+                processedMalls.push({
+                  ...product,
+                  brand_id: brand.brand_id,
+                  brand_name: brand.brand_name,
+                  product_id: product.product_id,
+                  category_id: category.category_id,
+                  country_id: brand.country_id,
+                  showBrandName: true, // Hanya produk pertama dalam brand yang menampilkan nama brand
+                });
+              } else {
+                processedMalls.push({
+                  ...product,
+                  brand_id: brand.brand_id,
+                  brand_name: brand.brand_name,
+                  product_id: product.product_id,
+                  category_id: category.category_id,
+                  country_id: brand.country_id,
+                  showBrandName: false, // Produk lainnya tidak menampilkan nama brand
+                });
+              }
+            });
+          });
+        });
+
+        this.activeMalls = processedMalls;
       } catch (error) {
         console.error("Error fetching product categories:", error);
       } finally {
@@ -1417,7 +1466,7 @@ const images = {
         id="product_name"
         v-model="search"
         class="form-control mr-sm-2 ml-md-n3 search-input"
-        item-title="brand_name"
+        item-title="product_name"
         item-value="product_id"
         :items="activeMalls"
         :custom-filter="filterMalls"
@@ -1437,6 +1486,7 @@ const images = {
               to="#"
             >
               <p
+                v-if="item.raw.showBrandName"
                 style="font-size: 12px"
                 class="font-weight-bold text-red-darken-4 mb-2"
               >
@@ -1531,7 +1581,7 @@ const images = {
       <v-btn
         elevation="0"
         class="btn_sign__up"
-        @click="router.push('/sign-in')"
+        @click="$router.push('/sign-in')"
       >
         <span> Sign Up / Sign In</span>
       </v-btn>
@@ -1660,7 +1710,7 @@ const images = {
           <v-btn
             elevation="0"
             class="btn_sign__up d-flex align-center"
-            @click="router.push('/sign-in')"
+            @click="$router.push('/sign-in')"
           >
             <span> Sign Up / Sign In</span>
           </v-btn>
@@ -1681,7 +1731,7 @@ const images = {
             id="product_name"
             v-model="search"
             class="form-control mr-sm-2 ml-md-n3 search-input"
-            item-title="brand_name"
+            item-title="product_name"
             item-value="product_id"
             :items="activeMalls"
             :custom-filter="filterMalls"
@@ -1701,6 +1751,7 @@ const images = {
                   to="#"
                 >
                   <p
+                    v-if="item.raw.showBrandName"
                     style="font-size: 12px"
                     class="font-weight-bold text-red-darken-4 mb-2"
                   >
