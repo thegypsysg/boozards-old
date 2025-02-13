@@ -379,6 +379,24 @@ export default {
     window.removeEventListener("resize", this.handleResize);
   },
   methods: {
+    toggleIsCount(product, event) {
+      event.stopPropagation(); // Mencegah memilih item di VAutocomplete
+      if (product) {
+        product.isCount = true;
+      }
+    },
+    decreaseCount(product, event) {
+      event.stopPropagation(); // Mencegah memilih item di VAutocomplete
+      if (product && product.count > 1) {
+        product.count--;
+      }
+    },
+    increaseCount(product, event) {
+      event.stopPropagation(); // Mencegah memilih item di VAutocomplete
+      if (product) {
+        product.count++;
+      }
+    },
     applyJob() {
       this.isLoading = true;
       const token = localStorage.getItem("token");
@@ -1078,8 +1096,11 @@ export default {
                   brand_name: brand.brand_name,
                   product_id: product.product_id,
                   category_id: category.category_id,
+                  slug: product.product_name.toLowerCase().replace(/\s+/g, "-"),
                   country_id: brand.country_id,
                   showBrandName: true, // Hanya produk pertama dalam brand yang menampilkan nama brand
+                  isCount: false,
+                  count: 1,
                 });
               } else {
                 processedMalls.push({
@@ -1088,8 +1109,11 @@ export default {
                   brand_name: brand.brand_name,
                   product_id: product.product_id,
                   category_id: category.category_id,
+                  slug: product.product_name.toLowerCase().replace(/\s+/g, "-"),
                   country_id: brand.country_id,
                   showBrandName: false, // Produk lainnya tidak menampilkan nama brand
+                  isCount: false,
+                  count: 1,
                 });
               }
             });
@@ -1481,63 +1505,107 @@ const images = {
             class="mb-4 px-2"
             v-bind="props"
           >
-            <router-link
-              class="text-decoration-none text-black font-weight-bold"
-              to="#"
+            <p
+              v-if="item.raw.showBrandName"
+              style="font-size: 12px"
+              class="font-weight-bold text-red-darken-4 mb-2"
             >
-              <p
-                v-if="item.raw.showBrandName"
-                style="font-size: 12px"
-                class="font-weight-bold text-red-darken-4 mb-2"
-              >
-                {{ item.raw.brand_name }}
-              </p>
-              <div
-                v-for="range in item.raw.ranges"
-                class="d-flex align-center w-100 mb-2"
-              >
-                <div style="width: 15%" class="mr-2">
-                  <div
-                    style="
-                      height: 45px;
-                      width: 100%;
-                      object-fit: cover;
-                      object-position: center;
+              {{ item.raw.brand_name }}
+            </p>
+            <div
+              v-for="range in item.raw.ranges"
+              class="d-flex align-center w-100 mb-2"
+            >
+              <div style="width: 15%" class="mr-2">
+                <div
+                  style="
+                    height: 45px;
+                    width: 100%;
+                    object-fit: cover;
+                    object-position: center;
+                  "
+                >
+                  <v-img
+                    height="45"
+                    cover
+                    :src="
+                      range.image_1
+                        ? $fileURL + range.image_1
+                        : $fileURL + item.raw.image
                     "
                   >
-                    <v-img
-                      height="45"
-                      cover
-                      :src="
-                        range.image_1
-                          ? $fileURL + range.image_1
-                          : $fileURL + item.raw.image
-                      "
-                    >
-                      <template #placeholder>
-                        <div class="skeleton" />
-                      </template>
-                    </v-img>
-                  </div>
-                </div>
-                <div
-                  class="d-flex align-center justify-space-between"
-                  style="font-size: 12px; width: 85%"
-                >
-                  <div class="">
-                    <p class="mb-1 font-weight-regular">
-                      {{ `${item?.raw?.product_name}` }}
-                    </p>
-                    <p class="font-weight-regular">
-                      <span>{{
-                        `${range?.quantity?.quantity_name} | 40%`
-                      }}</span>
-                    </p>
-                  </div>
-                  <p class="font-weight-bold text-red-darken-4">S$ 67.50</p>
+                    <template #placeholder>
+                      <div class="skeleton" />
+                    </template>
+                  </v-img>
                 </div>
               </div>
-            </router-link>
+              <div
+                class="d-flex align-center justify-space-between"
+                style="font-size: 12px; width: 85%"
+              >
+                <div class="w-100">
+                  <router-link
+                    class="text-decoration-none text-black font-weight-bold"
+                    :to="`/${item.raw.slug}`"
+                  >
+                    <p class="mb-1 font-weight-regular">
+                      {{
+                        `${item?.raw?.product_name} ${range?.quantity?.quantity_name}`
+                      }}
+                    </p>
+
+                    <p class="font-weight-regular">
+                      <span>{{ `40% | Scotland` }}</span>
+                    </p>
+                  </router-link>
+                  <div class="d-flex justify-space-between align-center">
+                    <span class="text-red-darken-1 font-weight-bold">
+                      S$ 59.00
+                    </span>
+                    <v-btn
+                      v-if="item?.raw?.isCount == false"
+                      @click="toggleIsCount(item.raw, $event)"
+                      size="xs"
+                      color="black"
+                      class="text-caption py-1 px-8"
+                      variant="flat"
+                      >Add</v-btn
+                    >
+                    <div
+                      v-if="item?.raw?.isCount == true"
+                      class="d-flex align-center ga-2"
+                    >
+                      <v-btn
+                        size="xs"
+                        color="black"
+                        class="text-caption pa-1 rounded-0"
+                        variant="flat"
+                        icon
+                        @click="decreaseCount(item.raw, $event)"
+                      >
+                        <v-icon>mdi-minus</v-icon>
+                      </v-btn>
+
+                      <span>
+                        {{ item?.raw?.count }}
+                      </span>
+
+                      <v-btn
+                        size="xs"
+                        color="black"
+                        class="text-caption pa-1 rounded-0"
+                        variant="flat"
+                        icon
+                        @click="increaseCount(item.raw, $event)"
+                      >
+                        <v-icon>mdi-plus</v-icon>
+                      </v-btn>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </template>
       </v-autocomplete>
@@ -1746,63 +1814,106 @@ const images = {
                 class="mb-4 px-2"
                 v-bind="props"
               >
-                <router-link
-                  class="text-decoration-none text-black font-weight-bold"
-                  to="#"
+                <p
+                  v-if="item.raw.showBrandName"
+                  style="font-size: 12px"
+                  class="font-weight-bold text-red-darken-4 mb-2"
                 >
-                  <p
-                    v-if="item.raw.showBrandName"
-                    style="font-size: 12px"
-                    class="font-weight-bold text-red-darken-4 mb-2"
-                  >
-                    {{ item.raw.brand_name }}
-                  </p>
-                  <div
-                    v-for="range in item.raw.ranges"
-                    class="d-flex align-center w-100 mb-2"
-                  >
-                    <div style="width: 15%" class="mr-2">
-                      <div
-                        style="
-                          height: 45px;
-                          width: 100%;
-                          object-fit: cover;
-                          object-position: center;
+                  {{ item.raw.brand_name }}
+                </p>
+                <div
+                  v-for="range in item.raw.ranges"
+                  class="d-flex align-center w-100 mb-2"
+                >
+                  <div style="width: 15%" class="mr-2">
+                    <div
+                      style="
+                        height: 45px;
+                        width: 100%;
+                        object-fit: cover;
+                        object-position: center;
+                      "
+                    >
+                      <v-img
+                        height="45"
+                        cover
+                        :src="
+                          range.image_1
+                            ? $fileURL + range.image_1
+                            : $fileURL + item.raw.image
                         "
                       >
-                        <v-img
-                          height="45"
-                          cover
-                          :src="
-                            range.image_1
-                              ? $fileURL + range.image_1
-                              : $fileURL + item.raw.image
-                          "
-                        >
-                          <template #placeholder>
-                            <div class="skeleton" />
-                          </template>
-                        </v-img>
-                      </div>
-                    </div>
-                    <div
-                      class="d-flex align-center justify-space-between"
-                      style="font-size: 12px; width: 85%"
-                    >
-                      <div class="">
-                        <p class="mb-1 font-weight-regular">
-                          {{ `${item?.raw?.product_name}` }}
-                        </p>
-                        <p class="font-weight-regular">
-                          <span>{{
-                            `${range?.quantity?.quantity_name} | 40%`
-                          }}</span>
-                        </p>
-                      </div>
-                      <p class="font-weight-bold text-red-darken-4">S$ 67.50</p>
+                        <template #placeholder>
+                          <div class="skeleton" />
+                        </template>
+                      </v-img>
                     </div>
                   </div>
-                </router-link>
+                  <div
+                    class="d-flex align-center justify-space-between"
+                    style="font-size: 12px; width: 85%"
+                  >
+                    <div class="w-100">
+                      <router-link
+                        class="text-decoration-none text-black font-weight-bold"
+                        :to="`/${item.raw.slug}`"
+                      >
+                        <p class="mb-1 font-weight-regular">
+                          {{
+                            `${item?.raw?.product_name} ${range?.quantity?.quantity_name}`
+                          }}
+                        </p>
+                        <p class="font-weight-regular">
+                          <span>{{ `40% | Scotland` }}</span>
+                        </p>
+                      </router-link>
+                      <div class="d-flex justify-space-between align-center">
+                        <span class="text-red-darken-1 font-weight-bold">
+                          S$ 59.00
+                        </span>
+                        <v-btn
+                          v-if="item?.raw?.isCount == false"
+                          @click="toggleIsCount(item.raw, $event)"
+                          size="xs"
+                          color="black"
+                          class="text-caption py-1 px-8"
+                          variant="flat"
+                          >Add</v-btn
+                        >
+                        <div
+                          v-if="item?.raw?.isCount == true"
+                          class="d-flex align-center ga-2"
+                        >
+                          <v-btn
+                            size="xs"
+                            color="black"
+                            class="text-caption pa-1 rounded-0"
+                            variant="flat"
+                            icon
+                            @click="decreaseCount(item.raw, $event)"
+                          >
+                            <v-icon>mdi-minus</v-icon>
+                          </v-btn>
+
+                          <span>
+                            {{ item?.raw?.count }}
+                          </span>
+
+                          <v-btn
+                            size="xs"
+                            color="black"
+                            class="text-caption pa-1 rounded-0"
+                            variant="flat"
+                            icon
+                            @click="increaseCount(item.raw, $event)"
+                          >
+                            <v-icon>mdi-plus</v-icon>
+                          </v-btn>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </template>
           </v-autocomplete>

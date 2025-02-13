@@ -69,38 +69,30 @@ const splideOptions = computed(() => ({
 }));
 
 const filteredProducts = computed(() => {
+  const mapProduct = (item) => {
+    const rangeItems = item.ranges.map((range, index) => ({
+      ...range,
+      selected: ref(index === 0), // Set selected true hanya untuk item pertama
+    }));
+
+    return {
+      ...item,
+      selectedImage: computed(() => {
+        const selectedRange = rangeItems.find((range) => range.selected.value);
+        return selectedRange?.image_1 || item.image;
+      }),
+      isCount: ref(false),
+      count: ref(1),
+      rangeItems,
+    };
+  };
+
   if (selected.value) {
     return props.products
       .filter((product) => product.country_id === selected.value)
-      .map((item) => {
-        return {
-          ...item,
-          selectedImage: ref(item.image),
-          isCount: ref(false),
-          count: ref(1),
-          rangeItems: item.ranges.map((range) => {
-            return {
-              ...range,
-              selected: ref(false),
-            };
-          }),
-        };
-      });
+      .map(mapProduct);
   } else {
-    return props.products.map((item) => {
-      return {
-        ...item,
-        selectedImage: ref(item.image),
-        isCount: ref(false),
-        count: ref(1),
-        rangeItems: item.ranges.map((range) => {
-          return {
-            ...range,
-            selected: ref(false),
-          };
-        }),
-      };
-    });
+    return props.products.map(mapProduct);
   }
 });
 
@@ -140,21 +132,14 @@ const handleMoved = () => {
 function handleSelectRange(menu, selectedItem) {
   const isAlreadySelected = selectedItem.selected.value;
 
-  // Set semua item menjadi false
+  // Set semua rangeItems menjadi tidak terpilih
   menu.rangeItems.forEach((item) => {
     item.selected.value = false;
   });
 
-  // Jika item yang sudah dipilih diklik lagi, semua tetap false
+  // Jika belum dipilih sebelumnya, jadikan selected
   if (!isAlreadySelected) {
     selectedItem.selected.value = true;
-    if (selectedItem.image_1) {
-      menu.selectedImage.value = selectedItem.image_1;
-    } else {
-      menu.selectedImage.value = menu.image;
-    }
-  } else {
-    menu.selectedImage.value = menu.image;
   }
 }
 
