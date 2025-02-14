@@ -17,6 +17,9 @@ export default (app) =>
       country: [],
       selectedPlace: "",
       activeCity: null,
+      footerData: null,
+      appDetails: null,
+      categoryData: null,
     },
     mutations: {
       setActiveTag(state, tag) {
@@ -49,6 +52,15 @@ export default (app) =>
       },
       setSelectedPlace(state, item) {
         state.selectedPlace = item;
+      },
+      setFooterData(state, item) {
+        state.footerData = item;
+      },
+      setAppDetails(state, item) {
+        state.appDetails = item;
+      },
+      setCategoryData(state, item) {
+        state.categoryData = item;
       },
     },
     actions: {

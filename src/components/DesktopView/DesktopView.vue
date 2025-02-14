@@ -81,7 +81,11 @@ export default {
     );
   },
   methods: {
-    ...mapMutations(["setItemSelected", "setItemSelectedComplete"]),
+    ...mapMutations([
+      "setItemSelected",
+      "setItemSelectedComplete",
+      "setAppDetails",
+    ]),
     getCountryMall() {
       this.isLoading = true;
       axios
@@ -144,6 +148,7 @@ export default {
         .get(`/app/details/${this.$appId}`)
         .then((response) => {
           const data = response.data.data;
+          this.setAppDetails(data[0]);
           // console.log(data);
           this.appDetails1 = data;
         })

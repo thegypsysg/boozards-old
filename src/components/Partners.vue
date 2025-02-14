@@ -7,7 +7,11 @@
             <span class="mdi mdi-office-building-outline"></span> EXCLUSIVE
             LOCATIONS
           </p> -->
-          <p align="center" class="header-title mt-4" :class="isSmall ? 'cust-title-2' : 'cust-title-1'">
+          <p
+            align="center"
+            class="header-title mt-4"
+            :class="isSmall ? 'cust-title-2' : 'cust-title-1'"
+          >
             Become Our Partner
           </p>
           <!-- <p class="text-center text-grey-darken-1 mx-16 mt-n4" :class="isSmall ? 'text-caption' : undefined" :style="{
@@ -32,13 +36,18 @@
               </v-img>
             </div>
             <v-card-title class="text-black text-center">
-             As a Shop Owner
+              As a Shop Owner
             </v-card-title>
             <v-card-text class="text-center">
-              Do you sell Alcohol.? We can help you find Buyers for your stock . 
+              Do you sell Alcohol.? We can help you find Buyers for your stock .
             </v-card-text>
             <v-card-actions align="center">
-              <v-btn elevation="0" class="mx-auto bg-info" style="background: #00cdcd !important">
+              <v-btn
+                elevation="0"
+                class="mx-auto bg-info"
+                style="background: #00cdcd !important"
+                :href="`https://api.whatsapp.com/send?phone=${footerData?.whats_app}&text=Hi I am a Shop Owner and would like to register on boozards. Pls send us some details`"
+              >
                 Partner with us
               </v-btn>
             </v-card-actions>
@@ -59,10 +68,16 @@
               As a Pub / Club Owner
             </v-card-title>
             <v-card-text class="text-center">
-              Do you own a Pub or a Club. ?  List your promotions and happy hour with us. 
+              Do you own a Pub or a Club. ? List your promotions and happy hour
+              with us.
             </v-card-text>
             <v-card-actions align="center">
-              <v-btn elevation="0" class="mx-auto bg-info" style="background: #84afdc !important">
+              <v-btn
+                elevation="0"
+                class="mx-auto bg-info"
+                style="background: #84afdc !important"
+                :href="`https://api.whatsapp.com/send?phone=${footerData?.whats_app}&text=Hi I am a Pub / Bar owner and would like to register on boozards. Pls send us some details`"
+              >
                 Enquire Now
               </v-btn>
             </v-card-actions>
@@ -80,13 +95,18 @@
               </v-img>
             </div>
             <v-card-title class="text-black text-center">
-              As a Delivery Rider 
+              As a Delivery Rider
             </v-card-title>
             <v-card-text class="text-center">
               Help us deliver our Alcohol to neighbourhood around you.
             </v-card-text>
             <v-card-actions align="center">
-              <v-btn elevation="0" class="mx-auto bg-info" style="background: #808080 !important">
+              <v-btn
+                elevation="0"
+                class="mx-auto bg-info"
+                style="background: #808080 !important"
+                :href="`https://api.whatsapp.com/send?phone=${footerData?.whats_app}&text=Hi I would like to apply as a Delivery Rider , partner`"
+              >
                 List Now
               </v-btn>
             </v-card-actions>
@@ -97,6 +117,8 @@
   </v-container>
 </template>
 <script>
+import { mapState } from "vuex";
+
 export default {
   name: "Partners",
   data() {
@@ -105,6 +127,7 @@ export default {
     };
   },
   computed: {
+    ...mapState(["footerData"]),
     isSmall() {
       return this.screenWidth < 640;
     },

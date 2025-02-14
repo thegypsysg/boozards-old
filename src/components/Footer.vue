@@ -1,136 +1,171 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import drink from "@/assets/images/boozards/drink2.jpg";
-import whisky from "@/assets/images/boozards/drinnk.jpg";
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import axios from "@/util/axios";
+import { appId, fileURL } from "../main";
+import { useStore } from "vuex";
 
+const store = useStore();
 
-const isLogin = ref(false)
-const screenWidth = ref(window.innerWidth)
-const showScrollButton = ref(false)
+const isLogin = ref(false);
+const screenWidth = ref(window.innerWidth);
+const showScrollButton = ref(false);
 
-const footerData = ref({
-  company_name: 'Boozards',
-  description: 'Boozards is a',
-  location: 'Marine Parade, Singapore',
-  mobile_number: '+6591992000',
-  whats_app: '+6591992000',
-  email_id: 'helpme@the-gypsy.sg',
-  copyright: '© The Gypsy International | Singapore, 2023 - 2025',
-})
+const trendingCard = ref([]);
+
+// const footerData = ref({
+//   company_name: "Boozards",
+//   description: "Boozards is a",
+//   location: "Marine Parade, Singapore",
+//   mobile_number: "+6591992000",
+//   whats_app: "+6591992000",
+//   email_id: "helpme@the-gypsy.sg",
+//   copyright: "© The Gypsy International | Singapore, 2023 - 2025",
+// });
 
 const quickLinks = ref([
-  'Monkey Shoulders',
-  'Johnnie Walker',
-  'Chivas Regal',
-  'Jameson',
-  'Ballentines'
-])
+  "Monkey Shoulders",
+  "Johnnie Walker",
+  "Chivas Regal",
+  "Jameson",
+  "Ballentines",
+]);
 
-const trendingCard = [
-  {
-    id: 1,
-    img: drink,
-    title: 'Whiskey',
-  },
-  {
-    id: 2,
-    img: whisky,
-    title: 'Gin',
-  },
-  {
-    id: 3,
-    img: drink,
-    title: 'Vodka',
-  },
-  {
-    id: 4,
-    img: "https://images.unsplash.com/photo-1569529465841-dfecdab7503b?q=80&w=400",
-    title: 'Rum',
-  },
-  {
-    id: 5,
-    img: drink,
-    title: 'Single Malt',
-  },
-  {
-    id: 6,
-    img: "https://images.unsplash.com/photo-1510626176961-4b57d4fbad03?q=80&w=400",
-    title: 'Beer',
-  }
-]
 // Computed properties
-const isSmall = computed(() => screenWidth.value < 640)
+const isSmall = computed(() => screenWidth.value < 640);
+const footerData = computed(() => store.state.footerData);
+const appDetails = computed(() => store.state.appDetails);
+const categoryData = computed(() => {
+  return store.state.categoryData?.flatMap((category) => category.brands);
+});
 
 // Methods
 const handleResize = () => {
-  screenWidth.value = window.innerWidth
-}
-
+  screenWidth.value = window.innerWidth;
+};
 
 const applyJob = () => {
-  const userName = localStorage.getItem('userName')
-  if (userName == 'null' || userName == null) {
-    isLogin.value = true
+  const userName = localStorage.getItem("userName");
+  if (userName == "null" || userName == null) {
+    isLogin.value = true;
   }
   // Add other conditions if needed
-}
+};
 
 const scrollToTop = () => {
   window.scrollTo({
     top: 0,
-    behavior: 'smooth'
-  })
-}
+    behavior: "smooth",
+  });
+};
 
 const handleScroll = () => {
-  showScrollButton.value = window.scrollY > 100
-}
+  showScrollButton.value = window.scrollY > 100;
+};
 
 // Add this method to handle scrolling
 const scrollToSection = (sectionId) => {
-  const element = document.getElementById(sectionId)
+  const element = document.getElementById(sectionId);
   if (element) {
-    element.scrollIntoView({ behavior: 'smooth' })
+    element.scrollIntoView({ behavior: "smooth" });
   }
-  
+};
+
+const formatName = (name) => name.toLowerCase().replace(/\s+/g, "");
+
+function scrollToSection2(sectionId, mobile) {
+  const cardSection = document.getElementById(sectionId);
+
+  // this.$nextTick(() => {
+  if (cardSection) {
+    const cardRect = cardSection.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const offset = mobile
+      ? cardRect.top + scrollTop - 300
+      : cardRect.top + scrollTop - 50; // Nilai offset yang diinginkan, dalam piksel
+
+    window.scrollTo({
+      top: offset,
+      behavior: "smooth",
+    });
+  }
+  // });
+  // window.scrollBy(0, -scrollOffset);
 }
+
+const getMenuListData = () => {
+  axios
+    .get(`/categories/active-website/app/${appId}`)
+    .then((response) => {
+      const data = response.data.data;
+      trendingCard.value = data
+        .sort(function (a, b) {
+          return a.category_id - b.category_id;
+        })
+        .filter((item) => item.active == "Y")
+        .map((item) => {
+          return {
+            ...item,
+            id: item.category_id,
+            img: item.image,
+            title: item.category_name,
+          };
+        });
+      // let itemFinal = [];
+    })
+    .catch((error) => {
+      // eslint-disable-next-line
+
+      throw error;
+    });
+};
 
 // Lifecycle hooks
 onMounted(() => {
-  window.addEventListener('resize', handleResize)
-  window.addEventListener('scroll', handleScroll)
-})
+  window.addEventListener("resize", handleResize);
+  window.addEventListener("scroll", handleScroll);
+  getMenuListData();
+});
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
-  window.removeEventListener('scroll', handleScroll)
-})
+  window.removeEventListener("resize", handleResize);
+  window.removeEventListener("scroll", handleScroll);
+});
 </script>
 
 <template>
   <div class="footer-wrapper">
-    <v-container fluid class="footer-container" :class="{ 'flex-column': isSmall }">
+    <v-container
+      fluid
+      class="footer-container"
+      :class="{ 'flex-column': isSmall }"
+    >
       <v-row class="gx-5" :class="{ 'flex-column': isSmall }">
         <!-- About Section -->
         <v-col cols="12" md="3">
-          <h2 class="footer-title">About Boozards</h2>
-          <p class="description mt-6 mb-6">Boozards is a</p>
+          <h2 class="footer-title">About {{ footerData?.company_name }}</h2>
+          <p class="description mt-6 mb-6">
+            {{ footerData?.company_name }} is a {{ appDetails?.app_detail }}
+          </p>
           <div class="contact-info">
             <div class="d-flex align-center mb-4">
-              <v-icon color="#FF1B6D" size="20" class="mr-3">mdi-map-marker</v-icon>
-              <span>{{ footerData.location }}</span>
+              <v-icon color="#FF1B6D" size="20" class="mr-3"
+                >mdi-map-marker</v-icon
+              >
+              <span>{{ footerData?.location }}</span>
             </div>
             <div class="d-flex align-center mb-4">
               <v-icon color="#FF1B6D" size="20" class="mr-3">mdi-phone</v-icon>
-              <span>{{ footerData.mobile_number }}</span>
+              <span>{{ footerData?.mobile_number }}</span>
             </div>
             <div class="d-flex align-center mb-4">
-              <v-icon color="#FF1B6D" size="20" class="mr-3">mdi-whatsapp</v-icon>
-              <span>{{ footerData.whats_app }}</span>
+              <v-icon color="#FF1B6D" size="20" class="mr-3"
+                >mdi-whatsapp</v-icon
+              >
+              <span>{{ footerData?.whats_app }}</span>
             </div>
             <div class="d-flex align-center mb-4">
               <v-icon color="#FF1B6D" size="20" class="mr-3">mdi-email</v-icon>
-              <span class="email-link">{{ footerData.email_id }}</span>
+              <span class="email-link">{{ footerData?.email_id }}</span>
             </div>
           </div>
         </v-col>
@@ -139,12 +174,21 @@ onUnmounted(() => {
         <v-col cols="12" md="3">
           <h2 class="footer-title">Our Brands</h2>
           <ul class="quick-links mt-6">
-            <li v-for="(link, index) in quickLinks" :key="index" class="mb-4">
-              {{ link }}
+            <li
+              v-for="cat in categoryData?.slice(0, 5)"
+              :key="cat.brand_id"
+              class="mb-4"
+            >
+              {{ cat.brand_name }}
             </li>
           </ul>
           <div class="mt-4">
-            <a href="#" @click.prevent="scrollToSection('ourBrands')" class="view-all">View all</a>
+            <a
+              href="#"
+              @click.prevent="scrollToSection('ourBrands')"
+              class="view-all"
+              >View all</a
+            >
           </div>
         </v-col>
 
@@ -153,23 +197,54 @@ onUnmounted(() => {
           <h2 class="footer-title">Our Booze</h2>
           <div class="categories-grid mt-6">
             <v-row dense>
-              <v-col v-for="item in trendingCard" 
-                     :key="item.id" 
-                     cols="4" 
-                     :class="{ 'pa-1': isSmall, 'pa-3': !isSmall }">
-                <div class="category-item">
+              <v-col
+                v-for="item in trendingCard.slice(0, 6)"
+                :key="item.id"
+                cols="4"
+                :class="{ 'pa-1': isSmall, 'pa-3': !isSmall }"
+              >
+                <div
+                  v-if="isSmall"
+                  class="category-item"
+                  @click="
+                    scrollToSection2(formatName(item.category_name), true)
+                  "
+                >
                   <div class="category-title mb-2">{{ item.title }}</div>
-                  <v-img :src="item.img" 
-                         :height="isSmall ? '60' : '80'" 
-                         cover 
-                         class="rounded">
+                  <v-img
+                    :src="fileURL + item.img"
+                    :height="isSmall ? '60' : '80'"
+                    cover
+                    class="rounded"
+                  >
+                  </v-img>
+                </div>
+                <div
+                  v-else
+                  class="category-item"
+                  @click="
+                    scrollToSection2(formatName(item.category_name), false)
+                  "
+                >
+                  <div class="category-title mb-2">{{ item.title }}</div>
+                  <v-img
+                    :src="fileURL + item.img"
+                    :height="isSmall ? '60' : '80'"
+                    cover
+                    class="rounded"
+                  >
                   </v-img>
                 </div>
               </v-col>
             </v-row>
           </div>
           <div class="mt-4">
-            <a href="#" @click.prevent="scrollToSection('ourBooze')" class="view-all">View all</a>
+            <a
+              href="#"
+              @click.prevent="scrollToSection('ourBooze')"
+              class="view-all"
+              >View all</a
+            >
           </div>
         </v-col>
 
@@ -177,13 +252,15 @@ onUnmounted(() => {
         <v-col cols="12" md="3">
           <div class="mobile-app-section">
             <p class="coming-soon">Coming Soon...</p>
-            <p class="explore-text">Explore 4 Walls on your Mobile</p>
+            <p class="explore-text">
+              Explore {{ footerData?.company_name }} on your Mobile
+            </p>
             <div class="store-buttons">
               <a href="#" class="store-link">
-                <img src="../assets/images/play-store.jpg" alt="Google Play"/>
+                <img src="../assets/images/play-store.jpg" alt="Google Play" />
               </a>
               <a href="#" class="store-link">
-                <img src="../assets/images/app-store.jpg" alt="App Store"/>
+                <img src="../assets/images/app-store.jpg" alt="App Store" />
               </a>
             </div>
           </div>
@@ -194,19 +271,77 @@ onUnmounted(() => {
     <!-- Bottom Footer -->
     <v-footer class="bg-black">
       <v-container fluid>
-        <v-row no-gutters align="center" :justify="isSmall ? 'center' : 'end'" class="flex-wrap">
+        <v-row
+          no-gutters
+          align="center"
+          :justify="isSmall ? 'center' : 'end'"
+          class="flex-wrap"
+        >
           <v-col :cols="isSmall ? '12' : 'auto'" class="text-center">
-            <span class="text-white copyright-text">{{ footerData.copyright }}</span>
+            <span class="text-white copyright-text">{{
+              footerData?.copyright
+            }}</span>
           </v-col>
           <v-col :cols="isSmall ? '12' : 'auto'" class="text-center mt-2">
             <div class="social-icons">
-              <v-btn v-for="icon in ['facebook', 'twitter', 'instagram', 'youtube']" 
-                     :key="icon" 
-                     :icon="`mdi-${icon}`"
-                     variant="text" 
-                     color="#FF1B6D" 
-                     density="comfortable" 
-                     class="mx-1" />
+              <v-btn
+                v-if="footerData?.facebook"
+                icon="mdi-facebook"
+                variant="text"
+                color="#FF1B6D"
+                density="comfortable"
+                class="mx-1"
+                :href="footerData?.facebook"
+              />
+              <v-btn
+                v-if="footerData?.twitter"
+                icon="mdi-twitter"
+                variant="text"
+                color="#FF1B6D"
+                density="comfortable"
+                class="mx-1"
+                :href="footerData?.twitter"
+              />
+              <v-btn
+                v-if="footerData?.instagram"
+                icon="mdi-instagram"
+                variant="text"
+                color="#FF1B6D"
+                density="comfortable"
+                class="mx-1"
+                :href="footerData?.instagram"
+              />
+              <v-btn
+                v-if="footerData?.youtube"
+                icon="mdi-youtube"
+                variant="text"
+                color="#FF1B6D"
+                density="comfortable"
+                class="mx-1"
+                :href="footerData?.youtube"
+              />
+              <v-btn
+                v-if="footerData?.tiktok"
+                variant="text"
+                color="#FF1B6D"
+                density="comfortable"
+                class="mx-1"
+                icon
+                :href="footerData?.tiktok"
+              >
+                <v-icon>
+                  <i class="fa-brands fa-tiktok" />
+                </v-icon>
+              </v-btn>
+              <v-btn
+                v-if="footerData?.linkedin"
+                icon="mdi-linkedin"
+                variant="text"
+                color="#FF1B6D"
+                density="comfortable"
+                class="mx-1"
+                :href="footerData?.linkedin"
+              />
             </div>
           </v-col>
         </v-row>
@@ -214,8 +349,14 @@ onUnmounted(() => {
     </v-footer>
 
     <!-- Add back the scroll to top button -->
-    <v-btn v-show="showScrollButton" @click="scrollToTop" class="scroll-to-top" icon="mdi-arrow-up" color="#FF1B6D"
-      size="large"></v-btn>
+    <v-btn
+      v-show="showScrollButton"
+      @click="scrollToTop"
+      class="scroll-to-top"
+      icon="mdi-arrow-up"
+      color="#FF1B6D"
+      size="large"
+    ></v-btn>
   </div>
 </template>
 
@@ -289,13 +430,13 @@ onUnmounted(() => {
 }
 
 .footer-title::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   bottom: 0;
   width: 60px;
   height: 3px;
-  background-color: #FF1B6D;
+  background-color: #ff1b6d;
 }
 
 .quick-links {
@@ -328,11 +469,10 @@ onUnmounted(() => {
 }
 
 .view-all {
-  color: #FF1B6D;
+  color: #ff1b6d;
   text-decoration: none;
   font-weight: 500;
 }
-
 
 .store-button {
   text-decoration: none;
@@ -410,7 +550,7 @@ onUnmounted(() => {
   right: 20px;
   z-index: 99;
   border-radius: 50% !important;
-  background-color: #FF1B6D !important;
+  background-color: #ff1b6d !important;
   color: white !important;
   width: 48px !important;
   height: 48px !important;
@@ -437,7 +577,7 @@ onUnmounted(() => {
 }
 
 .email-link {
-  color: #00E1D2;
+  color: #00e1d2;
   /* Turquoise/cyan color */
   text-decoration: none;
 }

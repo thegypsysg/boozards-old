@@ -614,7 +614,7 @@ export default {
         .get(`/app/contact/${this.$appId}`)
         .then((response) => {
           const data = response.data.data;
-          // console.log(data);
+          this.setFooterData(data);
           this.footerData = {
             company_name: data.company_name || "",
             location: data.location || "",
@@ -902,6 +902,8 @@ export default {
       "setSkillRecognised",
       "setIdCountryRecognised",
       "setIdSkillRecognised",
+      "setFooterData",
+      "setCategoryData",
     ]),
     selectTag(tag) {
       this.setActiveTag(tag); // Menetapkan tag yang dipilih sebagai tag aktif
@@ -1079,7 +1081,7 @@ export default {
           `/categories-with-products/app/${appId}`,
         );
         const data = response.data.data;
-
+        this.setCategoryData(data);
         // Flatten data dan kelompokkan berdasarkan brand_id
         const groupedBrands = {};
         const processedMalls = [];
@@ -1404,7 +1406,7 @@ const images = {
       </div>
     </router-link>
 
-    <v-menu v-if="!isSignin">
+    <v-menu v-if="!isProfile">
       <template #activator="{ props }">
         <v-btn
           class="ml-4 location-selector"
@@ -1666,7 +1668,7 @@ const images = {
       Logout
     </v-btn>
     <div>
-      <div v-if="!isSmall && !isSignin" class="cart d-flex align-center">
+      <div v-if="!isSmall && !isProfile" class="cart d-flex align-center">
         <div class="cart-line mr-2" />
         <v-icon size="35" color="black"> mdi mdi-cart-variant </v-icon>
         <span>$ 0</span>

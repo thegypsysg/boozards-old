@@ -986,7 +986,7 @@
                     style="border: 1px solid #ced4da; border-radius: 0.25rem"
                   >
                     <input
-                      v-model="input.passwordNew"
+                      v-model="input.passwordConfirm"
                       :type="!showPassword2 ? 'password' : 'text'"
                       required
                       class="form-control"
@@ -1657,7 +1657,7 @@ export default {
     window.addEventListener("resize", this.handleResize);
     app.config.globalProperties.$eventBus.$emit(
       "changeHeaderWelcome",
-      "My Profile"
+      "My Profile",
     );
     this.getCity();
     this.getTown();
@@ -1690,7 +1690,7 @@ export default {
               }`,
               "Content-Type": "multipart/form-data",
             },
-          }
+          },
         )
         .then((response) => {
           const data = response.data;
@@ -1704,8 +1704,8 @@ export default {
           const message = error.response.data.email_id
             ? error.response.data.email_id[0]
             : error.response.data.message === ""
-            ? "Something Wrong!!!"
-            : error.response.data.message;
+              ? "Something Wrong!!!"
+              : error.response.data.message;
           this.errorMessage = message;
           this.isError = true;
         })
@@ -1745,8 +1745,8 @@ export default {
           const message = error.response.data.verify_email_otp
             ? "Wrong OTP"
             : error.response.data.message === ""
-            ? "Something Wrong!!!"
-            : error.response.data.message;
+              ? "Something Wrong!!!"
+              : error.response.data.message;
           this.errorMessage = message;
           this.isError = true;
         })
@@ -1911,14 +1911,14 @@ export default {
             image_path: "",
             image: null,
             gender: this.resource.gender.filter(
-              (i) => i.value == data.gender
+              (i) => i.value == data.gender,
             )[0],
             gender2: data.gender || null,
             marital: this.resource.marital.filter(
-              (i) => i.value == data.marital_status
+              (i) => i.value == data.marital_status,
             )[0],
             nationality: this.resource.nationality.filter(
-              (i) => i.id == data.nationality
+              (i) => i.id == data.nationality,
             )[0],
             name: data.name,
             email: data.email_id,
@@ -1930,29 +1930,29 @@ export default {
             age: "",
 
             town: this.resource.town.filter(
-              (i) => i.id == data.town_current
+              (i) => i.id == data.town_current,
             )[0],
             city: this.resource.city.filter(
-              (i) => i.id == data.city_current
+              (i) => i.id == data.city_current,
             )[0],
             country: this.options.filter(
-              (i) => i.label == data.current_country_name
+              (i) => i.label == data.current_country_name,
             )[0].value,
           };
           this.isEmailVerified =
             data.email_verified == "N"
               ? false
               : data.email_verified == "Y"
-              ? true
-              : null;
+                ? true
+                : null;
           this.isPhoneVerified =
             data.mobile_verified == "N"
               ? false
               : data.mobile_verified == "Y"
-              ? true
-              : null;
+                ? true
+                : null;
           this.input.nationality = this.resource.nationality.filter(
-            (i) => i.id == data.nationality
+            (i) => i.id == data.nationality,
           );
         })
         .catch((error) => {
@@ -2016,8 +2016,8 @@ export default {
           const message = error.response.data.mobile_number
             ? error.response.data.mobile_number[0]
             : error.response.data.message === ""
-            ? "Something Wrong!!!"
-            : error.response.data.message;
+              ? "Something Wrong!!!"
+              : error.response.data.message;
           this.errorMessage = message;
           this.isError = true;
         })
@@ -2078,8 +2078,8 @@ export default {
           const message = error.response.data.mobile_number
             ? error.response.data.mobile_number[0]
             : error.response.data.message === ""
-            ? "Something Wrong!!!"
-            : error.response.data.message;
+              ? "Something Wrong!!!"
+              : error.response.data.message;
           this.errorMessage = message;
           this.isError = true;
         })
@@ -2130,8 +2130,8 @@ export default {
           const message = error.response.data.mobile_number
             ? error.response.data.mobile_number[0]
             : error.response.data.message === ""
-            ? "Something Wrong!!!"
-            : error.response.data.message;
+              ? "Something Wrong!!!"
+              : error.response.data.message;
           this.errorMessage = message;
           this.isError = true;
         })
@@ -2247,8 +2247,8 @@ export default {
           const message = error.response.data.email_id
             ? error.response.data.email_id[0]
             : error.response.data.message === ""
-            ? "Something Wrong!!!"
-            : error.response.data.message;
+              ? "Something Wrong!!!"
+              : error.response.data.message;
           this.errorMessage = message;
           this.isError = true;
         })
@@ -2294,8 +2294,8 @@ export default {
           const message = error.response.data.mobile_number
             ? error.response.data.mobile_number[0]
             : error.response.data.message === ""
-            ? "Something Wrong!!!"
-            : error.response.data.message;
+              ? "Something Wrong!!!"
+              : error.response.data.message;
           this.errorMessage = message;
           this.isError = true;
         })
@@ -2373,7 +2373,7 @@ export default {
           this.successMessage = data.message;
           app.config.globalProperties.$eventBus.$emit(
             "changeHeaderImage",
-            data.data.image
+            data.data.image,
           );
           // this.getUserData();
           // localStorage.setItem("name", data.data.name);
@@ -2472,8 +2472,8 @@ export default {
             const message = error.response.data.email_id
               ? error.response.data.email_id[0]
               : error.response.data.message === ""
-              ? "Something Wrong!!!"
-              : error.response.data.message;
+                ? "Something Wrong!!!"
+                : error.response.data.message;
             this.errorMessage = message;
             this.isError = true;
             this.isChangePassword = false;
@@ -2586,7 +2586,9 @@ export default {
   background-color: #fff;
   background-clip: padding-box;
   border-radius: 0.25rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 }
 
 @media screen and (prefers-reduced-motion: reduce) {
