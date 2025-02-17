@@ -1099,7 +1099,8 @@ export default {
                   product_id: product.product_id,
                   category_id: category.category_id,
                   slug: product.product_name.toLowerCase().replace(/\s+/g, "-"),
-                  country_id: brand.country_id,
+                  country_id: brand?.country?.country_id,
+                  country_name: brand?.country?.country_name,
                   showBrandName: true, // Hanya produk pertama dalam brand yang menampilkan nama brand
                   isCount: false,
                   count: 1,
@@ -1112,7 +1113,8 @@ export default {
                   product_id: product.product_id,
                   category_id: category.category_id,
                   slug: product.product_name.toLowerCase().replace(/\s+/g, "-"),
-                  country_id: brand.country_id,
+                  country_id: brand?.country?.country_id,
+                  country_name: brand?.country?.country_name,
                   showBrandName: false, // Produk lainnya tidak menampilkan nama brand
                   isCount: false,
                   count: 1,
@@ -1123,6 +1125,7 @@ export default {
         });
 
         this.activeMalls = processedMalls;
+        console.log("iniii", this.activeMalls);
       } catch (error) {
         console.error("Error fetching product categories:", error);
       } finally {
@@ -1558,12 +1561,22 @@ const images = {
                     </p>
 
                     <p class="font-weight-regular">
-                      <span>{{ `40% | Scotland` }}</span>
+                      <span>{{
+                        item.raw.percentage && item.raw.country_name
+                          ? `${item.raw.percentage}% | ${item.raw.country_name}`
+                          : item.raw.percentage
+                            ? `${item.raw.percentage}%`
+                            : item.raw.country_name
+                              ? `${item.raw.country_name}`
+                              : ""
+                      }}</span>
                     </p>
                   </router-link>
                   <div class="d-flex justify-space-between align-center">
                     <span class="text-red-darken-1 font-weight-bold">
-                      S$ 59.00
+                      <template v-if="range?.price_list?.rate">
+                        S$ {{ range?.price_list?.rate }}
+                      </template>
                     </span>
                     <v-btn
                       v-if="item?.raw?.isCount == false"
@@ -1866,12 +1879,22 @@ const images = {
                           }}
                         </p>
                         <p class="font-weight-regular">
-                          <span>{{ `40% | Scotland` }}</span>
+                          <span>{{
+                            item.raw.percentage && item.raw.country_name
+                              ? `${item.raw.percentage}% | ${item.raw.country_name}`
+                              : item.raw.percentage
+                                ? `${item.raw.percentage}%`
+                                : item.raw.country_name
+                                  ? `${item.raw.country_name}`
+                                  : ""
+                          }}</span>
                         </p>
                       </router-link>
                       <div class="d-flex justify-space-between align-center">
                         <span class="text-red-darken-1 font-weight-bold">
-                          S$ 59.00
+                          <template v-if="range?.price_list?.rate">
+                            S$ {{ range?.price_list?.rate }}
+                          </template>
                         </span>
                         <v-btn
                           v-if="item?.raw?.isCount == false"

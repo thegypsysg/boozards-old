@@ -33,7 +33,7 @@ const isEnd = ref(false);
 const isMobile = ref(false);
 
 const splideOptions = computed(() => ({
-  type: isMobile.value ? "loop" : "slide",
+  type: "slide",
   perPage: isMobile.value ? 1.5 : 4,
   arrows: false,
   pagination: false,
@@ -80,6 +80,15 @@ const filteredProducts = computed(() => {
       selectedImage: computed(() => {
         const selectedRange = rangeItems.find((range) => range.selected.value);
         return selectedRange?.image_1 || item.image;
+      }),
+      selectedPrice: computed(() => {
+        const selectedRange = rangeItems.find((range) => range.selected.value);
+        return selectedRange?.price_list?.rate || null;
+        // return selectedRange?.price_list?.rate
+        //   ? selectedRange?.price_list?.rate
+        //   : rangeItems[0]?.price_list?.rate
+        //     ? rangeItems[0]?.price_list?.rate
+        //     : null;
       }),
       isCount: ref(false),
       count: ref(1),
@@ -167,8 +176,10 @@ onUnmounted(() => {
     class="nursing-section mt-md-10 mt-sm-2"
   >
     <div class="d-flex justify-space-between align-center mb-4">
-      <div class="d-flex align-center">
-        <span class="text-h6 font-weight-bold">{{ props.title }}</span>
+      <div class="d-block d-md-flex align-center">
+        <span class="ml-4 ml-md-0 text-h6 font-weight-bold">{{
+          props.title
+        }}</span>
         <v-select
           style="min-width: 200px"
           variant="outlined"
@@ -252,7 +263,9 @@ onUnmounted(() => {
               </div>
               <div class="d-flex justify-space-between align-center">
                 <span class="text-red-darken-1 font-weight-bold">
-                  S$ 59.00
+                  <template v-if="menu?.selectedPrice.value">
+                    S$ {{ menu?.selectedPrice.value }}
+                  </template>
                 </span>
                 <v-btn
                   v-if="menu.isCount.value == false"

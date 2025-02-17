@@ -31,6 +31,7 @@ const quickLinks = ref([
 ]);
 
 // Computed properties
+const isLoggedIn = computed(() => localStorage.getItem("userName"));
 const isSmall = computed(() => screenWidth.value < 640);
 const footerData = computed(() => store.state.footerData);
 const appDetails = computed(() => store.state.appDetails);
@@ -269,7 +270,10 @@ onUnmounted(() => {
     </v-container>
 
     <!-- Bottom Footer -->
-    <v-footer class="bg-black">
+    <v-footer
+      class="bg-black"
+      :style="{ paddingBottom: isSmall && isLoggedIn ? '70px' : 0 }"
+    >
       <v-container fluid>
         <v-row
           no-gutters
@@ -357,6 +361,32 @@ onUnmounted(() => {
       color="#FF1B6D"
       size="large"
     ></v-btn>
+
+    <div
+      v-if="isSmall && isLoggedIn"
+      style="
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 99999;
+        height: 70px;
+        background: #ebe7e8;
+      "
+      class="cart-mobile d-flex align-center justify-space-between px-2 w-100"
+    >
+      <div class="cart-title py-4">
+        <v-icon class="cart-title-icon" size="40" color="black">
+          mdi mdi-cart-variant
+        </v-icon>
+        <div class="cart-title-count d-flex justify-center align-center">
+          <span>0</span>
+        </div>
+        <span class="ml-4">My Cart</span>
+      </div>
+      <div class="cart-count d-flex align-center justify-center">
+        <span>S$0</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -623,5 +653,28 @@ onUnmounted(() => {
 
 .social-icons {
   margin-top: 8px;
+}
+
+.cart-title {
+  color: black;
+}
+.cart-title-icon {
+  position: relative;
+}
+.cart-title-count {
+  position: absolute;
+  top: 7px;
+  left: 35px;
+  height: 20px;
+  border-radius: 50%;
+  width: 20px;
+  background: #ffa42e;
+}
+.cart-count {
+  border-left: 2px solid #bfbfbf !important;
+  min-height: 70px;
+  color: black;
+  padding-left: 10px;
+  padding-right: 20px;
 }
 </style>
