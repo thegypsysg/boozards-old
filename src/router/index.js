@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from "@/views/HomeView.vue";
 import MyProfile from "@/views/MyProfileView.vue";
+import PriceList from "@/views/PriceListView.vue";
 import PrivacyTerms from "@/views/PrivacyTerms.vue";
 import SignUp from "@/views/SignUpForm.vue";
 import OTPEmailForm from "@/views/OTPEmailForm.vue";
@@ -39,6 +40,11 @@ const routes = [
   {
     path: "/",
     component: Home,
+  },
+  {
+    path: "/price-list",
+    name: "Price List",
+    component: PriceList,
   },
   {
     path: "/my-profile",
@@ -96,56 +102,56 @@ const routes = [
     name: "Trending-buy",
     component: Trending,
     meta: {
-      locationSelection: true
-    }
+      locationSelection: true,
+    },
   },
   {
     path: "/rent",
     name: "Trending-rent",
     component: Trending,
     meta: {
-      locationSelection: true
-    }
+      locationSelection: true,
+    },
   },
   {
     path: "/roommates",
     name: "Trending-roommates",
     component: Trending,
     meta: {
-      locationSelection: true
-    }
+      locationSelection: true,
+    },
   },
   {
     path: "/staycation",
     name: "Trending-staycation",
     component: Trending,
     meta: {
-      locationSelection: true
-    }
+      locationSelection: true,
+    },
   },
   {
     path: "/vacation",
     name: "Trending-vacation",
     component: Trending,
     meta: {
-      locationSelection: true
-    }
+      locationSelection: true,
+    },
   },
   {
     path: "/co-living",
     name: "Trending-co-living",
     component: Trending,
     meta: {
-      locationSelection: true
-    }
+      locationSelection: true,
+    },
   },
   {
     path: "/co-working",
     name: "Trending-co-working",
     component: Trending,
     meta: {
-      locationSelection: true
-    }
+      locationSelection: true,
+    },
   },
   {
     path: "/buy/studio",

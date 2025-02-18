@@ -45,6 +45,7 @@
                   color="orange"
                   size="large"
                   class="text-uppercase text-white mt-4"
+                  to="/price-list"
                 >
                   View Price List
                 </v-btn>

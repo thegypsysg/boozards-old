@@ -65,6 +65,8 @@ export default {
       let title = "";
       if (this.currentRoute === "/my-profile") {
         title = "My Profile";
+      } else if (this.currentRoute === "/price-list") {
+        title = "Price List";
       } else if (this.currentRoute === "/sign-in") {
         title = "Sign-Up / Sign-in";
       } else if (this.currentRoute === "/social-sign-up") {
@@ -90,7 +92,8 @@ export default {
       return (
         this.currentRoute === "/my-profile" ||
         this.currentRoute === "/sign-in" ||
-        this.currentRoute === "/social-sign-up"
+        this.currentRoute === "/social-sign-up" ||
+        this.currentRoute === "/price-list"
       );
     },
     isBatamProperties() {
@@ -158,7 +161,7 @@ export default {
               );
             }
 
-            if (data.slug) {
+            if (data?.slug) {
               this.path = `/${data.slug}`;
               app.config.globalProperties.$eventBus.$emit(
                 "changeHeaderPath",
