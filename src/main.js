@@ -20,7 +20,7 @@ import { createApp } from "vue";
 import { registerPlugins } from "@/plugins";
 import "aos/dist/aos.css";
 
-const app = createApp(App).use(router);
+const app = createApp(App);
 
 app.config.globalProperties.$appId = 3;
 app.config.globalProperties.$superAppId = 1;
@@ -30,5 +30,5 @@ export const fileURL = "https://admin1.the-gypsy.sg/img/app/";
 
 registerPlugins(app);
 app.use(store(app));
-
+app.use(router);
 app.mount("#app");

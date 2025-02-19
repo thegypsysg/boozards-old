@@ -94,16 +94,17 @@ const listDataCommercial = ref([]);
 const listMainCategories = ref([]);
 const productCategories = ref([]);
 const isLoading = ref(true);
+
+const props = defineProps({
+  isSmall: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 function scrollToSection() {
   eventBus.scrollToSection = "happeningTarget"; // Ganti dengan ID section yang diinginkan
 }
-
-onMounted(() => {
-  AOS.init();
-  setTimeout(() => {
-    isZoomed.value = true;
-  }, 100); // Small delay to ensure the transition starts after mount
-});
 
 const handleIntersection = (entries, observer) => {
   entries.forEach((entry) => {
@@ -194,6 +195,11 @@ const getProductCategoryListData = async () => {
 };
 
 onMounted(() => {
+  AOS.init();
+  setTimeout(() => {
+    isZoomed.value = true;
+  }, 100); // Small delay to ensure the transition starts after mount
+
   const observer = new IntersectionObserver(handleIntersection, {
     threshold: 0.1, // Trigger when 10% of the element is visible
   });
@@ -207,12 +213,6 @@ onMounted(() => {
   getListMainCategories();
   get4WallsPropertyDataCommercial();
   getProductCategoryListData();
-});
-const props = defineProps({
-  isSmall: {
-    type: Boolean,
-    default: false,
-  },
 });
 </script>
 

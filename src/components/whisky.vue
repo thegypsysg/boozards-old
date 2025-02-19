@@ -231,23 +231,31 @@ onUnmounted(() => {
         <SplideSlide v-for="menu in filteredProducts" :key="menu.product_id">
           <!-- :key="menu?.product_id" -->
           <v-card class="card-wrapper" height="370" elevation="3">
-            <v-img
-              :src="fileURL + menu?.selectedImage.value"
-              height="200"
-              cover
-            ></v-img>
+            <router-link
+              class="text-decoration-none"
+              :to="`/product/${menu.product_id}`"
+            >
+              <v-img
+                :src="fileURL + menu?.selectedImage.value"
+                height="200"
+                cover
+              ></v-img>
+            </router-link>
             <div
               class="card-title d-flex flex-column justify-space-between"
               style="height: 170px"
             >
-              <div class="">
+              <router-link
+                class="text-decoration-none"
+                :to="`/product/${menu.product_id}`"
+              >
                 <p class="text-red-darken-4 font-weight-bold text-body-2">
                   {{ menu?.brand_name }}
                 </p>
-                <p class="font-weight-bold text-body-2 mt-1">
+                <p class="font-weight-bold text-black text-body-2 mt-1">
                   {{ menu?.product_name }}
                 </p>
-              </div>
+              </router-link>
               <div class="d-flex align-center ga-1 my-2">
                 <template v-for="item in menu?.rangeItems" :key="item.pq_id">
                   <v-btn

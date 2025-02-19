@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Home from "@/views/HomeView.vue";
 import MyProfile from "@/views/MyProfileView.vue";
 import PriceList from "@/views/PriceListView.vue";
+import ProductDetail from "@/views/ProductDetailView.vue";
 import PrivacyTerms from "@/views/PrivacyTerms.vue";
 import SignUp from "@/views/SignUpForm.vue";
 import OTPEmailForm from "@/views/OTPEmailForm.vue";
@@ -45,6 +46,11 @@ const routes = [
     path: "/price-list",
     name: "Price List",
     component: PriceList,
+  },
+  {
+    path: "/product/:id",
+    name: "Product Detail",
+    component: ProductDetail,
   },
   {
     path: "/my-profile",

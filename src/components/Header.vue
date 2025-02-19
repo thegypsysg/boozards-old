@@ -174,6 +174,9 @@ export default {
     isMyProfile() {
       return this.$route.path == "/my-profile";
     },
+    isProduct() {
+      return this.$route.path.includes("product");
+    },
     // isSignIn() {
     //   return this.$route.path == "/social-sign-up";
     // },
@@ -1409,7 +1412,7 @@ const images = {
       </div>
     </router-link>
 
-    <v-menu v-if="!isProfile">
+    <v-menu v-if="!isProfile && !isProduct">
       <template #activator="{ props }">
         <v-btn
           class="ml-4 location-selector"
@@ -1552,7 +1555,7 @@ const images = {
                 <div class="w-100">
                   <router-link
                     class="text-decoration-none text-black font-weight-bold"
-                    :to="`/${item.raw.slug}`"
+                    :to="`/product/${item.raw.product_id}`"
                   >
                     <p class="mb-1 font-weight-regular">
                       {{
@@ -1809,7 +1812,10 @@ const images = {
           Logout
         </v-btn>
 
-        <form class="navbar__search navbar__search__mobile mx-auto">
+        <form
+          v-if="!isProduct"
+          class="navbar__search navbar__search__mobile mx-auto"
+        >
           <v-autocomplete
             id="product_name"
             v-model="search"
@@ -1871,7 +1877,7 @@ const images = {
                     <div class="w-100">
                       <router-link
                         class="text-decoration-none text-black font-weight-bold"
-                        :to="`/${item.raw.slug}`"
+                        :to="`/product/${item.raw.product_id}`"
                       >
                         <p class="mb-1 font-weight-regular">
                           {{
@@ -1961,7 +1967,7 @@ const images = {
       </div>
     </div> -->
 
-        <div v-if="isSmall" class="ma-4">
+        <div v-if="isSmall && !isProduct" class="ma-4">
           <ExploreOurMenuList :desktop="false" />
         </div>
 

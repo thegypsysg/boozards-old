@@ -200,40 +200,50 @@ export default {
           >
             {{ item.category_name }}
           </h4>
-          <p
-            v-if="item.showBrandName"
-            style="font-size: 12px"
-            class="font-weight-bold text-red-darken-4 mb-2"
+          <router-link
+            class="text-decoration-none"
+            :to="`/product/${item.product_id}`"
           >
-            {{ item.brand_name }}
-          </p>
+            <p
+              v-if="item.showBrandName"
+              style="font-size: 12px"
+              class="font-weight-bold text-red-darken-4 mb-2"
+            >
+              {{ item.brand_name }}
+            </p>
+          </router-link>
           <div
             v-for="range in item.ranges"
             class="d-flex align-center w-100 mb-2"
           >
             <div style="width: 15%" class="mr-2">
-              <div
-                style="
-                  height: 45px;
-                  width: 100%;
-                  object-fit: cover;
-                  object-position: center;
-                "
+              <router-link
+                class="text-decoration-none"
+                :to="`/product/${item.product_id}`"
               >
-                <v-img
-                  height="45"
-                  cover
-                  :src="
-                    range.image_1
-                      ? $fileURL + range.image_1
-                      : $fileURL + item.image
+                <div
+                  style="
+                    height: 45px;
+                    width: 100%;
+                    object-fit: cover;
+                    object-position: center;
                   "
                 >
-                  <template #placeholder>
-                    <div class="skeleton" />
-                  </template>
-                </v-img>
-              </div>
+                  <v-img
+                    height="45"
+                    cover
+                    :src="
+                      range.image_1
+                        ? $fileURL + range.image_1
+                        : $fileURL + item.image
+                    "
+                  >
+                    <template #placeholder>
+                      <div class="skeleton" />
+                    </template>
+                  </v-img>
+                </div>
+              </router-link>
             </div>
             <div
               class="d-flex align-center justify-space-between"
@@ -248,11 +258,16 @@ export default {
                   v-if="!isSmall"
                   class="d-flex justify-space-between align-center"
                 >
-                  <p class="mb-1 font-weight-regular">
-                    {{
-                      `${item?.product_name} ${range?.quantity?.quantity_name}`
-                    }}
-                  </p>
+                  <router-link
+                    class="text-decoration-none text-black"
+                    :to="`/product/${item.product_id}`"
+                  >
+                    <p class="mb-1 font-weight-regular">
+                      {{
+                        `${item?.product_name} ${range?.quantity?.quantity_name}`
+                      }}
+                    </p>
+                  </router-link>
                   <div
                     class="d-flex justify-space-between align-center"
                     style="gap: 20px"
@@ -303,33 +318,49 @@ export default {
                     </div>
                   </div>
                 </div>
-                <p v-else class="mb-1 font-weight-regular">
-                  {{
-                    `${item?.product_name} ${range?.quantity?.quantity_name}`
-                  }}
-                </p>
+                <router-link
+                  v-else
+                  class="text-decoration-none text-black"
+                  :to="`/product/${item.product_id}`"
+                >
+                  <p class="mb-1 font-weight-regular">
+                    {{
+                      `${item?.product_name} ${range?.quantity?.quantity_name}`
+                    }}
+                  </p>
+                </router-link>
 
-                <p class="font-weight-regular">
-                  <span>{{
-                    item.percentage && item.country_name
-                      ? `${item.percentage}% | ${item.country_name}`
-                      : item.percentage
-                        ? `${item.percentage}%`
-                        : item.country_name
-                          ? `${item.country_name}`
-                          : ""
-                  }}</span>
-                </p>
+                <router-link
+                  class="text-decoration-none text-black"
+                  :to="`/product/${item.product_id}`"
+                >
+                  <p class="font-weight-regular">
+                    <span>{{
+                      item.percentage && item.country_name
+                        ? `${item.percentage}% | ${item.country_name}`
+                        : item.percentage
+                          ? `${item.percentage}%`
+                          : item.country_name
+                            ? `${item.country_name}`
+                            : ""
+                    }}</span>
+                  </p>
+                </router-link>
                 <!-- </router-link> -->
                 <div
                   v-if="isSmall"
                   class="d-flex justify-space-between align-center"
                 >
-                  <span class="text-red-darken-1 font-weight-bold">
-                    <template v-if="range?.price_list?.rate">
-                      S$ {{ range?.price_list?.rate }}
-                    </template>
-                  </span>
+                  <router-link
+                    class="text-decoration-none"
+                    :to="`/product/${item.product_id}`"
+                  >
+                    <span class="text-red-darken-1 font-weight-bold">
+                      <template v-if="range?.price_list?.rate">
+                        S$ {{ range?.price_list?.rate }}
+                      </template>
+                    </span>
+                  </router-link>
                   <v-btn
                     v-if="item?.isCount == false"
                     @click="toggleIsCount(item)"
