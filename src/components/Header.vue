@@ -8,6 +8,8 @@ import app from "@/util/eventBus";
 import axios from "@/util/axios";
 import moment from "moment-timezone";
 
+import Cart from "@/components/Cart.vue";
+
 import { appId } from "@/main";
 
 // Import images
@@ -36,6 +38,7 @@ export default {
   ],
   data() {
     return {
+      viewCart: false,
       isApply: false,
       isEmployment: false,
       isCheck: false,
@@ -143,6 +146,15 @@ export default {
     ...mapState(["idCountryRecognised"]),
     ...mapState(["skillRecognised"]),
     ...mapState(["idSkillRecognised"]),
+    ...mapState({
+      cartTotal: (state) => new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(state.cart.reduce((total, item) => total + item.price * item.quantity, 0)),
+    }),
+    ...mapState({
+      cartQuantity: (state) => state.cart.reduce((total, item) => total + item.quantity, 0),
+    }),
     tokenProvider() {
       // Mendapatkan URL dari browser
       const url = new URL(window.location.href);
@@ -1684,10 +1696,13 @@ const images = {
       Logout
     </v-btn>
     <div>
-      <div v-if="!isSmall && !isProfile" class="cart d-flex align-center">
+      <div v-if="!isSmall && !isProfile" @click="viewCart = true" class="cart d-flex align-center">
         <div class="cart-line mr-2" />
-        <v-icon size="35" color="black"> mdi mdi-cart-variant </v-icon>
-        <span>$ 0</span>
+        <v-badge :content="cartQuantity" color="red" offset-x="10" offset-y="10">
+            <v-icon size="45">mdi mdi-cart-variant</v-icon>
+        </v-badge>
+        <span class="ml-2">{{ cartTotal }}</span>
+        <Cart :viewCart="viewCart" @update:viewCart="viewCart = $event"/>
       </div>
     </div>
     <div

@@ -39,6 +39,7 @@
           <component :is="Component" />
         </Transition>
       </RouterView>
+      <FooterMobile v-show="!isDesktop"></FooterMobile>
     </div>
   </v-app>
 </template>
@@ -46,6 +47,7 @@
 <script>
 import { RouterView } from "vue-router";
 import Header from "@/components/Header.vue";
+import FooterMobile from "@/components/FooterMobile.vue";
 import app from "@/util/eventBus";
 import axios from "@/util/axios";
 
@@ -65,6 +67,8 @@ export default {
       let title = "";
       if (this.currentRoute === "/my-profile") {
         title = "My Profile";
+      } else if (this.currentRoute === "/checkout") {
+          title = "Checkout";
       } else if (this.currentRoute === "/price-list") {
         title = "Price List";
       } else if (this.currentRoute === "/sign-in") {

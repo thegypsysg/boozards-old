@@ -20,6 +20,7 @@ export default (app) =>
       footerData: null,
       appDetails: null,
       categoryData: null,
+      cart: JSON.parse(localStorage.getItem('cart')) || [],
     },
     mutations: {
       setActiveTag(state, tag) {
@@ -62,6 +63,39 @@ export default (app) =>
       setCategoryData(state, item) {
         state.categoryData = item;
       },
+      addToCart(state, product){
+        const item = state.cart.find((item) => item.id === product.id && item.range_id === product.range_id);
+        if (item) {
+          item.quantity += 1;
+        } else {
+          state.cart.push({ ...product, quantity: 1 });
+        }
+        localStorage.setItem('cart', JSON.stringify(state.cart));
+      },
+      updateCartQuantity(state, data) {
+        const { product_id, range_id, change } = data;
+        const item = state.cart.find((item) => item.id === product_id && item.range_id === range_id);
+        if (item) {
+          item.quantity += change;
+          if (item.quantity <= 0) {
+            state.cart = state.cart.filter(
+              (item) => !(item.id === product_id && item.range_id === range_id) 
+            );
+            localStorage.setItem('cart', JSON.stringify(state.cart));
+          }
+        }
+      },
+      removeFromCart(state, data){
+        const { product_id, range_id } = data;
+        state.cart = state.cart.filter(
+          (item) => !(item.id === product_id && item.range_id === range_id) 
+        );
+        localStorage.setItem('cart', JSON.stringify(state.cart));
+      },
+      clearCart(state){
+        state.cart = [];
+        localStorage.removeItem('cart');
+      }
     },
     actions: {
       async getLongLat({ commit }) {
@@ -241,5 +275,22 @@ export default (app) =>
           throw error;
         }
       },
+      addToCart({ commit }, product) {
+        commit('addToCart', product);
+      },
+      updateCartQuantity({ commit }, data) {
+        commit('updateCartQuantity', data);
+      },
+      removeFromCart({ commit }, data) {
+        commit('removeFromCart', data);
+      },
+      clearCart({ commit }) {
+        commit('clearCart');
+      },
+    },
+    getters: {
+      cartItems: (state) => state.cart,
+      cartTotal: (state) =>
+        state.cart.reduce((total, item) => total + item.price * item.quantity, 0),
     },
   });

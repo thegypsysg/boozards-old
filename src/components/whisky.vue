@@ -1,10 +1,12 @@
 <script setup>
 import { onMounted, ref, nextTick, onUnmounted, computed } from "vue";
+import { useStore } from 'vuex';
 import axios from "@/util/axios";
 import { fileURL } from "@/main";
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 
+const store = useStore();
 const props = defineProps({
   desktop: Boolean,
   title: {
@@ -25,6 +27,7 @@ const props = defineProps({
   },
 });
 
+const cart = computed(() => store.state.cart);
 const selected = ref(null);
 const splideRef = ref(null);
 const isBeginning = ref(true);
@@ -152,6 +155,46 @@ function handleSelectRange(menu, selectedItem) {
   }
 }
 
+const isInCart = (product) => {
+  const selectedRange = product.rangeItems.find((range) => range.selected.value);
+  return cart.value.some(item => item.id === product.product_id && item.range_id === selectedRange.range_id);
+};
+
+const cartQuantity = (product) => {
+  const selectedRange = product.rangeItems.find((range) => range.selected.value);
+  const item = cart.value.find(item => item.id === product.product_id && item.range_id === selectedRange.range_id);
+  return item ? item.quantity : 0;
+};
+
+
+const addToCart = (product) => {
+
+  const selectedRange = product.rangeItems.find((range) => range.selected.value);
+
+  const data = {
+    id: product.product_id,
+    range_id: selectedRange.range_id,
+    quantity_name: selectedRange.quantity.quantity_name,
+    name: product.product_name,
+    image: fileURL + product?.selectedImage.value,
+    price: product?.selectedPrice.value
+  }
+  
+  store.commit('addToCart', data);
+
+};
+
+const increaseQuantity = (product) => {
+  const selectedRange = product.rangeItems.find((range) => range.selected.value);
+  store.commit('updateCartQuantity', { product_id:  product.product_id, range_id: selectedRange.range_id, change: 1 });
+};
+
+// Function to decrease quantity (removes from cart if it reaches 0)
+const decreaseQuantity = (product) => {
+  const selectedRange = product.rangeItems.find((range) => range.selected.value);
+  store.commit('updateCartQuantity', { product_id:  product.product_id, range_id: selectedRange.range_id, change: -1 });
+};
+
 onMounted(() => {
   checkMobile();
   window.addEventListener("resize", checkMobile);
@@ -275,45 +318,47 @@ onUnmounted(() => {
                     S$ {{ menu?.selectedPrice.value }}
                   </template>
                 </span>
-                <v-btn
-                  v-if="menu.isCount.value == false"
-                  @click="menu.isCount.value = true"
-                  size="xs"
-                  color="black"
-                  class="text-caption py-1 px-8"
-                  variant="flat"
-                  >Add</v-btn
-                >
-                <div
-                  v-if="menu.isCount.value == true"
-                  class="d-flex align-center ga-2"
-                >
+                <span v-show="menu?.selectedPrice.value">
                   <v-btn
+                    v-if="!isInCart(menu)"
+                    @click="addToCart(menu)"
                     size="xs"
                     color="black"
-                    class="text-caption pa-1 rounded-0"
+                    class="text-caption py-1 px-8"
                     variant="flat"
-                    icon
-                    @click="if (menu.count.value > 1) menu.count.value--;"
+                    >Add</v-btn
                   >
-                    <v-icon>mdi-minus</v-icon>
-                  </v-btn>
-
-                  <span>
-                    {{ menu.count.value }}
-                  </span>
-
-                  <v-btn
-                    size="xs"
-                    color="black"
-                    class="text-caption pa-1 rounded-0"
-                    variant="flat"
-                    icon
-                    @click="menu.count.value++"
+                  <div
+                    v-else="isInCart(menu)"
+                    class="d-flex align-center ga-2"
                   >
-                    <v-icon>mdi-plus</v-icon>
-                  </v-btn>
-                </div>
+                    <v-btn
+                      size="xs"
+                      color="black"
+                      class="text-caption pa-1 rounded-0"
+                      variant="flat"
+                      icon
+                      @click="decreaseQuantity(menu)"
+                    >
+                      <v-icon>mdi-minus</v-icon>
+                    </v-btn>
+
+                    <span>
+                      {{ cartQuantity(menu) }}
+                    </span>
+
+                    <v-btn
+                      size="xs"
+                      color="black"
+                      class="text-caption pa-1 rounded-0"
+                      variant="flat"
+                      icon
+                      @click="increaseQuantity(menu)"
+                    >
+                      <v-icon>mdi-plus</v-icon>
+                    </v-btn>
+                  </div>
+                </span>
               </div>
             </div>
           </v-card>
