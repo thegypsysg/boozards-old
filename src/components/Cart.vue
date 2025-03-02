@@ -11,8 +11,7 @@
                                     <div class="text-h6">My Cart</div>
                                     <div class="text-h6" v-show="cartQuantity > 0">
                                         <span class="text-red">{{ cartQuantity }}</span> Items | 
-                                        <span class="text-blue" v-if="step == 1">S${{ (subTotal + 0.5).toFixed(2)  }}</span>
-                                        <span class="text-blue" v-else>S${{ (subTotal + selectedDeliveryPrice + 0.5).toFixed(2) }}</span>
+                                        <span class="text-blue">S${{ (subTotal + selectedDeliveryPrice + 0.5).toFixed(2) }}</span>
                                     </div>
                                     <div>
                                         <v-btn @click="close" icon="mdi-close-circle"></v-btn>
@@ -27,7 +26,7 @@
                 <div class="cart-items flex-grow-1 overflow-y-auto">
                     <v-row no-gutters>
                         <v-col  v-if="step == 1" v-for="(product, index) in cart" :key="index">
-                            <div class="d-flex align-center px-3">
+                            <div class="d-flex align-center px-3 py-1">
                                 <div class="flex-grow-0 flex-shrink-0">
                                     <v-img class="rounded bg-white" :src="product.image" width="65" height="65" cover>
                                         <template v-slot:placeholder>
@@ -115,7 +114,12 @@
                         <v-btn v-else-if="step == 2" @click="step = 3"  color="#ff9800" variant="flat"   size="large" >Proceed to Pay</v-btn>
                         <v-btn v-else-if="step == 3"  color="#ff9800" variant="flat"  size="large">Pay Now</v-btn>
                         <div>
-                            <v-icon @click="summaryDialog = true" color="blue">mdi-notebook</v-icon>
+                            <v-icon @click="summaryDialog = true" size="40">
+                                <v-img
+                                    src="@/assets/billing.png"
+                                    alt="Billing Summary"
+                                />
+                            </v-icon>
                             <v-dialog
                                 v-model="summaryDialog"
                                 max-width="500"
