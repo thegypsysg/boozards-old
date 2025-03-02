@@ -57,7 +57,7 @@
                                         </div>
                                         <div class="text-body-2"><strong class=" text-red">S{{ formatCurrency(product.price) }}</strong></div>
                                         <div>
-                                            <v-btn @click="handleRemoveFromCart(product.id, product.range_id)" color="red" icon="mdi-trash-can" size="small"></v-btn>
+                                            <v-btn @click="handleRemoveFromCart(product.id, product.range_id)" color="red" icon="mdi-trash-can" size="x-small"></v-btn>
                                         </div>
                                     </div>
                                 </div>
@@ -191,9 +191,19 @@
   overflow-wrap: break-word; /* Prevents overflow */
 }
 
+.no-header {
+    height: 100dvh!important;
+    min-height: 100dvh!important;
+}
+
+.no-header .m-drawer-content-wrap {
+    min-height: 100dvh!important;
+}
+
 .no-header .m-drawer-header {
   display: none !important;
 }
+
 .fill-height {
   height: 100%;
 }
