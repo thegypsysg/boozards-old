@@ -11,7 +11,8 @@
                                     <div class="text-h6">My Cart</div>
                                     <div class="text-h6" v-show="cartQuantity > 0">
                                         <span class="text-red">{{ cartQuantity }}</span> Items | 
-                                        <span class="text-blue">S{{ cartTotal }}</span>
+                                        <span class="text-blue" v-if="step == 1">S${{ subTotal.toFixed(2)  }}</span>
+                                        <span class="text-blue" v-else>S${{ (subTotal + selectedDeliveryPrice + 0.5).toFixed(2) }}</span>
                                     </div>
                                     <div>
                                         <v-btn @click="close" icon="mdi-close-circle"></v-btn>
@@ -261,7 +262,7 @@
 
     const step = ref(1);
     const summaryDialog = ref(false);
-    const selectedDelivery = ref("standard");
+    const selectedDelivery = ref(null);
     const deliveryOptions = ref([
         { label: "Standard Delivery Fee", value: "standard", price: 12.0 },
         { label: "Express (1.5 Hours)", value: "express", price: 15.0 },
@@ -294,12 +295,6 @@
 
     // Get total quantity of all cart items
     const cartQuantity = computed(() => store.state.cart.reduce((total, item) => total + item.quantity, 0));
-
-    // Get total price of all cart items
-    const cartTotal = computed(() => new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-      }).format(store.state.cart.reduce((total, item) => total + item.price * item.quantity, 0)));
 
     const subTotal = computed(() => store.state.cart.reduce((total, item) => total + item.price * item.quantity, 0));
     
