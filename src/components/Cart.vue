@@ -11,9 +11,8 @@
                                     <div class="text-h6">My Cart</div>
                                     <div class="text-h6" v-show="cartQuantity > 0">
                                         <span class="text-red">{{ cartQuantity }}</span> Items | 
-                                        <span class="text-blue" v-if="step == 1">S${{ subTotal.toFixed(2)  }}</span>
-                                        <span class="text-blue" v-else-if="step == 2">S${{ (subTotal + selectedDeliveryPrice).toFixed(2)  }}</span>
-                                        <span class="text-blue" v-else-if="step == 3">S${{ (subTotal + selectedDeliveryPrice + 0.5).toFixed(2) }}</span>
+                                        <span class="text-blue" v-if="step == 1">S${{ (subTotal + 0.5).toFixed(2)  }}</span>
+                                        <span class="text-blue" v-else>S${{ (subTotal + selectedDeliveryPrice + 0.5).toFixed(2) }}</span>
                                     </div>
                                     <div>
                                         <v-btn @click="close" icon="mdi-close-circle"></v-btn>
