@@ -116,7 +116,7 @@
                         <div>
                             <v-icon @click="summaryDialog = true" size="40">
                                 <v-img
-                                    src="@/assets/billing.png"
+                                    src="@/assets/images/billing.png"
                                     alt="Billing Summary"
                                 />
                             </v-icon>
