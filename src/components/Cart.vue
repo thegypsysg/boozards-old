@@ -12,7 +12,8 @@
                                     <div class="text-h6" v-show="cartQuantity > 0">
                                         <span class="text-red">{{ cartQuantity }}</span> Items | 
                                         <span class="text-blue" v-if="step == 1">S${{ subTotal.toFixed(2)  }}</span>
-                                        <span class="text-blue" v-else>S${{ (subTotal + selectedDeliveryPrice + 0.5).toFixed(2) }}</span>
+                                        <span class="text-blue" v-else-if="step == 2">S${{ (subTotal + selectedDeliveryPrice).toFixed(2)  }}</span>
+                                        <span class="text-blue" v-else-if="step == 3">S${{ (subTotal + selectedDeliveryPrice + 0.5).toFixed(2) }}</span>
                                     </div>
                                     <div>
                                         <v-btn @click="close" icon="mdi-close-circle"></v-btn>
@@ -285,7 +286,8 @@
         () => props.viewCart, // Watch for changes in viewCart prop
         (newValue) => {
             if (newValue) {
-            step.value = 1; // Set step to 1 when viewCart changes
+                step.value = 1; // Set step to 1 when viewCart changes
+                selectedDelivery.value = null;
             }
         }
     );
