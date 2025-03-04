@@ -74,15 +74,21 @@ export default (app) =>
       },
       updateCartQuantity(state, data) {
         const { product_id, range_id, change } = data;
-        const item = state.cart.find((item) => item.id === product_id && item.range_id === range_id);
-        if (item) {
-          item.quantity += change;
-          if (item.quantity <= 0) {
-            state.cart = state.cart.filter(
-              (item) => !(item.id === product_id && item.range_id === range_id) 
-            );
-            localStorage.setItem('cart', JSON.stringify(state.cart));
-          }
+        const index = state.cart.findIndex(
+            (item) => item.id === product_id && item.range_id === range_id
+        );
+    
+        if (index !== -1) {
+            const item = { ...state.cart[index] }; // Create a new object to trigger reactivity
+            item.quantity += change;
+    
+            if (item.quantity <= 0) {
+                state.cart.splice(index, 1); // Remove item from cart
+            } else {
+                state.cart[index] = item; // Replace object in array
+            }
+    
+            localStorage.setItem('cart', JSON.stringify(state.cart)); // Persist changes
         }
       },
       removeFromCart(state, data){

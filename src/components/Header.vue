@@ -1,5 +1,6 @@
 <script>
 import { setAuthHeader } from "@/util/axios";
+import cartMixin from "@/mixins/cartMixin";
 import { mapState, mapMutations } from "vuex";
 import app from "@/util/eventBus";
 
@@ -36,6 +37,7 @@ export default {
     "isSignin",
     "isBatamProperties",
   ],
+  mixins: [cartMixin],
   data() {
     return {
       viewCart: false,
@@ -147,13 +149,13 @@ export default {
     ...mapState(["skillRecognised"]),
     ...mapState(["idSkillRecognised"]),
     ...mapState({
-      cartTotal: (state) => new Intl.NumberFormat('en-US', {
+      cartSubTotal: (state) => new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
       }).format(state.cart.reduce((total, item) => total + item.price * item.quantity, 0)),
     }),
     ...mapState({
-      cartQuantity: (state) => state.cart.reduce((total, item) => total + item.quantity, 0),
+      cartTotalQuantity: (state) => state.cart.reduce((total, item) => total + item.quantity, 0),
     }),
     tokenProvider() {
       // Mendapatkan URL dari browser
@@ -1593,45 +1595,47 @@ const images = {
                         S$ {{ range?.price_list?.rate }}
                       </template>
                     </span>
-                    <v-btn
-                      v-if="item?.raw?.isCount == false"
-                      @click="toggleIsCount(item.raw, $event)"
-                      size="xs"
-                      color="black"
-                      class="text-caption py-1 px-8"
-                      variant="flat"
-                      >Add</v-btn
-                    >
-                    <div
-                      v-if="item?.raw?.isCount == true"
-                      class="d-flex align-center ga-2"
-                    >
+                    <span v-show="range?.price_list?.rate">
                       <v-btn
+                        v-if="!isInCart(item.raw, range)"
+                        @click="addToCart(item.raw, range)"
                         size="xs"
                         color="black"
-                        class="text-caption pa-1 rounded-0"
+                        class="text-caption py-1 px-8"
                         variant="flat"
-                        icon
-                        @click="decreaseCount(item.raw, $event)"
+                        >Add</v-btn
                       >
-                        <v-icon>mdi-minus</v-icon>
-                      </v-btn>
-
-                      <span>
-                        {{ item?.raw?.count }}
-                      </span>
-
-                      <v-btn
-                        size="xs"
-                        color="black"
-                        class="text-caption pa-1 rounded-0"
-                        variant="flat"
-                        icon
-                        @click="increaseCount(item.raw, $event)"
+                      <div
+                        v-else="isInCart(item.raw, range)"
+                        class="d-flex align-center ga-2"
                       >
-                        <v-icon>mdi-plus</v-icon>
-                      </v-btn>
-                    </div>
+                        <v-btn
+                          size="xs"
+                          color="black"
+                          class="text-caption pa-1 rounded-0"
+                          variant="flat"
+                          icon
+                          @click="decreaseQuantity(item.raw, range)"
+                        >
+                          <v-icon>mdi-minus</v-icon>
+                        </v-btn>
+
+                        <span>
+                          {{ cartQuantity(item.raw, range) }}
+                        </span>
+
+                        <v-btn
+                          size="xs"
+                          color="black"
+                          class="text-caption pa-1 rounded-0"
+                          variant="flat"
+                          icon
+                          @click="increaseQuantity(item.raw, range)"
+                        >
+                          <v-icon>mdi-plus</v-icon>
+                        </v-btn>
+                      </div>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1698,10 +1702,10 @@ const images = {
     <div>
       <div v-if="!isSmall && !isProfile" @click="viewCart = true" class="cart d-flex align-center">
         <div class="cart-line mr-2" />
-        <v-badge :content="cartQuantity" color="red" offset-x="10" offset-y="10">
+        <v-badge :content="cartTotalQuantity" color="red" offset-x="10" offset-y="10">
             <v-icon size="45">mdi mdi-cart-variant</v-icon>
         </v-badge>
-        <span class="ml-2">{{ cartTotal }}</span>
+        <span class="ml-2">{{ cartSubTotal }}</span>
         <Cart :viewCart="viewCart" @update:viewCart="viewCart = $event"/>
       </div>
     </div>

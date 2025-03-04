@@ -1,12 +1,11 @@
 <script setup>
 import { onMounted, ref, nextTick, onUnmounted, computed } from "vue";
-import { useStore } from 'vuex';
+import { useCart } from "@/composables/useCart";
 import axios from "@/util/axios";
 import { fileURL } from "@/main";
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 
-const store = useStore();
 const props = defineProps({
   desktop: Boolean,
   title: {
@@ -27,7 +26,7 @@ const props = defineProps({
   },
 });
 
-const cart = computed(() => store.state.cart);
+const { isInCart, cartQuantity, addToCart, increaseQuantity, decreaseQuantity } = useCart();
 const selected = ref(null);
 const splideRef = ref(null);
 const isBeginning = ref(true);
@@ -154,46 +153,6 @@ function handleSelectRange(menu, selectedItem) {
     selectedItem.selected.value = true;
   }
 }
-
-const isInCart = (product) => {
-  const selectedRange = product.rangeItems.find((range) => range.selected.value);
-  return cart.value.some(item => item.id === product.product_id && item.range_id === selectedRange.range_id);
-};
-
-const cartQuantity = (product) => {
-  const selectedRange = product.rangeItems.find((range) => range.selected.value);
-  const item = cart.value.find(item => item.id === product.product_id && item.range_id === selectedRange.range_id);
-  return item ? item.quantity : 0;
-};
-
-
-const addToCart = (product) => {
-
-  const selectedRange = product.rangeItems.find((range) => range.selected.value);
-
-  const data = {
-    id: product.product_id,
-    range_id: selectedRange.range_id,
-    quantity_name: selectedRange.quantity.quantity_name,
-    name: product.product_name,
-    image: fileURL + product?.selectedImage.value,
-    price: product?.selectedPrice.value
-  }
-  
-  store.commit('addToCart', data);
-
-};
-
-const increaseQuantity = (product) => {
-  const selectedRange = product.rangeItems.find((range) => range.selected.value);
-  store.commit('updateCartQuantity', { product_id:  product.product_id, range_id: selectedRange.range_id, change: 1 });
-};
-
-// Function to decrease quantity (removes from cart if it reaches 0)
-const decreaseQuantity = (product) => {
-  const selectedRange = product.rangeItems.find((range) => range.selected.value);
-  store.commit('updateCartQuantity', { product_id:  product.product_id, range_id: selectedRange.range_id, change: -1 });
-};
 
 onMounted(() => {
   checkMobile();

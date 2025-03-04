@@ -1,4 +1,12 @@
 <template>
+
+    <v-snackbar v-model="snackbar" :timeout="2000" :color="message.color">
+        {{ message.text }}
+        <template #actions>
+            <v-btn icon="mdi-close-circle"  @click="snackbar = false"></v-btn>
+        </template>
+    </v-snackbar>
+
     <MazDrawer variant="right" :model-value="viewCart" @update:model-value="emit('update:viewCart', $event)" class="no-header">
         <template #default="{ close }">
             <div class="cart-drawer fill-height">
@@ -66,7 +74,7 @@
                         <v-col v-if="step == 2" class="pa-5">
                             <div class="my-3 text-h6 d-flex justify-space-between">
                                 <span>Delivery Options</span>
-                                <v-btn @click="step = 1" color="grey" variant="flat"><v-icon>mdi-arrow-left</v-icon> Back</v-btn>
+                                <v-btn prepend-icon="mdi-arrow-left"  @click="step = 1" color="grey" variant="flat">Back</v-btn>
                             </div>
                             <MazRadioButtons
                                     v-slot="{ option, selected }"
@@ -86,8 +94,89 @@
                         </v-col>
                         <v-col v-if="step == 3"  class="pa-5">
                             <div class="my-3 text-h6 d-flex justify-space-between">
+                                <div class="d-flex flex-column">
+                                    <span>Where To Deliver . ?</span>
+                                    <!-- <span class="text-caption text-red">You do not have any Delivery Address in your List .</span> -->
+                                </div>
+                                <v-btn prepend-icon="mdi-arrow-left"  @click="step = 2" color="grey" variant="flat">Back</v-btn>
+                            </div>
+                            <v-alert v-show="addresses.length == 0" class="p-0" border="top" type="warning" variant="outlined" text="You do not have any Delivery Address in your List." ></v-alert>
+                            <div class="pt-5">
+                                <v-btn @click="addressDialog = true" prepend-icon="mdi-plus-circle" color="primary" variant="flat" size="large" block>Add New</v-btn>
+                                <v-dialog
+                                    v-model="addressDialog"
+                                    max-width="500"
+                                    >
+                                    <v-card>
+                                        <div class="d-flex align-center justify-space-between pa-4 border-b">
+                                            <div><strong>This Would Be Your Primary Address</strong></div>
+                                            <div>
+                                                <v-icon @click="addressDialog = false">mdi-close-circle</v-icon>
+                                            </div>
+                                        </div>
+                                        <div class="pa-5 d-flex flex-column ga-3">
+                                            <div>
+                                                <MazInput ref="streetRef" v-model="addressForm.main_address"  placeholder="Type Your Street Address" />
+                                            </div>
+                                           <div>
+                                                <MazTextarea
+                                                    v-model="addressForm.full_address"
+                                                    placeholder="Your Full Address"
+                                                />
+                                           </div>
+                                           <div>
+                                            <MazTextarea
+                                                    v-model="addressForm.landmark"
+                                                    placeholder="Any Landmarks"
+                                                />
+                                            </div> 
+                                            <div>
+                                                <MazInput v-model="addressForm.location_name"  placeholder="Name Your Location" />
+                                                <small class="text-muted text-caption">e.g Home, Office</small>
+                                            </div>
+                                            <div>
+                                                <v-btn @click="saveAddress()" :loading="savingAddress"
+                                                :disabled="savingAddress" color="primary" variant="flat" size="large" block>Save</v-btn>
+                                            </div>
+                                        </div>
+                                    </v-card>
+                                </v-dialog>
+                            </div>
+                            <MazRadioButtons
+                                    v-slot="{ option, selected }"
+                                    v-model="selectedAddress"
+                                    :options="addressesOptions"
+                                    orientation="col | row"
+                                    :selector="true"
+                                    color="info"
+                                    block
+                                    class="pt-5"
+                                >
+                                <div class="d-flex align-center justify-space-between ma-2">
+                                    <strong>{{ option.location_name }}</strong>
+                                    <v-icon @click="toggleAddressDetails(option.value)" class="cursor-pointer">
+                                        {{ addressExpanded[option.value] ? 'mdi-menu-up' : 'mdi-menu-down' }}
+                                    </v-icon>
+                                </div>
+                                <div v-if="addressExpanded[option.value]" class="d-flex flex-column ma-2">
+                                    <div class="d-flex justify-space-between">
+                                        <div class="flex-grow-1">
+                                            {{ option.full_address }}
+                                        </div>
+                                        <div v-show="option.primary_address" class="text-caption">
+                                            <strong>Primary</strong>
+                                        </div>
+                                    </div>
+                                    <p v-if="option.landmark" class="text-red-darken-4 font-weight-bold">
+                                        {{ option.landmark }}
+                                    </p>
+                                </div>
+                            </MazRadioButtons>
+                        </v-col>
+                        <v-col v-if="step == 4"  class="pa-5">
+                            <div class="my-3 text-h6 d-flex justify-space-between">
                                 <span>Payment Options</span>
-                                <v-btn @click="step = 2" color="grey" variant="flat"><v-icon>mdi-arrow-left</v-icon> Back</v-btn>
+                                <v-btn prepend-icon="mdi-arrow-left"  @click="step = 3" color="grey" variant="flat">Back</v-btn>
                             </div>
                             <MazRadioButtons
                                     v-slot="{ option, selected }"
@@ -110,9 +199,10 @@
                 <!-- Fixed Checkout Button -->
                 <div class="checkout-container border-t">
                     <div class="d-flex align-center justify-center justify-space-between">
-                        <v-btn v-if="step == 1" @click="step = 2" color="#ff9800" variant="flat"  size="large" >Delivery Options</v-btn>
-                        <v-btn v-else-if="step == 2" @click="step = 3"  color="#ff9800" variant="flat"   size="large" >Proceed to Pay</v-btn>
-                        <v-btn v-else-if="step == 3"  color="#ff9800" variant="flat"  size="large">Pay Now</v-btn>
+                        <v-btn v-if="step == 1" @click="nextStep(2)" color="#ff9800" variant="flat"  size="large" >Delivery Options</v-btn>
+                        <v-btn v-else-if="step == 2" @click="nextStep(3)"  color="#ff9800" variant="flat"   size="large">Where to Deliver. ?</v-btn>
+                        <v-btn v-else-if="step == 3" @click="nextStep(4)"  color="#ff9800" variant="flat"   size="large" >Proceed to Pay</v-btn>
+                        <v-btn v-else-if="step == 4"  color="#ff9800" variant="flat"  size="large">Pay Now</v-btn>
                         <div>
                             <v-icon @click="summaryDialog = true" size="40">
                                 <v-img
@@ -243,6 +333,10 @@
   padding-top: 10px;
 }
 
+.pac-container {
+  z-index: 99999 !important; /* Ensure autocomplete appears above modal */
+}
+
 @media (max-width: 768px) {
     .product-name {
         width: 45vw!important; 
@@ -252,19 +346,35 @@
 </style>
 
 <script setup>
-    import { ref, watch, computed, defineProps, defineEmits } from "vue";
+    import { ref, reactive, watch, computed, defineProps, defineEmits, onMounted, nextTick } from "vue";
+    import axios from "@/util/axios";
     import { useStore } from "vuex";
     import MazDrawer from "maz-ui/components/MazDrawer";
+    import MazInput from "maz-ui/components/MazInput";
+    import MazTextarea from "maz-ui/components/MazTextarea";
     import MazRadioButtons from "maz-ui/components/MazRadioButtons";
+    import { Loader } from '@googlemaps/js-api-loader';
 
     const props = defineProps({
-        viewCart: Boolean,
+        viewCart: Boolean
     });
 
     const emit = defineEmits(["update:viewCart"]);
     const store = useStore();
 
     const step = ref(1);
+    const snackbar = ref(false);
+    const message = ref({
+        text: "",
+        color: "success",
+    });
+    const addressForm = ref({
+        main_address: null,
+        full_address: null,
+        landmark: null,
+        location_name: "",
+    });
+    const addressDialog = ref(false);
     const summaryDialog = ref(false);
     const selectedDelivery = ref(null);
     const deliveryOptions = ref([
@@ -284,6 +394,51 @@
         { label: "Google Pay", value: "gpay"},
     ]);
 
+    let autocomplete;
+    const streetRef = ref(null); 
+    const initAutocomplete = async () => {
+        const loader = new Loader({
+            apiKey: 'AIzaSyDepjJJsj2zb9pi5j-9G0beqBTtTtfYhno', // Replace with your actual API key
+            libraries: ['places'],
+        });
+
+        await loader.load();
+
+        nextTick(() => {
+            if (streetRef.value) {
+            console.log('Initializing autocomplete on:', streetRef.value);
+
+
+            const nativeInput = streetRef.value.$el.querySelector('input');
+            if (!nativeInput) {
+                console.error('❌ Could not find the actual input inside MazInput!');
+                return;
+            }
+
+            autocomplete = new google.maps.places.Autocomplete(nativeInput, {
+                componentRestrictions: { country: 'SG' }, // Singapore only
+                types: ['address'],
+            });
+
+            autocomplete.addListener('place_changed', () => {
+                const place = autocomplete.getPlace();
+                if (place.geometry) {
+                console.log('Selected Place:', place.formatted_address);
+                addressForm.value.main_address = place.formatted_address;
+                }
+            });
+            } else {
+            console.error('Invalid input element:', streetRef.value);
+            }
+        });
+    };
+
+
+    watch(addressDialog, (isOpen) => {
+        if (isOpen) {
+            initAutocomplete();
+        }
+    });
 
     watch(
         () => props.viewCart, // Watch for changes in viewCart prop
@@ -294,6 +449,7 @@
             }
         }
     );
+
 
     // Get cart items
     const cart = computed(() => store.state.cart);
@@ -319,7 +475,129 @@
         store.commit("removeFromCart", { product_id, range_id });
     };
 
-    const nextStep = (step) => {
-        step.value = step
+    const nextStep = (value) => {
+
+        snackbar.value = false;
+        message.value = {
+            text: "",
+            color: "success"
+        };
+
+        if(value == 3){
+            if(selectedDelivery.value == null){
+                snackbar.value = true;
+                message.value = {
+                    text: "Please Select Delivery Options",
+                    color: "error"
+                };
+                return;
+            }
+        
+            if(!localStorage.getItem("userName")){
+                snackbar.value = true;
+                message.value = {
+                    text: "Please Signup or Login to Continue",
+                    color: "error"
+                };
+                return;
+            }
+        }
+        
+        step.value = value
     };
+    
+    const addresses = ref([]); 
+    const selectedAddress = ref(null);
+    const addressesOptions = computed(() => {
+        return addresses.value.map(address => ({
+            value: address.ga_id,
+            full_address: address.full_address,
+            main_address: address.main_address,
+            landmark: address.landmark,
+            location_name: address.location_name,
+            primary_address: address.primary_address,
+        }));
+    });
+    const getAddress = async () => {
+        const token = localStorage.getItem("token");
+
+        await axios.get(`/get-address`, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+        .then((response) => {
+            // ✅ Ensure `data` contains an array before assigning
+            const data = response.data.data; // Make sure it's `.data.data` based on your API response
+            addresses.value = Array.isArray(data) ? data : [];
+            selectedAddress.value =  addresses.value.find(address => address.primary_address)?.ga_id || null;
+        })
+        .catch((error) => {
+            console.error("Error fetching addresses:", error);
+            //alert(error.response?.data?.message || "Something went wrong!");
+        });
+    };
+
+    const savingAddress = ref(false);
+    const saveAddress = async () => {
+        savingAddress.value = true;
+        const token = localStorage.getItem("token");
+
+        try {
+            const response = await axios.post(`/save-address`, addressForm.value, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            // Handle success response
+            console.log(response.data);
+
+            // ✅ Push the new address into `addresses.value`
+            addresses.value.push(response.data.data);  // Ensure `addresses` is a reactive array
+            selectedAddress.value = response.data.data.ga_id;
+            addresses.value = addresses.value.map(address => ({
+                ...address,
+                primary_address: address.ga_id === selectedAddress.value
+            }));
+
+            // ✅ Optionally, reset form after successful save
+            addressForm.value = {
+                main_address: "",
+                full_address: "",
+                landmark: "",
+                location_name: "",
+            };
+
+            snackbar.value = true;
+            message.value = {
+                text: response.data.message,
+                color: "success"
+            };
+
+            addressDialog.value = false;
+            
+        } catch (error) {
+            console.error("Error saving address:", error);
+            const message = error.response?.data?.message || "Something went wrong!";
+            snackbar.value = true;
+            message.value = {
+                text: message,
+                color: "error"
+            };
+
+        } finally {
+            savingAddress.value = false;
+        }
+    };
+
+    const addressExpanded = ref({});
+    const toggleAddressDetails = (ga_id) => {
+        addressExpanded.value[ga_id] = !addressExpanded.value[ga_id]; // Toggle true/false
+    };  
+
+    onMounted(() => {
+        const token = localStorage.getItem("token");
+        if (token && token != null && token != "" && token != "null") {
+            getAddress();
+        }
+    });
 </script>

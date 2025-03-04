@@ -1,10 +1,12 @@
 <script>
 import axios from "@/util/axios";
 import { appId } from "@/main";
+import cartMixin from "@/mixins/cartMixin";
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: "PriceListView",
+  mixins: [cartMixin],
   data() {
     return {
       isLoading: false,
@@ -277,45 +279,48 @@ export default {
                         S$ {{ range?.price_list?.rate }}
                       </template>
                     </span>
-                    <v-btn
-                      v-if="item?.isCount == false"
-                      @click="toggleIsCount(item)"
-                      size="xs"
-                      color="black"
-                      class="text-caption py-1 px-8"
-                      variant="flat"
-                      >Add</v-btn
-                    >
-                    <div
-                      v-if="item?.isCount == true"
-                      class="d-flex align-center ga-2"
-                    >
+
+                    <span v-show="range?.price_list?.rate">
                       <v-btn
+                        v-if="!isInCart(item, range)"
+                        @click="addToCart(item, range)"
                         size="xs"
                         color="black"
-                        class="text-caption pa-1 rounded-0"
+                        class="text-caption py-1 px-8"
                         variant="flat"
-                        icon
-                        @click="decreaseCount(item)"
+                        >Add</v-btn
                       >
-                        <v-icon>mdi-minus</v-icon>
-                      </v-btn>
-
-                      <span>
-                        {{ item?.count }}
-                      </span>
-
-                      <v-btn
-                        size="xs"
-                        color="black"
-                        class="text-caption pa-1 rounded-0"
-                        variant="flat"
-                        icon
-                        @click="increaseCount(item)"
+                      <div
+                        v-else="isInCart(item, range)"
+                        class="d-flex align-center ga-2"
                       >
-                        <v-icon>mdi-plus</v-icon>
-                      </v-btn>
-                    </div>
+                        <v-btn
+                          size="xs"
+                          color="black"
+                          class="text-caption pa-1 rounded-0"
+                          variant="flat"
+                          icon
+                          @click="decreaseQuantity(item, range)"
+                        >
+                          <v-icon>mdi-minus</v-icon>
+                        </v-btn>
+
+                        <span>
+                          {{ cartQuantity(item, range) }}
+                        </span>
+
+                        <v-btn
+                          size="xs"
+                          color="black"
+                          class="text-caption pa-1 rounded-0"
+                          variant="flat"
+                          icon
+                          @click="increaseQuantity(item, range)"
+                        >
+                          <v-icon>mdi-plus</v-icon>
+                        </v-btn>
+                      </div>
+                    </span>
                   </div>
                 </div>
                 <router-link
