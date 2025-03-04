@@ -397,8 +397,10 @@
     let autocomplete;
     const streetRef = ref(null); 
     const initAutocomplete = async () => {
+
+        const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
         const loader = new Loader({
-            apiKey: 'AIzaSyDepjJJsj2zb9pi5j-9G0beqBTtTtfYhno', // Replace with your actual API key
+            apiKey: googleMapsApiKey, // Replace with your actual API key
             libraries: ['places'],
         });
 
