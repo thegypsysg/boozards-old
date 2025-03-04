@@ -477,13 +477,16 @@
 
     const nextStep = (value) => {
 
-        snackbar.value = false;
-        message.value = {
-            text: "",
-            color: "success"
-        };
+        
 
         if(value == 3){
+
+            snackbar.value = false;
+            message.value = {
+                text: "",
+                color: "success"
+            };
+
             if(selectedDelivery.value == null){
                 snackbar.value = true;
                 message.value = {
@@ -492,8 +495,9 @@
                 };
                 return;
             }
-        
-            if(!localStorage.getItem("userName")){
+            
+            const token = localStorage.getItem("token");
+            if(token == 'null'){
                 snackbar.value = true;
                 message.value = {
                     text: "Please Signup or Login to Continue",
