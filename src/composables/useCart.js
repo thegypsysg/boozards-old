@@ -10,18 +10,22 @@ export function useCart() {
         return product.rangeItems.find((range) => range.selected?.value);
     };
 
-    const isInCart = (product) => {
-        const selectedRange = getSelectedRange(product);
-        if (!selectedRange) return false;
-
+    const isInCart = (product, selectedRange = null) => {
+        if(selectedRange == null){
+            selectedRange = getSelectedRange(product);
+            if (selectedRange == null) return false;
+        }
+       
         return cart.value.some(
-            (item) => item.id === product.product_id && item.range_id === selectedRange.range_id
+            (item) => item.id === product.product_id && item.range_id === selectedRange?.range_id
         );
     };
 
-    const cartQuantity = (product) => {
-        const selectedRange = getSelectedRange(product);
-        if (!selectedRange) return 0;
+    const cartQuantity = (product, selectedRange = null) => {
+        if(selectedRange == null){
+            selectedRange = getSelectedRange(product);
+            if (selectedRange == null) return false;
+          }
 
         const item = cart.value.find(
             (item) => item.id === product.product_id && item.range_id === selectedRange.range_id
@@ -29,38 +33,42 @@ export function useCart() {
         return item ? item.quantity : 0;
     };
 
-    const addToCart = (product) => {
-        const selectedRange = getSelectedRange(product);
-        if (!selectedRange) {
-            console.warn("No selected range found for product:", product);
-            return;
+    const addToCart = (product, selectedRange = null) => {
+
+        if(selectedRange == null){
+            selectedRange = getSelectedRange(product);
+            if (selectedRange == null) return false;
         }
 
         const data = {
             id: product.product_id,
-            range_id: selectedRange.range_id,
-            quantity_name: selectedRange.quantity?.quantity_name ?? "N/A",
+            range_id: selectedRange?.range_id,
+            quantity_name: selectedRange?.quantity?.quantity_name ?? "N/A",
             name: product.product_name,
             image: fileURL + (product?.selectedImage?.value ?? ""),
-            price: product?.selectedPrice?.value ?? 0,
+            price: product?.selectedPrice?.value ? product?.selectedPrice?.value : selectedRange?.price_list.rate ? selectedRange?.price_list.rate : 0,
         };
+
+        console.log(data)
 
         store.commit("addToCart", data);
     };
 
-    const updateQuantity = (product, change) => {
-        const selectedRange = getSelectedRange(product);
-        if (!selectedRange) return;
+    const updateQuantity = (product, selectedRange, change) => {
+        if(selectedRange == null){
+            selectedRange = getSelectedRange(product);
+            if (selectedRange == null) return false;
+          }
 
         store.commit("updateCartQuantity", {
             product_id: product.product_id,
-            range_id: selectedRange.range_id,
+            range_id: selectedRange?.range_id,
             change,
         });
     };
 
-    const increaseQuantity = (product) => updateQuantity(product, 1);
-    const decreaseQuantity = (product) => updateQuantity(product, -1);
+    const increaseQuantity = (product, range = null) => updateQuantity(product, range, 1);
+    const decreaseQuantity = (product, range = null) => updateQuantity(product, range, -1);
 
     return { isInCart, cartQuantity, addToCart, increaseQuantity, decreaseQuantity };
 }

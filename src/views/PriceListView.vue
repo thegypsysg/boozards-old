@@ -221,7 +221,7 @@ export default {
             <div style="width: 15%" class="mr-2">
               <router-link
                 class="text-decoration-none"
-                :to="`/product/${item.product_id}`"
+                :to="`/product/${item.encrypted_id}?range_id=${range?.range_id}`"
               >
                 <div
                   style="
@@ -262,7 +262,7 @@ export default {
                 >
                   <router-link
                     class="text-decoration-none text-black"
-                    :to="`/product/${item.product_id}`"
+                    :to="`/product/${item.encrypted_id}?range_id=${range?.range_id}`"
                   >
                     <p class="mb-1 font-weight-regular">
                       {{
@@ -326,7 +326,7 @@ export default {
                 <router-link
                   v-else
                   class="text-decoration-none text-black"
-                  :to="`/product/${item.product_id}`"
+                  :to="`/product/${item.encrypted_id}?range_id=${range?.range_id}`"
                 >
                   <p class="mb-1 font-weight-regular">
                     {{
@@ -337,7 +337,7 @@ export default {
 
                 <router-link
                   class="text-decoration-none text-black"
-                  :to="`/product/${item.product_id}`"
+                  :to="`/product/${item.encrypted_id}?range_id=${range?.range_id}`"
                 >
                   <p class="font-weight-regular">
                     <span>{{
@@ -358,7 +358,7 @@ export default {
                 >
                   <router-link
                     class="text-decoration-none"
-                    :to="`/product/${item.product_id}`"
+                    :to="`/product/${item.encrypted_id}?range_id=${range?.range_id}`"
                   >
                     <span class="text-red-darken-1 font-weight-bold">
                       <template v-if="range?.price_list?.rate">
@@ -366,45 +366,47 @@ export default {
                       </template>
                     </span>
                   </router-link>
-                  <v-btn
-                    v-if="item?.isCount == false"
-                    @click="toggleIsCount(item)"
-                    size="xs"
-                    color="black"
-                    class="text-caption py-1 px-8"
-                    variant="flat"
-                    >Add</v-btn
-                  >
-                  <div
-                    v-if="item?.isCount == true"
-                    class="d-flex align-center ga-2"
-                  >
-                    <v-btn
-                      size="xs"
-                      color="black"
-                      class="text-caption pa-1 rounded-0"
-                      variant="flat"
-                      icon
-                      @click="decreaseCount(item)"
-                    >
-                      <v-icon>mdi-minus</v-icon>
-                    </v-btn>
+                  <span v-show="range?.price_list?.rate">
+                      <v-btn
+                        v-if="!isInCart(item, range)"
+                        @click="addToCart(item, range)"
+                        size="xs"
+                        color="black"
+                        class="text-caption py-1 px-8"
+                        variant="flat"
+                        >Add</v-btn
+                      >
+                      <div
+                        v-else="isInCart(item, range)"
+                        class="d-flex align-center ga-2"
+                      >
+                        <v-btn
+                          size="xs"
+                          color="black"
+                          class="text-caption pa-1 rounded-0"
+                          variant="flat"
+                          icon
+                          @click="decreaseQuantity(item, range)"
+                        >
+                          <v-icon>mdi-minus</v-icon>
+                        </v-btn>
 
-                    <span>
-                      {{ item?.count }}
+                        <span>
+                          {{ cartQuantity(item, range) }}
+                        </span>
+
+                        <v-btn
+                          size="xs"
+                          color="black"
+                          class="text-caption pa-1 rounded-0"
+                          variant="flat"
+                          icon
+                          @click="increaseQuantity(item, range)"
+                        >
+                          <v-icon>mdi-plus</v-icon>
+                        </v-btn>
+                      </div>
                     </span>
-
-                    <v-btn
-                      size="xs"
-                      color="black"
-                      class="text-caption pa-1 rounded-0"
-                      variant="flat"
-                      icon
-                      @click="increaseCount(item)"
-                    >
-                      <v-icon>mdi-plus</v-icon>
-                    </v-btn>
-                  </div>
                 </div>
               </div>
             </div>

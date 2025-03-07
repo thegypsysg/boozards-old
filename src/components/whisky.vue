@@ -140,6 +140,11 @@ const handleMoved = () => {
   }
 };
 
+const getProductDetailsLink = (product) => {
+  const selectedRange = product.rangeItems.find((range) => range.selected?.value);
+  return `/product/${product.encrypted_id}?range_id=${selectedRange?.range_id}`;
+};
+
 function handleSelectRange(menu, selectedItem) {
   const isAlreadySelected = selectedItem.selected.value;
 
@@ -235,7 +240,7 @@ onUnmounted(() => {
           <v-card class="card-wrapper" height="370" elevation="3">
             <router-link
               class="text-decoration-none"
-              :to="`/product/${menu.product_id}`"
+               :to="getProductDetailsLink(menu)"
             >
               <v-img
                 :src="fileURL + menu?.selectedImage.value"
@@ -249,7 +254,7 @@ onUnmounted(() => {
             >
               <router-link
                 class="text-decoration-none"
-                :to="`/product/${menu.product_id}`"
+                :to="getProductDetailsLink(menu)"
               >
                 <p class="text-red-darken-4 font-weight-bold text-body-2">
                   {{ menu?.brand_name }}

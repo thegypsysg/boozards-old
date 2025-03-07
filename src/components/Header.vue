@@ -1569,7 +1569,7 @@ const images = {
                 <div class="w-100">
                   <router-link
                     class="text-decoration-none text-black font-weight-bold"
-                    :to="`/product/${item.raw.product_id}`"
+                    :to="`/product/${item.raw.encrypted_id}?range_id=${range.range_id}`"
                   >
                     <p class="mb-1 font-weight-regular">
                       {{
@@ -1896,7 +1896,7 @@ const images = {
                     <div class="w-100">
                       <router-link
                         class="text-decoration-none text-black font-weight-bold"
-                        :to="`/product/${item.raw.product_id}`"
+                        :to="`/product/${item.raw.encrypted_id}`"
                       >
                         <p class="mb-1 font-weight-regular">
                           {{
@@ -1921,45 +1921,47 @@ const images = {
                             S$ {{ range?.price_list?.rate }}
                           </template>
                         </span>
-                        <v-btn
-                          v-if="item?.raw?.isCount == false"
-                          @click="toggleIsCount(item.raw, $event)"
-                          size="xs"
-                          color="black"
-                          class="text-caption py-1 px-8"
-                          variant="flat"
-                          >Add</v-btn
-                        >
-                        <div
-                          v-if="item?.raw?.isCount == true"
-                          class="d-flex align-center ga-2"
-                        >
+                        <span v-show="range?.price_list?.rate">
                           <v-btn
+                            v-if="!isInCart(item.raw, range)"
+                            @click="addToCart(item.raw, range)"
                             size="xs"
                             color="black"
-                            class="text-caption pa-1 rounded-0"
+                            class="text-caption py-1 px-8"
                             variant="flat"
-                            icon
-                            @click="decreaseCount(item.raw, $event)"
+                            >Add</v-btn
                           >
-                            <v-icon>mdi-minus</v-icon>
-                          </v-btn>
-
-                          <span>
-                            {{ item?.raw?.count }}
-                          </span>
-
-                          <v-btn
-                            size="xs"
-                            color="black"
-                            class="text-caption pa-1 rounded-0"
-                            variant="flat"
-                            icon
-                            @click="increaseCount(item.raw, $event)"
+                          <div
+                            v-else="isInCart(item.raw, range)"
+                            class="d-flex align-center ga-2"
                           >
-                            <v-icon>mdi-plus</v-icon>
-                          </v-btn>
-                        </div>
+                            <v-btn
+                              size="xs"
+                              color="black"
+                              class="text-caption pa-1 rounded-0"
+                              variant="flat"
+                              icon
+                              @click="decreaseQuantity(item.raw, range)"
+                            >
+                              <v-icon>mdi-minus</v-icon>
+                            </v-btn>
+
+                            <span>
+                              {{ cartQuantity(item.raw, range) }}
+                            </span>
+
+                            <v-btn
+                              size="xs"
+                              color="black"
+                              class="text-caption pa-1 rounded-0"
+                              variant="flat"
+                              icon
+                              @click="increaseQuantity(item.raw, range)"
+                            >
+                              <v-icon>mdi-plus</v-icon>
+                            </v-btn>
+                          </div>
+                        </span>
                       </div>
                     </div>
                   </div>
