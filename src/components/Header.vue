@@ -24,6 +24,7 @@ import instaIcon from "@/assets/images/icons/insta.png";
 import tiktokIcon from "@/assets/images/icons/tiktok.png";
 import whatsappIcon from "@/assets/whatsapp.svg";
 import ExploreOurMenuList from "./explore-our-menu-list.vue";
+import { reactive } from "vue";
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
@@ -72,6 +73,7 @@ export default {
       userName: null,
       userDated: null,
       drawer: false,
+      openMobileSearchBar: false,
       // itemSelected: 'Singapore',
       country: [],
       countryRegistrable: [],
@@ -89,41 +91,48 @@ export default {
       // ---------------------------
       dialog2: false,
       activeMalls: [],
-      selectedLocation: {
+      selectedLocation: reactive({
+        country_id: 1,
         country: "Singapore",
         city: "Singapore City",
-      },
+      }),
       locationDropdown: [
         {
+          country_id: 1,
           country: "Singapore",
           flagUrl: "https://flagcdn.com/w40/sg.png",
           properties: 1,
           cities: [
             {
+              country_id: 1,
               name: "Singapore City",
               imageUrl: "https://example.com/singapore-city.jpg",
             },
           ],
         },
         {
+          country_id: 3,
           country: "Indonesia",
           flagUrl: "https://flagcdn.com/w40/id.png",
           properties: 1,
           cities: [
-            { name: "Batam", imageUrl: "https://example.com/batam.jpg" },
+            { country_id: 3, name: "Batam", imageUrl: "https://example.com/batam.jpg" },
           ],
         },
         {
+          country_id: 2,
           country: "India",
           flagUrl: "https://flagcdn.com/w40/in.png",
           properties: 3,
           cities: [
-            { name: "Mumbai", imageUrl: "https://example.com/mumbai.jpg" },
+            { country_id: 2, name: "Mumbai", imageUrl: "https://example.com/mumbai.jpg" },
             {
+              country_id: 2,
               name: "Goa - Margao",
               imageUrl: "https://example.com/goa-margao.jpg",
             },
             {
+              country_id: 2,
               name: "Goa - Panjim",
               imageUrl: "https://example.com/goa-panjim.jpg",
             },
@@ -252,6 +261,7 @@ export default {
     //this.getCity();
     this.getTrendingCardData();
     this.getActiveSkills();
+    this.getLocationDropDownData();
     // app.config.globalProperties.$eventBus.$on(
     //   'getHeaderDetail',
     //   this.getHeaderDetail
@@ -396,6 +406,9 @@ export default {
     window.removeEventListener("resize", this.handleResize);
   },
   methods: {
+    toggleMobileSearchBar() {
+      this.openMobileSearchBar = !this.openMobileSearchBar;
+    },
     toggleIsCount(product, event) {
       event.stopPropagation(); // Mencegah memilih item di VAutocomplete
       if (product) {
@@ -558,7 +571,9 @@ export default {
         })
         .then((response) => {
           const data = response.data.data;
-          //console.log(data);
+          // console.log(data);
+          console.log("user data: " + data);
+          console.log("user data: " + JSON.stringify(data));
 
           this.userName = data.name;
           localStorage.setItem("userName", data.name);
@@ -977,6 +992,52 @@ export default {
           console.log(error);
         });
     },
+    getLocationDropDownData() {
+      this.isLoading = true; 
+      let appId = null;
+      console.log("country app id")
+      axios.get(`/get-app-id`, {
+        params: {
+            'company_name': "Boozards"
+        }
+        })
+        .then((response) => {
+          appId = response.data.data['app_id'];
+          axios
+            .get(`/app-city-list-group-by-country/${appId}`)
+            .then((response) => {
+              const data = response.data.data;
+              console.log("country: " + JSON.stringify(data));
+              this.locationDropdown = data.map((country) => {
+               return {
+                 country_id: country.country_id,
+                 country: country.country_name,
+                 flagUrl: country.flag,
+                 properties: country.app_cities.length,
+                 cities: country.app_cities.map((city) => {
+                   return {
+                    country_id: country.country_id,
+                    name: city.city_name,
+                    imageUrl: city.city_image
+                   }
+                  })
+                };
+              });
+              console.log("country: " + JSON.stringify(this.locationDropdown))
+            })
+            .catch((error) => {
+              // eslint-disable-next-line
+              console.log("country" + error);
+            })
+            .finally(() => {
+              this.isLoading = false;
+            });
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log("country" + error);
+        })
+    },
     getCountry() {
       this.isLoading = true;
       axios
@@ -1051,7 +1112,8 @@ export default {
       event.preventDefault();
     },
     selectLocation(country, city) {
-      this.selectedLocation = { country: country.country, city: city.name };
+      this.selectedLocation = { country_id: country.country_id, country: country.country, city: city.name };
+      console.log("selected: " + JSON.stringify(this.selectedLocation));
     },
     gotoMallDetail(item) {
       this.dialog2 = false;
@@ -1438,7 +1500,7 @@ const images = {
           <div class="d-flex align-center gap-2">
             <v-avatar size="24" v-if="selectedLocation.country">
               <v-img
-                :src="
+                :src="$fileURL + 
                   locationDropdown.find(
                     (l) => l.country === selectedLocation.country,
                   )?.flagUrl
@@ -1462,7 +1524,7 @@ const images = {
             <v-list-subheader>
               <div class="d-flex align-center gap-2">
                 <v-avatar size="24">
-                  <v-img :src="location.flagUrl" cover></v-img>
+                  <v-img :src="$fileURL + location.flagUrl" cover></v-img>
                 </v-avatar>
                 <span class="text-subtitle-1 font-weight-medium">
                   {{ location.country }} ({{ location.properties }} Properties)
@@ -1483,7 +1545,7 @@ const images = {
             >
               <template #prepend>
                 <v-avatar size="24" class="mr-2">
-                  <v-img :src="city.imageUrl" cover></v-img>
+                  <v-img :src="$fileURL + city.imageUrl" cover></v-img>
                 </v-avatar>
               </template>
               <v-list-item-title>{{ city.name }}</v-list-item-title>
@@ -1492,6 +1554,12 @@ const images = {
         </v-list>
       </v-card>
     </v-menu>
+    
+    <div v-if="!isDesktop && !isProfile && !isProduct" @click="toggleMobileSearchBar()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+      </svg>``
+    </div>
 
     <div
       v-if="isHeader || isProfile"
@@ -1499,7 +1567,8 @@ const images = {
       :class="{ 'navbar-header-mobile': !isDesktop && isProfile }"
     >
       <div class="divider" :class="{ 'd-none': !isDesktop && isProfile }" />
-      <h1>{{ titleHeader }}</h1>
+      <h1 v-if="isDekstop">{{ titleHeader }}</h1>
+      <h2 v-else>{{ titleHeader }}</h2>
     </div>
 
     <v-spacer v-if="isHeader || isProfile" />
@@ -1706,7 +1775,7 @@ const images = {
             <v-icon size="45">mdi mdi-cart-variant</v-icon>
         </v-badge>
         <span class="ml-2">{{ cartSubTotal }}</span>
-        <Cart :viewCart="viewCart" @update:viewCart="viewCart = $event"/>
+        <Cart :viewCart="viewCart" :selectedLocation="selectedLocation.country_id.toString()" @update:viewCart="viewCart = $event"/>
       </div>
     </div>
     <div
@@ -1989,6 +2058,148 @@ const images = {
     </div> -->
 
         <div v-if="isSmall && !isProduct" class="ma-4">
+          <form
+            v-if="this.openMobileSearchBar"
+            class="navbar__search mx-auto"
+          >
+            <v-autocomplete
+              id="product_name"
+              v-model="search"
+              class="form-control mr-sm-2 ml-md-n3 search-input"
+              item-title="product_name"
+              item-value="product_id"
+              :items="activeMalls"
+              :custom-filter="filterMalls"
+              style="font-style: italic"
+              placeholder="Type your brands... Chivas,Monkey,Roku,"
+              density="compact"
+              color="blue-grey-lighten-2"
+            >
+              <template #item="{ props, item }">
+                <div
+                  v-if="item.raw.ranges.length > 0"
+                  class="mb-4 px-2"
+                  v-bind="props"
+                >
+                  <p
+                    v-if="item.raw.showBrandName"
+                    style="font-size: 12px"
+                    class="font-weight-bold text-red-darken-4 mb-2"
+                  >
+                    {{ item.raw.brand_name }}
+                  </p>
+                  <div
+                    v-for="range in item.raw.ranges"
+                    class="d-flex align-center w-100 mb-2"
+                  >
+                    <div style="width: 15%" class="mr-2">
+                      <div
+                        style="
+                          height: 45px;
+                          width: 100%;
+                          object-fit: cover;
+                          object-position: center;
+                        "
+                      >
+                        <v-img
+                          height="45"
+                          cover
+                          :src="
+                            range.image_1
+                              ? $fileURL + range.image_1
+                              : $fileURL + item.raw.image
+                          "
+                        >
+                          <template #placeholder>
+                            <div class="skeleton" />
+                          </template>
+                        </v-img>
+                      </div>
+                    </div>
+                    <div
+                      class="d-flex align-center justify-space-between"
+                      style="font-size: 12px; width: 85%"
+                    >
+                      <div class="w-100">
+                        <router-link
+                          class="text-decoration-none text-black font-weight-bold"
+                          :to="`/product/${item.raw.encrypted_id}`"
+                        >
+                          <p class="mb-1 font-weight-regular">
+                            {{
+                              `${item?.raw?.product_name} ${range?.quantity?.quantity_name}`
+                            }}
+                          </p>
+                          <p class="font-weight-regular">
+                            <span>{{
+                              item.raw.percentage && item.raw.country_name
+                                ? `${item.raw.percentage}% | ${item.raw.country_name}`
+                                : item.raw.percentage
+                                  ? `${item.raw.percentage}%`
+                                  : item.raw.country_name
+                                    ? `${item.raw.country_name}`
+                                    : ""
+                            }}</span>
+                          </p>
+                        </router-link>
+                        <div class="d-flex justify-space-between align-center">
+                          <span class="text-red-darken-1 font-weight-bold">
+                            <template v-if="range?.price_list?.rate">
+                              S$ {{ range?.price_list?.rate }}
+                            </template>
+                          </span>
+                          <span v-show="range?.price_list?.rate">
+                            <v-btn
+                              v-if="!isInCart(item.raw, range)"
+                              @click="addToCart(item.raw, range)"
+                              size="xs"
+                              color="black"
+                              class="text-caption py-1 px-8"
+                              variant="flat"
+                              >Add</v-btn
+                            >
+                            <div
+                              v-else="isInCart(item.raw, range)"
+                              class="d-flex align-center ga-2"
+                            >
+                              <v-btn
+                                size="xs"
+                                color="black"
+                                class="text-caption pa-1 rounded-0"
+                                variant="flat"
+                                icon
+                                @click="decreaseQuantity(item.raw, range)"
+                              >
+                                <v-icon>mdi-minus</v-icon>
+                              </v-btn>
+
+                              <span>
+                                {{ cartQuantity(item.raw, range) }}
+                              </span>
+
+                              <v-btn
+                                size="xs"
+                                color="black"
+                                class="text-caption pa-1 rounded-0"
+                                variant="flat"
+                                icon
+                                @click="increaseQuantity(item.raw, range)"
+                              >
+                                <v-icon>mdi-plus</v-icon>
+                              </v-btn>
+                            </div>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </v-autocomplete>
+            <button class="btn btn--search" type="submit">
+              <v-icon color="white"> mdi-magnify </v-icon>
+            </button>
+          </form>
           <ExploreOurMenuList :desktop="false" />
         </div>
 
@@ -2045,13 +2256,19 @@ const images = {
       class="drawer__top"
       :class="{ 'py-6': userName == null, 'py-2': userName != null }"
     >
-      <router-link
-        v-if="userName == null"
-        class="text-decoration-none"
-        to="/sign-in"
+    <div
+      v-if="userName == null"
+      class="btn_sign__up-cont-drawer"
+    >
+      <v-btn
+        elevation="0"
+        class="btn_sign__up"
+        @click="$router.push('/sign-in')"
       >
-        <span style="font-size: 1.125rem; color: white">Sign up / Sign In</span>
-      </router-link>
+        <span> Sign Up / Sign In</span>
+      </v-btn>
+      <div class="btn_sign__up-drawer-hover" />
+    </div>
       <div v-else class="d-flex align-center">
         <div style="width: 55px; height: 55px; border-radius: 50%">
           <v-img
@@ -2487,10 +2704,36 @@ header.v-sheet.v-app-bar {
   overflow: hidden;
   background: #0197d5;
   width: min-content;
+  box-sizing: border-box;
+}
+
+.btn_sign__up-cont:hover {
+  outline: 2px #eeeeee solid;
+}
+
+.btn_sign__up-cont-drawer {
+  position: relative;
+  overflow: hidden;
+  background: #0197d5;
+  width: min-content;
+  box-sizing: border-box;
+}
+
+.btn_sign__up-cont-drawer:hover {
+  outline: 2px #eeeeee solid;
+}
+
+
+@media (max-width: 599px) {
+  .btn_sign__up-cont {
+    display: none;
+  }
 }
 
 .btn_sign__up span {
   z-index: 1000;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .btn_sign__up-hover {
@@ -2505,6 +2748,22 @@ header.v-sheet.v-app-bar {
 }
 
 .btn_sign__up-cont:hover .btn_sign__up-hover {
+  bottom: 0px;
+  border-radius: 0px;
+}
+
+.btn_sign__up-drawer-hover {
+  position: absolute;
+  border-radius: 50%;
+  bottom: -50px;
+  height: 50px;
+  width: 100%;
+  background: #002e41;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+}
+
+.btn_sign__up-cont-drawer:hover .btn_sign__up-drawer-hover {
   bottom: 0px;
   border-radius: 0px;
 }

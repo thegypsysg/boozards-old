@@ -45,7 +45,7 @@
   .btn_sign__up {
     font-size: 12px !important;
     font-weight: 700;
-    line-height: 22px;
+    line-height: 0px;
     padding: 10px !important;
   }
   .btn_log__out {
@@ -141,6 +141,6 @@
     max-width: 50%;
   }
   .navbar__search__mobile {
-    width: 300px !important;
+    display: none;
   }
 }

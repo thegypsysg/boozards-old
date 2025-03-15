@@ -1,7 +1,8 @@
 import axios from "axios";
 
 // Atur base URL API
-axios.defaults.baseURL = "https://admin1.the-gypsy.sg/api";
+// axios.defaults.baseURL = "https://admin1.the-gypsy.sg/api";
+axios.defaults.baseURL = "http://127.0.0.1:8000/api";
 axios.defaults.headers.post["Accept"] = "application/json";
 axios.interceptors.response.use(
   function (response) {

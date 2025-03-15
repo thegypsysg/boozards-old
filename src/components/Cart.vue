@@ -19,7 +19,7 @@
                                     <div class="text-h6">My Cart</div>
                                     <div class="text-h6" v-show="cartQuantity > 0">
                                         <span class="text-red">{{ cartQuantity }}</span> Items | 
-                                        <span class="text-blue">S${{ (subTotal + selectedDeliveryPrice + 0.5).toFixed(2) }}</span>
+                                        <span class="text-blue">S${{ (subTotal + selectedDeliveryPrice + platformFee + ((subTotal + selectedDeliveryPrice + 0.5) * taxAmount / 100)).toFixed(2) }}</span>
                                     </div>
                                     <div>
                                         <v-btn @click="close" icon="mdi-close-circle"></v-btn>
@@ -145,6 +145,8 @@
                             <MazRadioButtons
                                     v-slot="{ option, selected }"
                                     v-model="selectedAddress"
+                                    @update:model-value="(ga_id) => {toggleAddressDetails(ga_id)}"
+                                    @click="toggleAddressDetails(ga_id)"
                                     :options="addressesOptions"
                                     orientation="col | row"
                                     :selector="true"
@@ -152,24 +154,26 @@
                                     block
                                     class="pt-5"
                                 >
-                                <div class="d-flex align-center justify-space-between ma-2">
-                                    <strong>{{ option.location_name }}</strong>
-                                    <v-icon @click="toggleAddressDetails(option.value)" class="cursor-pointer">
-                                        {{ addressExpanded[option.value] ? 'mdi-menu-up' : 'mdi-menu-down' }}
-                                    </v-icon>
-                                </div>
-                                <div v-if="addressExpanded[option.value]" class="d-flex flex-column ma-2">
-                                    <div class="d-flex justify-space-between">
-                                        <div class="flex-grow-1">
-                                            {{ option.full_address }}
-                                        </div>
-                                        <div v-show="option.primary_address" class="text-caption">
-                                            <strong>Primary</strong>
-                                        </div>
+                                <div >
+                                    <div class="d-flex align-center justify-space-between ma-2">
+                                        <strong>{{ option.location_name }}</strong>
+                                        <v-icon class="cursor-pointer">
+                                            {{ addressExpanded[option.value] ? 'mdi-menu-up' : 'mdi-menu-down' }}
+                                        </v-icon>
                                     </div>
-                                    <p v-if="option.landmark" class="text-red-darken-4 font-weight-bold">
-                                        {{ option.landmark }}
-                                    </p>
+                                    <div v-if="addressExpanded[option.value]" class="d-flex flex-column ma-2">
+                                        <div class="d-flex justify-space-between">
+                                            <div class="flex-grow-1">
+                                                {{ option.full_address }}
+                                            </div>
+                                            <div v-show="option.primary_address" class="text-caption">
+                                                <strong>Primary</strong>
+                                            </div>
+                                        </div>
+                                        <p v-if="option.landmark" class="text-red-darken-4 font-weight-bold">
+                                            {{ option.landmark }}
+                                        </p>
+                                    </div>
                                 </div>
                             </MazRadioButtons>
                         </v-col>
@@ -236,17 +240,17 @@
                                                 <tr>
                                                 <td>Platform Fee</td>
                                                 <td>S$</td>
-                                                <td class="text-end">0.50</td>
+                                                <td class="text-end">{{ platformFee.toFixed(2) }}</td>
                                                 </tr>
                                                 <tr>
-                                                <td>G.S.T</td>
+                                                <td>G.S.T {{ taxAmount != null ? '(' + taxAmount + '%)' : '(Not Applicable)' }} </td>
                                                 <td>S$</td>
-                                                <td class="text-end">0.00</td>
+                                                <td class="text-end">{{ taxAmount != null ? (subTotal + selectedDeliveryPrice + 0.5) * taxAmount / 100 : '0.00' }}</td>
                                                 </tr>
                                                 <tr class="total-row">
                                                 <td><strong>This is what you pay</strong></td>
                                                 <td><strong>S$</strong></td>
-                                                <td class="text-end"><strong>{{ (subTotal + selectedDeliveryPrice + 0.50).toFixed(2) }}</strong></td>
+                                                <td class="text-end"><strong>{{ (subTotal + selectedDeliveryPrice + platformFee + ((subTotal + selectedDeliveryPrice + 0.5) * taxAmount / 100)).toFixed(2) }}</strong></td>
                                                 </tr>
                                             </tbody>
                                         </v-table>
@@ -354,10 +358,18 @@
     import MazTextarea from "maz-ui/components/MazTextarea";
     import MazRadioButtons from "maz-ui/components/MazRadioButtons";
     import { Loader } from '@googlemaps/js-api-loader';
+import { number } from "maz-ui";
 
     const props = defineProps({
-        viewCart: Boolean
+        viewCart: Boolean,
+        selectedLocation: String,
     });
+    
+    watch(props.selectedLocation, async (location, oldLocation) => {
+        console.log("props" + props.selectedLocation)
+        console.log("UpdateUpdate")
+        await getTaxAmount();
+    })
 
     const emit = defineEmits(["update:viewCart"]);
     const store = useStore();
@@ -524,6 +536,13 @@
             primary_address: address.primary_address,
         }));
     });
+    const addressExpanded = ref({});
+    const toggleAddressDetails = (ga_id) => {
+        if (Object.keys(addressExpanded.value).find(key => addressExpanded.value[key] === true) != ga_id) {
+            addressExpanded.value[Object.keys(addressExpanded.value).find(key => addressExpanded.value[key] === true)] = false; // close other opened details
+        }
+        addressExpanded.value[ga_id] = !addressExpanded.value[ga_id]; // Toggle true/false
+    };  
     const getAddress = async () => {
         const token = localStorage.getItem("token");
 
@@ -534,32 +553,41 @@
             // ✅ Ensure `data` contains an array before assigning
             const data = response.data.data; // Make sure it's `.data.data` based on your API response
             addresses.value = Array.isArray(data) ? data : [];
+            // get primaryAddressIndex and assign them as selected
+            const primaryAddressIndex = addresses.value.findIndex(address => address.primary_address)
+            const primaryAddress = addresses.value.find(address => address.primary_address)
+            addresses.value.splice(primaryAddressIndex, 1)
+            addresses.value.unshift(primaryAddress)
             selectedAddress.value =  addresses.value.find(address => address.primary_address)?.ga_id || null;
+            addressExpanded.value[primaryAddress['ga_id']] = true
+            console.log("selected address: "+ selectedAddress.value)
         })
         .catch((error) => {
             console.error("Error fetching addresses:", error);
             //alert(error.response?.data?.message || "Something went wrong!");
         });
     };
-
+    
     const savingAddress = ref(false);
     const saveAddress = async () => {
         savingAddress.value = true;
         const token = localStorage.getItem("token");
-
+        
         try {
             const response = await axios.post(`/save-address`, addressForm.value, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-
+            
             // Handle success response
             console.log(response.data);
-
+            
             // ✅ Push the new address into `addresses.value`
-            addresses.value.push(response.data.data);  // Ensure `addresses` is a reactive array
+            addresses.value.unshift(response.data.data);  // Ensure `addresses` is a reactive array
+            // const primaryAddressIndex = addresses.value.findIndex(address => address.primary_address)
             selectedAddress.value = response.data.data.ga_id;
+            toggleAddressDetails(response.data.data.ga_id);
             addresses.value = addresses.value.map(address => ({
                 ...address,
                 primary_address: address.ga_id === selectedAddress.value
@@ -595,15 +623,89 @@
         }
     };
 
-    const addressExpanded = ref({});
-    const toggleAddressDetails = (ga_id) => {
-        addressExpanded.value[ga_id] = !addressExpanded.value[ga_id]; // Toggle true/false
-    };  
+    const taxAmount = ref(null);
+    const getTaxAmount = async () => {
+        const token = localStorage.getItem("token");
+        let data = null;
+        
+        try {
+            await axios.get(`/gypsy-user`, {headers: {Authorization: `Bearer ${token}`,},})
+            .then((response) => {
+                data = response.data.data['country_current'];
+            })
+        .catch((_) => {
+        })
+        
+        const response = await axios.get(`/get-tax-amount`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            params: {
+                'country_id': parseInt(props.selectedLocation) != null ? parseInt(props.selectedLocation) : data
+            }
+        });
+            if (response.data.data['applicable'] === 'Y') {
+                taxAmount.value = response.data.data['tax_rate']
+            }
+        } catch(error) {
+          // eslint-disable-next-line
+          console.log(error);
+        }
+    }; 
+
+    const platformFee = ref(null);  
+    const getPlatformFee = async () => {
+        const token = localStorage.getItem("token");
+        let data = null;
+        
+        try {
+            await axios.get(`/get-app-id`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                params: {
+                    'company_name': "Boozards"
+                }
+            })
+            .then((response) => {
+                data = response.data.data['app_id'];
+            })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        })
+        
+        const response = await axios.get(`/get-platform-fee`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            params: {
+                'app_id': data
+            }
+        });
+        
+        platformFee.value = parseFloat(response.data.data['platform_fee'])
+        
+        } catch (error) {
+            console.error("Error getting tax rate:", error);
+            // const message = error.response?.data?.message || "Something went wrong!";
+            // snackbar.value = true;
+            // message.value = {
+            //     text: message,
+            //     color: "error"
+            // };
+
+        } finally {
+            // savingAddress.value = false;
+        }
+    }; 
 
     onMounted(() => {
         const token = localStorage.getItem("token");
         if (token && token != null && token != "" && token != "null") {
+            getTaxAmount();
             getAddress();
+            getPlatformFee();
         }
     });
 </script>

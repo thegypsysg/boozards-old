@@ -12,6 +12,7 @@ export default (app) =>
       itemSelected2: "---Select City---",
       itemSelected2Complete: null,
       selectedTrending: "",
+      selectedCountry: "",
       latitude: "",
       longitude: "",
       country: [],
@@ -62,6 +63,9 @@ export default (app) =>
       },
       setCategoryData(state, item) {
         state.categoryData = item;
+      },
+      setSelectedCountry(state, item) {
+        state.selectedCountry = item;
       },
       addToCart(state, product){
         const item = state.cart.find((item) => item.id === product.id && item.range_id === product.range_id);
