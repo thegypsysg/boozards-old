@@ -124,18 +124,30 @@
                                                     placeholder="Your Full Address"
                                                 />
                                            </div>
-                                            <div>
-                                                <MazInput v-model="addressForm.town"  placeholder="Town" />
-                                            </div>
-                                            <div>
-                                                <MazInput v-model="addressForm.city"  placeholder="City" />
-                                            </div>
-                                            <div>
-                                                <MazInput v-model="addressForm.country"  placeholder="Country" />
-                                            </div>
-                                            <div>
-                                                <MazInput v-model="addressForm.postal_code"  placeholder="Postal Code" />
-                                            </div>
+                                            <v-row>
+                                                <v-col cols="6">
+                                                    <div>
+                                                        <MazInput v-model="addressForm.town"  placeholder="Town" />
+                                                    </div>
+                                                </v-col>
+                                                <v-col cols="6">
+                                                    <div>
+                                                        <MazInput v-model="addressForm.city"  placeholder="City" />
+                                                    </div>
+                                                </v-col>
+                                            </v-row>
+                                            <v-row>
+                                                <v-col cols="6">
+                                                        <div>
+                                                        <MazInput v-model="addressForm.country"  placeholder="Country" />
+                                                    </div>
+                                                </v-col>
+                                                <v-col cols="6">
+                                                    <div>
+                                                        <MazInput v-model="addressForm.postal_code"  placeholder="Postal Code" />
+                                                    </div>
+                                                </v-col>
+                                            </v-row>
                                             <div>
                                                 <MazInput v-model="addressForm.condo_name"  placeholder="Condo Name" />
                                             </div>
