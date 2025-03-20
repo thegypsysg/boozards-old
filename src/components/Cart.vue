@@ -433,6 +433,8 @@ import { number } from "maz-ui";
             autocomplete = new google.maps.places.Autocomplete(nativeInput, {
                 componentRestrictions: { country: 'SG' }, // Singapore only
                 types: ['address'],
+                types: ['geocode'],
+                types: ['establishment']
             });
 
             autocomplete.addListener('place_changed', () => {
@@ -441,6 +443,7 @@ import { number } from "maz-ui";
                 console.log('Selected Place:', place.formatted_address);
                 console.log('Selected Place:', place.address_components);
                 addressForm.value.main_address = place.formatted_address;
+                addressForm.value.full_address = place.formatted_address;
                 }
             });
             } else {
