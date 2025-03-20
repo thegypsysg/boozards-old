@@ -410,6 +410,7 @@ import { number } from "maz-ui";
     const streetRef = ref(null); 
     const initAutocomplete = async () => {
 
+        // const googleMapsApiKey = 'AIzaSyDepjJJsj2zb9pi5j-9G0beqBTtTtfYhno';
         const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
         const loader = new Loader({
             apiKey: googleMapsApiKey, // Replace with your actual API key
@@ -438,6 +439,7 @@ import { number } from "maz-ui";
                 const place = autocomplete.getPlace();
                 if (place.geometry) {
                 console.log('Selected Place:', place.formatted_address);
+                console.log('Selected Place:', place.address_components);
                 addressForm.value.main_address = place.formatted_address;
                 }
             });
