@@ -124,6 +124,21 @@
                                                     placeholder="Your Full Address"
                                                 />
                                            </div>
+                                            <div>
+                                                <MazInput v-model="addressForm.town"  placeholder="Town" />
+                                            </div>
+                                            <div>
+                                                <MazInput v-model="addressForm.city"  placeholder="City" />
+                                            </div>
+                                            <div>
+                                                <MazInput v-model="addressForm.country"  placeholder="Country" />
+                                            </div>
+                                            <div>
+                                                <MazInput v-model="addressForm.postal_code"  placeholder="Postal Code" />
+                                            </div>
+                                            <div>
+                                                <MazInput v-model="addressForm.condo_name"  placeholder="Condo Name" />
+                                            </div>
                                            <div>
                                             <MazTextarea
                                                     v-model="addressForm.landmark"
@@ -384,6 +399,11 @@ import { number } from "maz-ui";
         main_address: null,
         full_address: null,
         landmark: null,
+        town: null,
+        city: null,
+        country: null,
+        postal_code: null,
+        condo_name: null,
         location_name: "",
     });
     const addressDialog = ref(false);
@@ -440,11 +460,44 @@ import { number } from "maz-ui";
             autocomplete.addListener('place_changed', () => {
                 const place = autocomplete.getPlace();
                 if (place.geometry) {
-                console.log('Address Components:', place.address_components);
-                console.log('Selected Place:', place.formatted_address);
-                console.log('Selected Place:', place.address_components);
-                addressForm.value.main_address = place.formatted_address;
-                addressForm.value.full_address = place.formatted_address;
+                    console.log('Place:', place);
+                    console.log('Address Components:', place.address_components);
+                    console.log('Selected Place:', place.formatted_address);
+                    console.log('Selected Place:', place.address_components);
+                    addressForm.value.full_address = place.formatted_address;
+
+                    var streetName = "";
+                    var route = "";
+                    for (let i = 0; i < place.address_components.length; i++) {
+                        const component = place.address_components[i];
+                        // Check the types to determine what kind of address component it is
+                        if (component.types.includes('street_number')) {
+                            streetName = component.long_name; // Locality is typically the city or town
+                        }
+                        if (component.types.includes('route')) {
+                            route = component.long_name; // Locality is typically the city or town
+                        }
+                        
+                        var mainAddress = [streetName, route].filter(Boolean).join(' '); // This avoids trailing spaces
+                        console.log({mainAddress})
+
+                        if (component.types.includes('locality')) {
+                            addressForm.value.city = component.long_name; // Locality is typically the city or town
+                        }
+                        if (component.types.includes('neighborhood')) {
+                            addressForm.value.town = component.long_name; // Locality is typically the city or town
+                        }
+                        if (component.types.includes('country')) {
+                            addressForm.value.country = component.long_name; // Country
+                        }
+                        if (component.types.includes('postal_code')) {
+                            addressForm.value.postal_code = component.long_name; // Postal Code
+                        }
+                        if (component.types.includes('sublocality') || component.types.includes('neighborhood')) {
+                            addressForm.value.condo_name = component.long_name; // Condo or neighborhood name
+                        }
+                    }
+                    addressForm.value.main_address = mainAddress
                 }
             });
             } else {
@@ -605,6 +658,11 @@ import { number } from "maz-ui";
                 full_address: "",
                 landmark: "",
                 location_name: "",
+                town: "",
+                city: "",
+                country: "",
+                postal_code: "",
+                condo_name: "",
             };
 
             snackbar.value = true;
