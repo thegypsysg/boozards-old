@@ -116,7 +116,11 @@ export default {
           flagUrl: "https://flagcdn.com/w40/id.png",
           properties: 1,
           cities: [
-            { country_id: 3, name: "Batam", imageUrl: "https://example.com/batam.jpg" },
+            {
+              country_id: 3,
+              name: "Batam",
+              imageUrl: "https://example.com/batam.jpg",
+            },
           ],
         },
         {
@@ -125,7 +129,11 @@ export default {
           flagUrl: "https://flagcdn.com/w40/in.png",
           properties: 3,
           cities: [
-            { country_id: 2, name: "Mumbai", imageUrl: "https://example.com/mumbai.jpg" },
+            {
+              country_id: 2,
+              name: "Mumbai",
+              imageUrl: "https://example.com/mumbai.jpg",
+            },
             {
               country_id: 2,
               name: "Goa - Margao",
@@ -158,13 +166,20 @@ export default {
     ...mapState(["skillRecognised"]),
     ...mapState(["idSkillRecognised"]),
     ...mapState({
-      cartSubTotal: (state) => new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-      }).format(state.cart.reduce((total, item) => total + item.price * item.quantity, 0)),
+      cartSubTotal: (state) =>
+        new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(
+          state.cart.reduce(
+            (total, item) => total + item.price * item.quantity,
+            0,
+          ),
+        ),
     }),
     ...mapState({
-      cartTotalQuantity: (state) => state.cart.reduce((total, item) => total + item.quantity, 0),
+      cartTotalQuantity: (state) =>
+        state.cart.reduce((total, item) => total + item.quantity, 0),
     }),
     tokenProvider() {
       // Mendapatkan URL dari browser
@@ -993,37 +1008,38 @@ export default {
         });
     },
     getLocationDropDownData() {
-      this.isLoading = true; 
+      this.isLoading = true;
       let appId = null;
-      console.log("country app id")
-      axios.get(`/get-app-id`, {
-        params: {
-            'company_name': "Boozards"
-        }
+      console.log("country app id");
+      axios
+        .get(`/get-app-id`, {
+          params: {
+            company_name: "Boozards",
+          },
         })
         .then((response) => {
-          appId = response.data.data['app_id'];
+          appId = response.data.data["app_id"];
           axios
             .get(`/app-city-list-group-by-country/${appId}`)
             .then((response) => {
               const data = response.data.data;
               console.log("country: " + JSON.stringify(data));
               this.locationDropdown = data.map((country) => {
-               return {
-                 country_id: country.country_id,
-                 country: country.country_name,
-                 flagUrl: country.flag,
-                 properties: country.app_cities.length,
-                 cities: country.app_cities.map((city) => {
-                   return {
-                    country_id: country.country_id,
-                    name: city.city_name,
-                    imageUrl: city.city_image
-                   }
-                  })
+                return {
+                  country_id: country.country_id,
+                  country: country.country_name,
+                  flagUrl: country.flag,
+                  properties: country.app_cities.length,
+                  cities: country.app_cities.map((city) => {
+                    return {
+                      country_id: country.country_id,
+                      name: city.city_name,
+                      imageUrl: city.city_image,
+                    };
+                  }),
                 };
               });
-              console.log("country: " + JSON.stringify(this.locationDropdown))
+              console.log("country: " + JSON.stringify(this.locationDropdown));
             })
             .catch((error) => {
               // eslint-disable-next-line
@@ -1036,7 +1052,7 @@ export default {
         .catch((error) => {
           // eslint-disable-next-line
           console.log("country" + error);
-        })
+        });
     },
     getCountry() {
       this.isLoading = true;
@@ -1112,7 +1128,11 @@ export default {
       event.preventDefault();
     },
     selectLocation(country, city) {
-      this.selectedLocation = { country_id: country.country_id, country: country.country, city: city.name };
+      this.selectedLocation = {
+        country_id: country.country_id,
+        country: country.country,
+        city: city.name,
+      };
       console.log("selected: " + JSON.stringify(this.selectedLocation));
     },
     gotoMallDetail(item) {
@@ -1500,7 +1520,8 @@ const images = {
           <div class="d-flex align-center gap-2">
             <v-avatar size="24" v-if="selectedLocation.country">
               <v-img
-                :src="$fileURL + 
+                :src="
+                  $fileURL +
                   locationDropdown.find(
                     (l) => l.country === selectedLocation.country,
                   )?.flagUrl
@@ -1554,11 +1575,23 @@ const images = {
         </v-list>
       </v-card>
     </v-menu>
-    
-    <div v-if="!isDesktop && !isProfile && !isProduct" @click="toggleMobileSearchBar()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-      </svg>``
+
+    <div
+      v-if="!isDesktop && !isProfile && !isProduct"
+      @click="toggleMobileSearchBar()"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="currentColor"
+        class="bi bi-search"
+        viewBox="0 0 16 16"
+      >
+        <path
+          d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"
+        /></svg
+      >``
     </div>
 
     <div
@@ -1769,13 +1802,26 @@ const images = {
       Logout
     </v-btn>
     <div>
-      <div v-if="!isSmall && !isProfile" @click="viewCart = true" class="cart d-flex align-center">
+      <div
+        v-if="!isSmall && !isProfile"
+        @click="viewCart = true"
+        class="cart d-flex align-center"
+      >
         <div class="cart-line mr-2" />
-        <v-badge :content="cartTotalQuantity" color="red" offset-x="10" offset-y="10">
-            <v-icon size="45">mdi mdi-cart-variant</v-icon>
+        <v-badge
+          :content="cartTotalQuantity"
+          color="red"
+          offset-x="10"
+          offset-y="10"
+        >
+          <v-icon size="45">mdi mdi-cart-variant</v-icon>
         </v-badge>
         <span class="ml-2">{{ cartSubTotal }}</span>
-        <Cart :viewCart="viewCart" :selectedLocation="selectedLocation.country_id.toString()" @update:viewCart="viewCart = $event"/>
+        <Cart
+          :viewCart="viewCart"
+          :selectedLocation="selectedLocation.country_id.toString()"
+          @update:viewCart="viewCart = $event"
+        />
       </div>
     </div>
     <div
@@ -2058,10 +2104,7 @@ const images = {
     </div> -->
 
         <div v-if="isSmall && !isProduct" class="ma-4">
-          <form
-            v-if="this.openMobileSearchBar"
-            class="navbar__search mx-auto"
-          >
+          <form v-if="openMobileSearchBar" class="navbar__search mx-auto">
             <v-autocomplete
               id="product_name"
               v-model="search"
@@ -2256,19 +2299,16 @@ const images = {
       class="drawer__top"
       :class="{ 'py-6': userName == null, 'py-2': userName != null }"
     >
-    <div
-      v-if="userName == null"
-      class="btn_sign__up-cont-drawer"
-    >
-      <v-btn
-        elevation="0"
-        class="btn_sign__up"
-        @click="$router.push('/sign-in')"
-      >
-        <span> Sign Up / Sign In</span>
-      </v-btn>
-      <div class="btn_sign__up-drawer-hover" />
-    </div>
+      <div v-if="userName == null" class="btn_sign__up-cont-drawer">
+        <v-btn
+          elevation="0"
+          class="btn_sign__up"
+          @click="$router.push('/sign-in')"
+        >
+          <span> Sign Up / Sign In</span>
+        </v-btn>
+        <div class="btn_sign__up-drawer-hover" />
+      </div>
       <div v-else class="d-flex align-center">
         <div style="width: 55px; height: 55px; border-radius: 50%">
           <v-img
@@ -2722,7 +2762,6 @@ header.v-sheet.v-app-bar {
 .btn_sign__up-cont-drawer:hover {
   outline: 2px #eeeeee solid;
 }
-
 
 @media (max-width: 599px) {
   .btn_sign__up-cont {
