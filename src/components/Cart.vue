@@ -437,7 +437,7 @@ import { number } from "maz-ui";
             autocomplete.addListener('place_changed', () => {
                 const place = autocomplete.getPlace();
                 if (place.geometry) {
-                console.log('Selected Place:', place.address_components);
+                console.log('Address Components:', place.address_components);
                 console.log('Selected Place:', place.formatted_address);
                 addressForm.value.main_address = place.formatted_address;
                 }
