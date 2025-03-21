@@ -681,28 +681,30 @@ const initAutocomplete = async () => {
           console.log("Address Components:", place.address_components);
           console.log("Selected Place:", place.formatted_address);
           console.log("Selected Place:", place.address_components);
-          addressForm.value.full_address = place.formatted_address;
 
+          var placeName = place.name;
           var streetName = "";
           var route = "";
           for (let i = 0; i < place.address_components.length; i++) {
             const component = place.address_components[i];
-            // Check the types to determine what kind of address component it is
+
+            var mainAddress = [placeName, streetName, route].filter(Boolean).join(' ');
+                    
+            var fullAddress = [placeName, place.formatted_address].filter(Boolean).join(' ');
+            
+						// Check the types to determine what kind of address component it is
             if (component.types.includes("street_number")) {
-              streetName = component.long_name; // Locality is typically the city or town
+              streetName = component.long_name;
             }
             if (component.types.includes("route")) {
-              route = component.long_name; // Locality is typically the city or town
+              route = component.long_name;
             }
-
-            var mainAddress = [streetName, route].filter(Boolean).join(" "); // This avoids trailing spaces
-            console.log({ mainAddress });
 
             if (component.types.includes("locality")) {
-              addressForm.value.city = component.long_name; // Locality is typically the city or town
+              addressForm.value.city = component.long_name; // City
             }
             if (component.types.includes("neighborhood")) {
-              addressForm.value.town = component.long_name; // Locality is typically the city or town
+              addressForm.value.town = component.long_name; // Town
             }
             if (component.types.includes("country")) {
               addressForm.value.country = component.long_name; // Country
@@ -717,7 +719,8 @@ const initAutocomplete = async () => {
               addressForm.value.condo_name = component.long_name; // Condo or neighborhood name
             }
           }
-          addressForm.value.main_address = mainAddress;
+          addressForm.value.main_address = mainAddress
+        	addressForm.value.full_address = fullAddress
         }
       });
     } else {
