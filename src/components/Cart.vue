@@ -192,7 +192,7 @@
                   block
                   >Add New</v-btn
                 >
-                <v-dialog v-model="addressDialog" max-width="500">
+                <v-dialog v-model="addressDialog" max-width="600">
                   <v-card>
                     <div
                       class="d-flex align-center justify-space-between pa-4 border-b"
@@ -207,76 +207,118 @@
                       </div>
                     </div>
                     <div class="pa-5 d-flex flex-column ga-3">
-                      <div>
-                        <MazInput
-                          ref="streetRef"
-                          v-model="addressForm.main_address"
-                          placeholder="Type Your Street Address"
-                        />
-                      </div>
-                      <div>
-                        <MazTextarea
-                          v-model="addressForm.full_address"
-                          placeholder="Your Full Address"
-                        />
-                      </div>
                       <v-row>
-                        <v-col cols="6">
-                          <div>
-                            <MazInput
-                              v-model="addressForm.town"
-                              placeholder="Town"
-                            />
-                          </div>
-                        </v-col>
-                        <v-col cols="6">
-                          <div>
-                            <MazInput
-                              v-model="addressForm.city"
-                              placeholder="City"
-                            />
-                          </div>
+                        <v-col cols="12">
+                          <label class="text-grey-darken-1 font-weight-bold">Street Address</label>
+                          <MazInput
+                            class="mt-1"
+                            ref="streetRef"
+                            v-model="addressForm.main_address"
+                            placeholder="Type Your Street Address"
+                          />
                         </v-col>
                       </v-row>
+
                       <v-row>
-                        <v-col cols="6">
+                        <v-col cols="8">
                           <div>
-                            <MazInput
-                              v-model="addressForm.country"
-                              placeholder="Country"
+                            <label class="text-grey-darken-1 font-weight-bold">Full Address</label>
+                            <MazTextarea
+                              class="mt-1"
+                              rows="4"
+                              v-model="addressForm.full_address"
+                              placeholder="Your Full Address"
                             />
+                          
                           </div>
                         </v-col>
-                        <v-col cols="6">
+                        <v-col cols="4">
                           <div>
+                            <label class="text-grey-darken-1 font-weight-bold">Unit #</label>
                             <MazInput
+                              class="mt-1 mb-2"
+                              v-model="addressForm.unit"
+                              placeholder="Unit"
+                            />
+                          </div>
+                          <div>
+                            <label class="text-grey-darken-1 font-weight-bold">Postal Code</label>
+                            <MazInput
+                              class="mt-1"
                               v-model="addressForm.postal_code"
                               placeholder="Postal Code"
                             />
                           </div>
                         </v-col>
                       </v-row>
-                      <div>
-                        <MazInput
-                          v-model="addressForm.condo_name"
-                          placeholder="Condo Name"
-                        />
-                      </div>
-                      <div>
-                        <MazTextarea
-                          v-model="addressForm.landmark"
-                          placeholder="Any Landmarks"
-                        />
-                      </div>
-                      <div>
-                        <MazInput
-                          v-model="addressForm.location_name"
-                          placeholder="Name Your Location"
-                        />
-                        <small class="text-muted text-caption"
-                          >e.g Home, Office</small
-                        >
-                      </div>
+                    
+                      <v-row>
+                        <v-col cols="4">
+                          <div>
+                            <label class="text-grey-darken-1 font-weight-bold">Town</label>
+                            <MazInput
+                              class="mt-1"
+                              v-model="addressForm.town"
+                              placeholder="Town"
+                            />
+                          </div>
+                        </v-col>
+                        <v-col cols="4">
+                          <div>
+                            <label class="text-grey-darken-1 font-weight-bold">City</label>
+                            <MazInput
+                              class="mt-1"
+                              v-model="addressForm.city"
+                              placeholder="City"
+                            />
+                          </div>
+                        </v-col>
+                        <v-col cols="4">
+                          <div>
+                            <label class="text-grey-darken-1 font-weight-bold">Country</label>
+                            <MazInput
+                              class="mt-1"
+                              v-model="addressForm.country"
+                              placeholder="Country"
+                            />
+                          </div>
+                        </v-col>
+                      </v-row>
+
+                      <v-row>
+                        <v-col>
+                          <label class="text-grey-darken-1 font-weight-bold">Condo / Apartment Name</label>
+                          <MazInput
+                            class="mt-1"
+                            v-model="addressForm.condo_name"
+                            placeholder="Condo Name"
+                          />
+                        </v-col>
+                      </v-row>
+
+                      <v-row>
+                        <v-col>
+                          <label class="text-grey-darken-1 font-weight-bold">Landmark Details</label>
+                          <MazTextarea
+                            class="mt-1"
+                            v-model="addressForm.landmark"
+                            placeholder="Any Landmarks"
+                          />
+                        </v-col>
+                      </v-row>
+                      <v-row>
+                        <v-col>
+                          <label class="text-grey-darken-1 font-weight-bold">Name Location as</label>
+                          <MazInput
+                            class="mt-1"
+                            v-model="addressForm.location_name"
+                            placeholder="Name Your Location"
+                          />
+                          <small class="text-muted text-caption"
+                            >e.g Home, Office</small
+                          >
+                        </v-col>
+                      </v-row>
                       <div>
                         <v-btn
                           @click="saveAddress()"
@@ -613,14 +655,15 @@ const message = ref({
   color: "success",
 });
 const addressForm = ref({
-  main_address: null,
-  full_address: null,
-  landmark: null,
-  town: null,
-  city: null,
-  country: null,
-  postal_code: null,
-  condo_name: null,
+  main_address: "",
+  full_address: "",
+  unit: "",
+  postal_code: "",
+  town: "",
+  city: "",
+  country: "",
+  condo_name: "",
+  landmark: "",
   location_name: "",
 });
 const addressDialog = ref(false);
@@ -677,20 +720,13 @@ const initAutocomplete = async () => {
       autocomplete.addListener("place_changed", () => {
         const place = autocomplete.getPlace();
         if (place.geometry) {
-          console.log("Place:", place);
           console.log("Address Components:", place.address_components);
-          console.log("Selected Place:", place.formatted_address);
-          console.log("Selected Place:", place.address_components);
 
           var placeName = place.name;
           var streetName = "";
           var route = "";
           for (let i = 0; i < place.address_components.length; i++) {
             const component = place.address_components[i];
-
-            var mainAddress = [placeName, streetName, route].filter(Boolean).join(' ');
-                    
-            var fullAddress = [placeName, place.formatted_address].filter(Boolean).join(' ');
             
 						// Check the types to determine what kind of address component it is
             if (component.types.includes("street_number")) {
@@ -719,6 +755,11 @@ const initAutocomplete = async () => {
               addressForm.value.condo_name = component.long_name; // Condo or neighborhood name
             }
           }
+
+          var wrappedAddress = addressForm.value.city+' '+addressForm.value.postal_code;
+          var mainAddress = [placeName, streetName, route].filter(Boolean).join(' ');
+          var fullAddress = [mainAddress, wrappedAddress].filter(Boolean).join('\n');
+
           addressForm.value.main_address = mainAddress
         	addressForm.value.full_address = fullAddress
         }
@@ -729,8 +770,24 @@ const initAutocomplete = async () => {
   });
 };
 
+const resetForm = () => {
+  addressForm.value = {
+    main_address: "",
+    full_address: "",
+    unit: "",
+    postal_code: "",
+    town: "",
+    city: "",
+    country: "",
+    condo_name: "",
+    landmark: "",
+    location_name: "",
+  };
+}
+
 watch(addressDialog, (isOpen) => {
   if (isOpen) {
+    resetForm();
     initAutocomplete();
   }
 });
@@ -903,17 +960,7 @@ const saveAddress = async () => {
     }));
 
     // ✅ Optionally, reset form after successful save
-    addressForm.value = {
-      main_address: "",
-      full_address: "",
-      landmark: "",
-      location_name: "",
-      town: "",
-      city: "",
-      country: "",
-      postal_code: "",
-      condo_name: "",
-    };
+    resetForm();
 
     snackbar.value = true;
     message.value = {
