@@ -335,6 +335,8 @@
                   </v-card>
                 </v-dialog>
               </div>
+
+              <!-- Addresses List -->
               <MazRadioButtons
                 v-slot="{ option, selected }"
                 v-model="selectedAddress"
@@ -362,10 +364,7 @@
                       }}
                     </v-icon>
                   </div>
-                  <div
-                    v-if="addressExpanded[option.value]"
-                    class="d-flex flex-column ma-2"
-                  >
+                  <div v-if="addressExpanded[option.value]" class="d-flex flex-column ma-2" >
                     <div class="d-flex justify-space-between">
                       <div class="flex-grow-1">
                         {{ option.full_address }}
@@ -383,6 +382,7 @@
                   </div>
                 </div>
               </MazRadioButtons>
+              
             </v-col>
             <v-col v-if="step == 4" class="pa-5">
               <div class="my-3 text-h6 d-flex justify-space-between">
@@ -720,6 +720,7 @@ const initAutocomplete = async () => {
       autocomplete.addListener("place_changed", () => {
         const place = autocomplete.getPlace();
         if (place.geometry) {
+          console.log("Place:", place);
           console.log("Address Components:", place.address_components);
 
           var placeName = place.name;
@@ -748,20 +749,22 @@ const initAutocomplete = async () => {
             if (component.types.includes("postal_code")) {
               addressForm.value.postal_code = component.long_name; // Postal Code
             }
-            if (
+            /* if (
               component.types.includes("sublocality") ||
               component.types.includes("neighborhood")
             ) {
               addressForm.value.condo_name = component.long_name; // Condo or neighborhood name
-            }
+            } */
           }
 
           var wrappedAddress = addressForm.value.city+' '+addressForm.value.postal_code;
           var mainAddress = [placeName, streetName, route].filter(Boolean).join(' ');
-          var fullAddress = [mainAddress, wrappedAddress].filter(Boolean).join('\n');
+          var fullSingleLine = streetName+' '+route
+          var fullAddress = [fullSingleLine, wrappedAddress].filter(Boolean).join('\n');
 
           addressForm.value.main_address = mainAddress
         	addressForm.value.full_address = fullAddress
+          addressForm.value.condo_name = placeName;
         }
       });
     } else {
