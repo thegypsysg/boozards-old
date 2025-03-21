@@ -1529,7 +1529,7 @@ const images = {
                 cover
               ></v-img>
             </v-avatar>
-            <span>{{ selectedLocation.city }}</span>
+            <span class="searchCityName">{{ selectedLocation.city }}</span>
           </div>
         </v-btn>
       </template>
@@ -1582,8 +1582,8 @@ const images = {
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="32"
-        height="32"
+        width="22"
+        height="22"
         fill="currentColor"
         class="bi bi-search"
         viewBox="0 0 16 16"
@@ -2831,11 +2831,15 @@ header.v-sheet.v-app-bar {
   background-color: #f5f5f5;
 }
 
+.searchCityName {
+  font-size: 12px !important;
+}
+
 .location-selector {
   background-color: #f5f5f5 !important;
   border-radius: 8px;
-  padding: 0 16px;
-  height: 50px;
+  padding: 0 10px;
+  height: 40px;
 }
 
 .location-selector:hover {
