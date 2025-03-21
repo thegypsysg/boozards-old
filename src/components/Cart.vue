@@ -335,53 +335,41 @@
                   </v-card>
                 </v-dialog>
               </div>
-
-              <!-- Addresses List -->
-              <MazRadioButtons
-                v-slot="{ option, selected }"
-                v-model="selectedAddress"
-                @update:model-value="
-                  (ga_id) => {
-                    toggleAddressDetails(ga_id);
-                  }
-                "
-                @click="toggleAddressDetails(ga_id)"
-                :options="addressesOptions"
-                orientation="col | row"
-                :selector="true"
-                color="info"
-                block
-                class="pt-5"
-              >
-                <div>
-                  <div class="d-flex align-center justify-space-between ma-2">
+              
+              <div v-for="option in addressesOptions" :class="{
+                  'mt-2': true,
+                  'pa-5':true,
+                  'bg-teal-lighten-2': option.primary_address,
+                  'rounded-lg': true,
+                  'border-md': !option.primary_address,
+                }">
+                <v-row>
+                  <v-col>
                     <strong>{{ option.location_name }}</strong>
-                    <v-icon class="cursor-pointer">
-                      {{
-                        addressExpanded[option.value]
-                          ? "mdi-menu-up"
-                          : "mdi-menu-down"
-                      }}
-                    </v-icon>
-                  </div>
-                  <div v-if="addressExpanded[option.value]" class="d-flex flex-column ma-2" >
-                    <div class="d-flex justify-space-between">
-                      <div class="flex-grow-1">
-                        {{ option.full_address }}
-                      </div>
-                      <div v-show="option.primary_address" class="text-caption">
-                        <strong>Primary</strong>
-                      </div>
-                    </div>
-                    <p
-                      v-if="option.landmark"
-                      class="text-red-darken-4 font-weight-bold"
-                    >
+                  </v-col>
+                </v-row>
+                <v-divider v-if="option.primary_address" :thickness="2" class="mt-2 mb-2 border-opacity-25" />
+                <v-divider v-else :thickness="2" class="mt-2 mb-2 border-opacity-15" />
+                <v-row>
+                  <v-col cols="9">
+                    <p>{{ option.full_address }}</p>
+                  </v-col>
+                  <v-col v-if="option.primary_address" col="3" class="justify-end">
+                    <strong>Primary</strong>
+                  </v-col>
+                </v-row>
+                <v-row class="d-flex">
+                  <v-col cols="9" class="d-flex align-center pa-0 pl-3">
+                    <p v-if="option.landmark" class="text-red-darken-4 font-weight-bold" >
                       {{ option.landmark }}
                     </p>
-                  </div>
-                </div>
-              </MazRadioButtons>
+                  </v-col>
+                  <v-col cols="3" class="d-flex align-center pa-0">
+                    <v-btn class="" @click="handleRemoveLocation(option.value)" color="red" icon="mdi-trash-can" size="small"></v-btn>
+                    <v-btn class="" @click="handleEditLocation(option.value)" color="lime" icon="mdi-pencil-outline" size="small"></v-btn>
+                  </v-col>
+                </v-row>
+              </div>
               
             </v-col>
             <v-col v-if="step == 4" class="pa-5">
@@ -834,6 +822,16 @@ const handleUpdateQuantity = (product_id, range_id, change) => {
 // Remove item from cart
 const handleRemoveFromCart = (product_id, range_id) => {
   store.commit("removeFromCart", { product_id, range_id });
+};
+
+// Remove item from cart
+const handleRemoveLocation = (address_id) => {
+  console.log("Remove Location : ID -", address_id);
+};
+
+// Remove item from cart
+const handleEditLocation = (address_id) => {
+  console.log("Edit Location : ID -", address_id);
 };
 
 const nextStep = (value) => {
