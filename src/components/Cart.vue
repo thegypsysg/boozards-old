@@ -336,7 +336,7 @@
                 </v-dialog>
               </div>
               
-              <div v-for="option in addressesOptions" :class="{
+              <div v-for="(option, index) in addressesOptions" :class="{
                   'mt-2': true,
                   'pa-5':true,
                   'bg-teal-lighten-2': option.primary_address,
@@ -365,7 +365,7 @@
                     </p>
                   </v-col>
                   <v-col cols="3" class="d-flex align-center pa-0">
-                    <v-btn class="" @click="handleRemoveLocation(option.value)" color="red" icon="mdi-trash-can" size="small"></v-btn>
+                    <v-btn class="" @click="handleOpenDialog(option, index)" color="red" icon="mdi-trash-can" size="small"></v-btn>
                     <v-btn class="" @click="handleEditLocation(option.value)" color="lime" icon="mdi-pencil-outline" size="small"></v-btn>
                   </v-col>
                 </v-row>
@@ -519,6 +519,17 @@
       </div>
     </template>
   </MazDrawer>
+  <v-dialog v-model="openDialog" max-width="400" persistent>
+    <v-card prepend-icon="mdi-trash-can"
+      :text=modalText
+      :title=modalTitle >
+      <template v-slot:actions>
+        <v-spacer></v-spacer>
+        <v-btn @click="openDialog = false"> Disagree </v-btn>
+        <v-btn @click="handleDeleteAddress()"> Agree </v-btn>
+      </template>
+    </v-card>
+  </v-dialog>
 </template>
 
 <style>
@@ -626,6 +637,13 @@ const props = defineProps({
   viewCart: Boolean,
   selectedLocation: String,
 });
+
+const openDialog = ref(false)
+const addressIndex = ref(null)
+const addressId = ref(null)
+const addressName = ref(null)
+const modalTitle = "Are you Sure?"
+const modalText = ref(null)
 
 watch(props.selectedLocation, async (location, oldLocation) => {
   console.log("props" + props.selectedLocation);
@@ -824,12 +842,29 @@ const handleRemoveFromCart = (product_id, range_id) => {
   store.commit("removeFromCart", { product_id, range_id });
 };
 
-// Remove item from cart
-const handleRemoveLocation = (address_id) => {
-  console.log("Remove Location : ID -", address_id);
+// Open Confirmation Modal
+const handleOpenDialog = (option, index) => {
+  console.log({option})
+  addressIndex.value = index
+  addressId.value = option.value
+  addressName.value = option.location_name
+  modalText.value = `Do you surely want to delete the address "${addressName.value}"?`
+  openDialog.value = true
+}
+
+// Delete address from the DB & the list
+const handleDeleteAddress = async () => {
+  const token = localStorage.getItem("token");
+  await axios.get('/delete-address/'+addressId.value, null, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  addresses.value.splice(addressIndex.value, 1)
+  openDialog.value = false
 };
 
-// Remove item from cart
+// Edit Address
 const handleEditLocation = (address_id) => {
   console.log("Edit Location : ID -", address_id);
 };
