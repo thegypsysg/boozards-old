@@ -855,11 +855,17 @@ const handleOpenDialog = (option, index) => {
 // Delete address from the DB & the list
 const handleDeleteAddress = async () => {
   const token = localStorage.getItem("token");
-  await axios.get('/delete-address/'+addressId.value, null, {
+  const response =await axios.get('/delete-address/'+addressId.value, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
+  
+  snackbar.value = true;
+  message.value = {
+    text: response.data.message,
+    color: "success",
+  }
   addresses.value.splice(addressIndex.value, 1)
   openDialog.value = false
 };
