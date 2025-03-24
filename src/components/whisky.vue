@@ -153,10 +153,16 @@ function handleSelectRange(menu, selectedItem) {
     item.selected.value = false;
   });
 
+  // Undone the unselect quantity here
+  selectedItem.selected.value = true
+
   // Jika belum dipilih sebelumnya, jadikan selected
-  if (!isAlreadySelected) {
+  /* if (!isAlreadySelected) {
     selectedItem.selected.value = true;
   }
+  else {
+    selectedItem.selected.value = true;
+  } */
 }
 
 onMounted(() => {

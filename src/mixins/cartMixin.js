@@ -47,7 +47,8 @@ export default {
         range_id: selectedRange.range_id,
         quantity_name: selectedRange.quantity?.quantity_name ?? "N/A",
         name: product.product_name,
-        image: fileURL + (product?.selectedImage?.value ?? ""),
+        // image: fileURL + (product?.selectedImage?.value ?? ""),
+        image: fileURL + (product?.image ?? ""),  // The previous image was not showing/uploading 
         price: product?.selectedPrice?.value ?? selectedRange?.price_list?.rate,
       };
 
