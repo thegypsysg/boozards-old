@@ -1,5 +1,5 @@
 <template>
-  <v-snackbar v-model="snackbar" :timeout="2000" :color="message.color">
+  <v-snackbar v-model="snackbar" :timeout="3000" :color="message.color">
     {{ message.text }}
     <template #actions>
       <v-btn icon="mdi-close-circle" @click="snackbar = false"></v-btn>
@@ -1016,11 +1016,10 @@ const saveAddress = async () => {
 
     addressDialog.value = false;
   } catch (error) {
-    console.error("Error saving address:", error);
-    const message = error.response?.data?.message || "Something went wrong!";
+    const errorMessage = error.response?.data?.message || "Something went wrong!";
     snackbar.value = true;
     message.value = {
-      text: message,
+      text: errorMessage,
       color: "error",
     };
   } finally {
