@@ -184,7 +184,7 @@
               ></v-alert>
               <div class="pt-5">
                 <v-btn
-                  @click="addressDialog = true"
+                  @click="openAddressDialog"
                   prepend-icon="mdi-plus-circle"
                   color="primary"
                   variant="flat"
@@ -633,6 +633,8 @@ import MazRadioButtons from "maz-ui/components/MazRadioButtons";
 import { Loader } from "@googlemaps/js-api-loader";
 import { number } from "maz-ui";
 
+const authToken = localStorage.getItem("token");
+
 const props = defineProps({
   viewCart: Boolean,
   selectedLocation: String,
@@ -651,6 +653,8 @@ watch(props.selectedLocation, async (location, oldLocation) => {
 
 const emit = defineEmits(["update:viewCart"]);
 const store = useStore();
+const isEditAddressForm = ref(false);
+const addressID = ref("");
 
 const step = ref(1);
 const snackbar = ref(false);
@@ -658,7 +662,7 @@ const message = ref({
   text: "",
   color: "success",
 });
-const addressForm = ref({
+const addressForm = reactive({
   main_address: "",
   full_address: "",
   unit: "",
@@ -693,6 +697,11 @@ const paymentOptions = ref([
   { label: "Pay Now", value: "paynow" },
   { label: "Google Pay", value: "gpay" },
 ]);
+
+const openAddressDialog = () => {
+  resetForm()
+  addressDialog.value = true
+}
 
 let autocomplete;
 const streetRef = ref(null);
@@ -740,35 +749,29 @@ const initAutocomplete = async () => {
             }
 
             if (component.types.includes("locality")) {
-              addressForm.value.city = component.long_name; // City
+              addressForm.city = component.long_name; // City
             }
             if (component.types.includes("neighborhood")) {
-              addressForm.value.town = component.long_name; // Town
+              addressForm.town = component.long_name; // Town
             }
             if (component.types.includes("country")) {
-              addressForm.value.country = component.long_name; // Country
+              addressForm.country = component.long_name; // Country
             }
             if (component.types.includes("postal_code")) {
-              addressForm.value.postal_code = component.long_name; // Postal Code
+              addressForm.postal_code = component.long_name; // Postal Code
             }
-            /* if (
-              component.types.includes("sublocality") ||
-              component.types.includes("neighborhood")
-            ) {
-              addressForm.value.condo_name = component.long_name; // Condo or neighborhood name
-            } */
           }
 
-          var wrappedAddress = addressForm.value.city+' '+addressForm.value.postal_code;
+          var wrappedAddress = addressForm.city+' '+addressForm.postal_code;
           var mainAddress = [placeName, streetName, route].filter(Boolean).join(' ');
           var fullSingleLine = streetName+' '+route
           var fullAddress = [fullSingleLine, wrappedAddress].filter(Boolean).join('\n');
 
-          addressForm.value.main_address = mainAddress
-        	addressForm.value.full_address = fullAddress
-          addressForm.value.condo_name = placeName;
-          addressForm.value.latitude = place.geometry.location.lat();
-          addressForm.value.longitude = place.geometry.location.lng();
+          addressForm.main_address = mainAddress
+        	addressForm.full_address = fullAddress
+          addressForm.condo_name = placeName;
+          addressForm.latitude = place.geometry.location.lat();
+          addressForm.longitude = place.geometry.location.lng();
         }
       });
     } else {
@@ -778,23 +781,20 @@ const initAutocomplete = async () => {
 };
 
 const resetForm = () => {
-  addressForm.value = {
-    main_address: "",
-    full_address: "",
-    unit: "",
-    postal_code: "",
-    town: "",
-    city: "",
-    country: "",
-    condo_name: "",
-    landmark: "",
-    location_name: "",
-  };
+  addressForm.main_address = ""
+  addressForm.full_address = ""
+  addressForm.unit = ""
+  addressForm.postal_code = ""
+  addressForm.town = ""
+  addressForm.city = ""
+  addressForm.country = ""
+  addressForm.condo_name = ""
+  addressForm.landmark = ""
+  addressForm.location_name = ""
 }
 
 watch(addressDialog, (isOpen) => {
   if (isOpen) {
-    resetForm();
     initAutocomplete();
   }
 });
@@ -851,10 +851,9 @@ const handleOpenDialog = (option, index) => {
 
 // Delete address from the DB & the list
 const handleDeleteAddress = async () => {
-  const token = localStorage.getItem("token");
   const response =await axios.get('/delete-address/'+addressId.value, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${authToken}`,
     },
   });
   
@@ -868,8 +867,26 @@ const handleDeleteAddress = async () => {
 };
 
 // Edit Address
-const handleEditLocation = (address_id) => {
-  console.log("Edit Location : ID -", address_id);
+const handleEditLocation = async (address_id) => {
+  isEditAddressForm.value = true
+  addressID.value = address_id
+  axios.get('/get-address/'+address_id).then(response => {
+    let formData = response.data.data
+    addressForm.main_address = formData.address_master?.street_address,
+    addressForm.full_address = formData.full_address,
+    addressForm.unit = formData.unit_number,
+    addressForm.postal_code = formData.address_master?.postal_code,
+    addressForm.town = formData.address_master?.town.town_name,
+    addressForm.city = formData.address_master?.city.city_name,
+    addressForm.country = formData.address_master?.country.country_name,
+    addressForm.condo_name = formData?.condo_name || "",
+    addressForm.landmark = formData.landmark,
+    addressForm.location_name = formData.location_name
+    addressDialog.value = true
+  })
+  .catch(error => {
+    console.error(error);
+  });
 };
 
 const nextStep = (value) => {
@@ -889,8 +906,7 @@ const nextStep = (value) => {
       return;
     }
 
-    const token = localStorage.getItem("token");
-    if (token == "null") {
+    if (authToken == "null") {
       snackbar.value = true;
       message.value = {
         text: "Please Signup or Login to Continue",
@@ -931,11 +947,10 @@ const toggleAddressDetails = (ga_id) => {
   addressExpanded.value[ga_id] = !addressExpanded.value[ga_id]; // Toggle true/false
 };
 const getAddress = async () => {
-  const token = localStorage.getItem("token");
 
   try {
     const response = await axios.get(`/get-address`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${authToken}` },
     });
 
     // Pastikan `data` adalah array sebelum menggunakannya
@@ -950,7 +965,7 @@ const getAddress = async () => {
     //   (address) => address.primary_address,
     // );
 
-    if (primaryAddress) {
+    /* if (primaryAddress) {
       // Hanya memindahkan alamat utama ke urutan pertama jika ditemukan
       addresses.value.splice(primaryAddressIndex, 1);
       addresses.value.unshift(primaryAddress);
@@ -964,7 +979,8 @@ const getAddress = async () => {
       }
     } else {
       selectedAddress.value = null; // Jika tidak ada primary address, set null
-    }
+    } */
+    selectedAddress.value = null;
   } catch (error) {
     console.error("Error fetching addresses:", error);
     // alert(error.response?.data?.message || "Something went wrong!");
@@ -974,35 +990,49 @@ const getAddress = async () => {
 const savingAddress = ref(false);
 const saveAddress = async () => {
   savingAddress.value = true;
-  const token = localStorage.getItem("token");
-
   try {
-    const response = await axios.post(`/save-address`, addressForm.value, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    // ✅ Push the new address into `addresses.value`
-    addresses.value.unshift(response.data.data); // Ensure `addresses` is a reactive array
-    // const primaryAddressIndex = addresses.value.findIndex(address => address.primary_address)
-    selectedAddress.value = response.data.data.ga_id;
-    toggleAddressDetails(response.data.data.ga_id);
-    addresses.value = addresses.value.map((address) => ({
-      ...address,
-      // primary_address: address.ga_id === selectedAddress.value,
-    }));
+    if(!isEditAddressForm.value) {
+      const response = await axios.post(`/save-address`, addressForm, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      // ✅ Push the new address into `addresses.value`
+      addresses.value.unshift(response.data.data); // Ensure `addresses` is a reactive array
+      // const primaryAddressIndex = addresses.value.findIndex(address => address.primary_address)
+      selectedAddress.value = response.data.data.ga_id;
+      toggleAddressDetails(response.data.data.ga_id);
+      addresses.value = addresses.value.map((address) => ({
+        ...address,
+        // primary_address: address.ga_id === selectedAddress.value,
+      }));
 
+      snackbar.value = true;
+      message.value = {
+        text: response.data.message,
+        color: "success",
+      };
+    }
+    else {
+      console.log('isEditAddressForm', addressForm);
+      const response = await axios.put(`/update-address/`+addressID.value, addressForm, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      getAddress();
+      snackbar.value = true;
+      message.value = {
+        text: response.data.message,
+        color: "success",
+      };
+    }
     // ✅ Optionally, reset form after successful save
     resetForm();
-
-    snackbar.value = true;
-    message.value = {
-      text: response.data.message,
-      color: "success",
-    };
-
+    isEditAddressForm.value = false
     addressDialog.value = false;
-  } catch (error) {
+  }
+  catch (error) {
     const errorMessage = error.response?.data?.message || "Something went wrong!";
     snackbar.value = true;
     message.value = {
@@ -1016,12 +1046,11 @@ const saveAddress = async () => {
 
 const taxAmount = ref(null);
 const getTaxAmount = async () => {
-  const token = localStorage.getItem("token");
   let data = null;
 
   try {
     await axios
-      .get(`/gypsy-user`, { headers: { Authorization: `Bearer ${token}` } })
+      .get(`/gypsy-user`, { headers: { Authorization: `Bearer ${authToken}` } })
       .then((response) => {
         data = response.data.data["country_current"];
       })
@@ -1029,7 +1058,7 @@ const getTaxAmount = async () => {
 
     const response = await axios.get(`/get-tax-amount`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${authToken}`,
       },
       params: {
         country_id:
@@ -1049,14 +1078,13 @@ const getTaxAmount = async () => {
 
 const platformFee = ref(null);
 const getPlatformFee = async () => {
-  const token = localStorage.getItem("token");
   let data = null;
 
   try {
     await axios
       .get(`/get-app-id`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${authToken}`,
         },
         params: {
           company_name: "Boozards",
@@ -1072,7 +1100,7 @@ const getPlatformFee = async () => {
 
     const response = await axios.get(`/get-platform-fee`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${authToken}`,
       },
       params: {
         app_id: data,
@@ -1094,8 +1122,7 @@ const getPlatformFee = async () => {
 };
 
 onMounted(() => {
-  const token = localStorage.getItem("token");
-  if (token && token != null && token != "" && token != "null") {
+  if (authToken && authToken != null && authToken != "" && authToken != "null") {
     getTaxAmount();
     getAddress();
     getPlatformFee();
