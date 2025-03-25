@@ -671,6 +671,8 @@ const addressForm = ref({
   condo_name: "",
   landmark: "",
   location_name: "",
+  latitude: "",
+  longitude: "",
 });
 const addressDialog = ref(false);
 const summaryDialog = ref(false);
@@ -771,6 +773,8 @@ const initAutocomplete = async () => {
           addressForm.value.main_address = mainAddress
         	addressForm.value.full_address = fullAddress
           addressForm.value.condo_name = placeName;
+          addressForm.value.latitude = place.geometry.location.lat();
+          addressForm.value.longitude = place.geometry.location.lng();
         }
       });
     } else {
