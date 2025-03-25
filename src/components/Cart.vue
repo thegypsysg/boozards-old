@@ -646,8 +646,6 @@ const modalTitle = "Are you Sure?"
 const modalText = ref(null)
 
 watch(props.selectedLocation, async (location, oldLocation) => {
-  console.log("props" + props.selectedLocation);
-  console.log("UpdateUpdate");
   await getTaxAmount();
 });
 
@@ -710,8 +708,6 @@ const initAutocomplete = async () => {
 
   nextTick(() => {
     if (streetRef.value) {
-      console.log("Initializing autocomplete on:", streetRef.value);
-
       const nativeInput = streetRef.value.$el.querySelector("input");
       if (!nativeInput) {
         console.error("❌ Could not find the actual input inside MazInput!");
@@ -728,8 +724,6 @@ const initAutocomplete = async () => {
       autocomplete.addListener("place_changed", () => {
         const place = autocomplete.getPlace();
         if (place.geometry) {
-          console.log("Place:", place);
-          console.log("Address Components:", place.address_components);
 
           var placeName = place.name;
           var streetName = "";
@@ -848,7 +842,6 @@ const handleRemoveFromCart = (product_id, range_id) => {
 
 // Open Confirmation Modal
 const handleOpenDialog = (option, index) => {
-  console.log({option})
   addressIndex.value = index
   addressId.value = option.value
   addressName.value = option.location_name
@@ -950,12 +943,12 @@ const getAddress = async () => {
     addresses.value = Array.isArray(data) ? data : [];
 
     // Cari alamat utama (primary address)
-    const primaryAddressIndex = addresses.value.findIndex(
-      (address) => address.primary_address,
-    );
-    const primaryAddress = addresses.value.find(
-      (address) => address.primary_address,
-    );
+    // const primaryAddressIndex = addresses.value.findIndex(
+    //   (address) => address.primary_address,
+    // );
+    // const primaryAddress = addresses.value.find(
+    //   (address) => address.primary_address,
+    // );
 
     if (primaryAddress) {
       // Hanya memindahkan alamat utama ke urutan pertama jika ditemukan
@@ -972,8 +965,6 @@ const getAddress = async () => {
     } else {
       selectedAddress.value = null; // Jika tidak ada primary address, set null
     }
-
-    console.log("selected address:", selectedAddress.value);
   } catch (error) {
     console.error("Error fetching addresses:", error);
     // alert(error.response?.data?.message || "Something went wrong!");
@@ -991,10 +982,6 @@ const saveAddress = async () => {
         Authorization: `Bearer ${token}`,
       },
     });
-
-    // Handle success response
-    console.log(response.data);
-
     // ✅ Push the new address into `addresses.value`
     addresses.value.unshift(response.data.data); // Ensure `addresses` is a reactive array
     // const primaryAddressIndex = addresses.value.findIndex(address => address.primary_address)
@@ -1002,7 +989,7 @@ const saveAddress = async () => {
     toggleAddressDetails(response.data.data.ga_id);
     addresses.value = addresses.value.map((address) => ({
       ...address,
-      primary_address: address.ga_id === selectedAddress.value,
+      // primary_address: address.ga_id === selectedAddress.value,
     }));
 
     // ✅ Optionally, reset form after successful save
