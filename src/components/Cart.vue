@@ -760,6 +760,9 @@ const initAutocomplete = async () => {
             if (component.types.includes("postal_code")) {
               addressForm.postal_code = component.long_name; // Postal Code
             }
+            else {
+              addressForm.postal_code = "";
+            }
           }
 
           var wrappedAddress = addressForm.city+' '+addressForm.postal_code;
