@@ -70,35 +70,36 @@ onUnmounted(() => {
       <v-col cols="12" v-else>
         <v-row justify="center" >
           <v-col cols="12" md="6" class="pa-5">
-            <v-img  :src="fileURL + product?.image"></v-img>
+            <v-img  :src="fileURL + product?.image || fileURL + selectedRange?.image1"></v-img>
           </v-col>
           <v-col cols="12" md="6"  class="pa-5">
-              <h3 class="text-red mb-3">{{ product?.brand.brand_name }}</h3>
-              <h2 class="mb-4">{{ product?.product_name }} <span class="text-blue">{{ selectedRange?.quantity.quantity_name }}</span></h2>
+              <h1 class="text-red">{{ product?.brand.brand_name }}</h1>
+              <h2 class="mb-4">{{ product?.product_name }} - <span class="">{{ selectedRange?.quantity.quantity_name }}</span></h2>
               <v-row no-gutters class="mb-3">
                 <v-col cols="12" md="8" >
                   <v-row>
-                    <v-col cols="5"><strong>Alcohol %</strong></v-col>
+                    <v-col cols="12">{{ selectedRange?.description }}</v-col>
+                    <v-col cols="6"><strong>Alcohol Percentage</strong></v-col>
                     <v-col cols="1" class="text-center">:</v-col>
-                    <v-col cols="6" class="text-right">40 %</v-col>
+                    <v-col cols="5" class="text-right">40 %</v-col>
                   </v-row>
                 </v-col>
               </v-row>
               <v-row no-gutters class="mb-3">
                 <v-col cols="12" md="8" >
                   <v-row>
-                    <v-col cols="5"><strong>Bottle Volume</strong></v-col>
+                    <v-col cols="6"><strong>Bottle Volume</strong></v-col>
                     <v-col cols="1" class="text-center">:</v-col>
-                    <v-col cols="6" class="text-right">{{ selectedRange?.quantity.quantity_name }}</v-col>
+                    <v-col cols="5" class="text-right">{{ selectedRange?.quantity.quantity_name }}</v-col>
                   </v-row>
                 </v-col>
               </v-row>
               <v-row no-gutters class="mb-3">
                 <v-col cols="12" md="8" >
                   <v-row>
-                    <v-col cols="5"><strong>Origin</strong></v-col>
+                    <v-col cols="6"><strong>Country of Origin</strong></v-col>
                     <v-col cols="1" class="text-center">:</v-col>
-                    <v-col cols="6" class="text-right">{{ product?.brand.country.country_name }}</v-col>
+                    <v-col cols="5" class="text-right">{{ product?.brand.country.country_name }}</v-col>
                   </v-row>
                 </v-col>
               </v-row>
@@ -109,7 +110,7 @@ onUnmounted(() => {
                     @click="addToCart(product,selectedRange)"
                     rounded=""
                     color="black"
-                    class="py-1 px-8"
+                    class="py-2 px-12 mt-5"
                     variant="flat"
                     >Add To Cart</v-btn
                   >
@@ -159,6 +160,12 @@ onUnmounted(() => {
                 <span class="mx-2">:</span>
                 <span>Scotland</span>
               </div> -->
+          </v-col>
+        </v-row>
+        <v-row v-if="product?.additional_description">
+          <v-col lg="6" md="8" sm="12">
+            <h2 class="mt-1">Description</h2>
+            <div class="mt-3 text-justify">{{ product?.additional_description }}</div>
           </v-col>
         </v-row>
       </v-col>

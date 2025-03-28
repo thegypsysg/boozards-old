@@ -1492,7 +1492,7 @@ const images = {
     elevation="1"
     fixed
   >
-    <router-link to="/">
+    <a href="/">
       <div class="logo-img-container ml-4">
         <v-img
           class="logo-img"
@@ -1506,7 +1506,7 @@ const images = {
           </template>
         </v-img>
       </div>
-    </router-link>
+    </a>
 
     <v-menu v-if="!isProfile && !isProduct">
       <template #activator="{ props }">
@@ -1669,9 +1669,9 @@ const images = {
                 style="font-size: 12px; width: 85%"
               >
                 <div class="w-100">
-                  <router-link
+                  <a
                     class="text-decoration-none text-black font-weight-bold"
-                    :to="`/product/${item.raw.encrypted_id}?range_id=${range.range_id}`"
+                    :href="`/product/${item.raw.encrypted_id}?range_id=${range.range_id}`"
                   >
                     <p class="mb-1 font-weight-regular">
                       {{
@@ -1690,7 +1690,7 @@ const images = {
                               : ""
                       }}</span>
                     </p>
-                  </router-link>
+                  </a>
                   <div class="d-flex justify-space-between align-center">
                     <span class="text-red-darken-1 font-weight-bold">
                       <template v-if="range?.price_list?.rate">

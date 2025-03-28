@@ -45,8 +45,8 @@ export function useCart() {
             range_id: selectedRange?.range_id,
             quantity_name: selectedRange?.quantity?.quantity_name ?? "N/A",
             name: product.product_name,
-            image: fileURL + (product?.selectedImage?.value ?? ""),
-            price: product?.selectedPrice?.value ? product?.selectedPrice?.value : selectedRange?.price_list.rate ? selectedRange?.price_list.rate : 0,
+            image: fileURL + (product?.image ?? ""),
+            price: product?.selectedPrice?.value ? product?.selectedPrice?.value : selectedRange?.price_list?.rate ? selectedRange?.price_list?.rate : 0,
         };
 
         console.log(data)

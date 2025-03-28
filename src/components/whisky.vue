@@ -243,7 +243,7 @@ onUnmounted(() => {
       <Splide ref="splideRef" :options="splideOptions">
         <SplideSlide v-for="menu in filteredProducts" :key="menu.product_id">
           <!-- :key="menu?.product_id" -->
-          <v-card class="card-wrapper" height="370" elevation="3">
+          <v-card class="card-wrapper" height="420" elevation="3">
             <router-link
               class="text-decoration-none"
                :to="getProductDetailsLink(menu)"
@@ -282,13 +282,11 @@ onUnmounted(() => {
                   <!-- @click="item.selected.value = !item.selected.value" -->
                 </template>
               </div>
-              <div class="d-flex justify-space-between align-center">
+              <div v-if="menu?.selectedPrice.value" class="d-flex justify-space-between align-center">
                 <span class="text-red-darken-1 font-weight-bold">
-                  <template v-if="menu?.selectedPrice.value">
-                    S$ {{ menu?.selectedPrice.value }}
-                  </template>
+                  S$ {{ menu?.selectedPrice.value }}
                 </span>
-                <span v-show="menu?.selectedPrice.value">
+                <span>
                   <v-btn
                     v-if="!isInCart(menu)"
                     @click="addToCart(menu)"
@@ -329,6 +327,12 @@ onUnmounted(() => {
                     </v-btn>
                   </div>
                 </span>
+              </div>
+              <hr />
+              <div class="mt-5">
+                <span class="mr-2 font-weight-bold text-grey">{{ menu.percentage }}</span>
+                <span class="text-blue">% |</span>
+                <span class="ml-2 text-orange font-weight-bold">Scotland</span>
               </div>
             </div>
           </v-card>
