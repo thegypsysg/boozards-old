@@ -1508,7 +1508,7 @@ const images = {
       </div>
     </a>
 
-    <v-menu v-if="!isProfile && !isProduct">
+    <v-menu v-if="!isProfile">
       <template #activator="{ props }">
         <v-btn
           class="ml-4 location-selector"
@@ -1577,7 +1577,7 @@ const images = {
     </v-menu>
 
     <div
-      v-if="!isDesktop && !isProfile && !isProduct"
+      v-if="!isDesktop && !isProfile"
       @click="toggleMobileSearchBar()"
     >
       <svg
@@ -2103,7 +2103,7 @@ const images = {
       </div>
     </div> -->
 
-        <div v-if="isSmall && !isProduct" class="ma-4">
+        <div v-if="isSmall" class="ma-4">
           <form v-if="openMobileSearchBar" class="navbar__search mx-auto">
             <v-autocomplete
               id="product_name"
