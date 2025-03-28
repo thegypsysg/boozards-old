@@ -10,6 +10,7 @@ const route = useRoute()
 const { isInCart, cartQuantity, addToCart, increaseQuantity, decreaseQuantity } = useCart();
 const product = ref(null)
 const selectedRange = ref(null);
+const giftPack = ref(null);
 const isLoading = ref(false)
 const screenWidth = ref(window.innerWidth)
 const isCount = ref(false)
@@ -29,6 +30,7 @@ const getProductDetails = async () => {
     const response = await axios.get(`/product/${encryptedId}`)
     product.value = response.data.data
     selectedRange.value = product.value.ranges.find(range => range.range_id === Number(rangeId));
+    giftPack.value = selectedRange.value.description == 'Packed in Gift Box' ? 'Gift Pack Available' : '';
 
     console.log(selectedRange.value)
   } catch (err) {
@@ -78,10 +80,10 @@ onUnmounted(() => {
               <v-row no-gutters class="mb-3">
                 <v-col cols="12" md="8" >
                   <v-row>
-                    <v-col cols="12">{{ selectedRange?.description }}</v-col>
+                    <v-col cols="12">{{ giftPack }}</v-col>
                     <v-col cols="6"><strong>Alcohol Percentage</strong></v-col>
                     <v-col cols="1" class="text-center">:</v-col>
-                    <v-col cols="5" class="text-right">40 %</v-col>
+                    <v-col cols="5" class="text-right">{{ product?.percentage || '' }}%</v-col>
                   </v-row>
                 </v-col>
               </v-row>
@@ -90,7 +92,7 @@ onUnmounted(() => {
                   <v-row>
                     <v-col cols="6"><strong>Bottle Volume</strong></v-col>
                     <v-col cols="1" class="text-center">:</v-col>
-                    <v-col cols="5" class="text-right">{{ selectedRange?.quantity.quantity_name }}</v-col>
+                    <v-col cols="5" class="text-right">{{ selectedRange?.quantity?.quantity_name || '' }}</v-col>
                   </v-row>
                 </v-col>
               </v-row>

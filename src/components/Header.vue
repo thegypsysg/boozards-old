@@ -1606,8 +1606,7 @@ const images = {
 
     <v-spacer v-if="isHeader || isProfile" />
 
-    <form
-      v-if="!isHeader && !isProfile && !isBatamProperties"
+    <form v-if="!isHeader && !isProfile && !isBatamProperties"
       class="navbar__search navbar__search__desktop"
     >
       <v-autocomplete
@@ -2009,9 +2008,9 @@ const images = {
                     style="font-size: 12px; width: 85%"
                   >
                     <div class="w-100">
-                      <router-link
+                      <a
                         class="text-decoration-none text-black font-weight-bold"
-                        :to="`/product/${item.raw.encrypted_id}`"
+                        :href="`/product/${item.raw.encrypted_id}?range_id=${range.range_id}`"
                       >
                         <p class="mb-1 font-weight-regular">
                           {{
@@ -2029,7 +2028,7 @@ const images = {
                                   : ""
                           }}</span>
                         </p>
-                      </router-link>
+                      </a>
                       <div class="d-flex justify-space-between align-center">
                         <span class="text-red-darken-1 font-weight-bold">
                           <template v-if="range?.price_list?.rate">
@@ -2164,9 +2163,9 @@ const images = {
                       style="font-size: 12px; width: 85%"
                     >
                       <div class="w-100">
-                        <router-link
+                        <a
                           class="text-decoration-none text-black font-weight-bold"
-                          :to="`/product/${item.raw.encrypted_id}`"
+                          :href="`/product/${item.raw.encrypted_id}?range_id=${range.range_id}`"
                         >
                           <p class="mb-1 font-weight-regular">
                             {{
@@ -2184,7 +2183,7 @@ const images = {
                                     : ""
                             }}</span>
                           </p>
-                        </router-link>
+                        </a>
                         <div class="d-flex justify-space-between align-center">
                           <span class="text-red-darken-1 font-weight-bold">
                             <template v-if="range?.price_list?.rate">
