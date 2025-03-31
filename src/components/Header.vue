@@ -1508,7 +1508,7 @@ const images = {
       </div>
     </a>
 
-    <v-menu v-if="!isProfile">
+    <v-menu v-if="!isProfile && !isProduct">
       <template #activator="{ props }">
         <v-btn
           class="ml-4 location-selector"
@@ -1575,9 +1575,151 @@ const images = {
         </v-list>
       </v-card>
     </v-menu>
+    
+    <!-- Search for Mobile View -->
+
+    <form v-if="isProduct" class="navbar__search">
+      <v-autocomplete
+        id="product_name"
+        v-model="search"
+        class="form-control mr-sm-2 ml-md-n3 search-input"
+        item-title="product_name"
+        item-value="product_id"
+        :items="activeMalls"
+        :custom-filter="filterMalls"
+        style="font-style: italic"
+        placeholder="Type your brands... Chivas,Monkey,Roku,"
+        density="compact"
+        color="blue-grey-lighten-2"
+      >
+        <template #item="{ props, item }">
+          <div
+            v-if="item.raw.ranges.length > 0"
+            class="mb-4 px-2"
+            v-bind="props"
+          >
+            <p
+              v-if="item.raw.showBrandName"
+              style="font-size: 12px"
+              class="font-weight-bold text-red-darken-4 mb-2"
+            >
+              {{ item.raw.brand_name }}
+            </p>
+            <div
+              v-for="range in item.raw.ranges"
+              class="d-flex align-center w-100 mb-2"
+            >
+              <div style="width: 15%" class="mr-2">
+                <div
+                  style="
+                    height: 45px;
+                    width: 100%;
+                    object-fit: cover;
+                    object-position: center;
+                  "
+                >
+                  <v-img
+                    height="45"
+                    cover
+                    :src="
+                      range.image_1
+                        ? $fileURL + range.image_1
+                        : $fileURL + item.raw.image
+                    "
+                  >
+                    <template #placeholder>
+                      <div class="skeleton" />
+                    </template>
+                  </v-img>
+                </div>
+              </div>
+              <div
+                class="d-flex align-center justify-space-between"
+                style="font-size: 12px; width: 85%"
+              >
+                <div class="w-100">
+                  <a
+                    class="text-decoration-none text-black font-weight-bold"
+                    :href="`/product/${item.raw.encrypted_id}?range_id=${range.range_id}`"
+                  >
+                    <p class="mb-1 font-weight-regular">
+                      {{
+                        `${item?.raw?.product_name} ${range?.quantity?.quantity_name}`
+                      }}
+                    </p>
+                    <p class="font-weight-regular">
+                      <span>{{
+                        item.raw.percentage && item.raw.country_name
+                          ? `${item.raw.percentage}% | ${item.raw.country_name}`
+                          : item.raw.percentage
+                            ? `${item.raw.percentage}%`
+                            : item.raw.country_name
+                              ? `${item.raw.country_name}`
+                              : ""
+                      }}</span>
+                    </p>
+                  </a>
+                  <div class="d-flex justify-space-between align-center">
+                    <span class="text-red-darken-1 font-weight-bold">
+                      <template v-if="range?.price_list?.rate">
+                        S$ {{ range?.price_list?.rate }}
+                      </template>
+                    </span>
+                    <span v-show="range?.price_list?.rate">
+                      <v-btn
+                        v-if="!isInCart(item.raw, range)"
+                        @click="addToCart(item.raw, range)"
+                        size="xs"
+                        color="black"
+                        class="text-caption py-1 px-8"
+                        variant="flat"
+                        >Add</v-btn
+                      >
+                      <div
+                        v-else="isInCart(item.raw, range)"
+                        class="d-flex align-center ga-2"
+                      >
+                        <v-btn
+                          size="xs"
+                          color="black"
+                          class="text-caption pa-1 rounded-0"
+                          variant="flat"
+                          icon
+                          @click="decreaseQuantity(item.raw, range)"
+                        >
+                          <v-icon>mdi-minus</v-icon>
+                        </v-btn>
+
+                        <span>
+                          {{ cartQuantity(item.raw, range) }}
+                        </span>
+
+                        <v-btn
+                          size="xs"
+                          color="black"
+                          class="text-caption pa-1 rounded-0"
+                          variant="flat"
+                          icon
+                          @click="increaseQuantity(item.raw, range)"
+                        >
+                          <v-icon>mdi-plus</v-icon>
+                        </v-btn>
+                      </div>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </v-autocomplete>
+      <button class="btn btn--search" type="submit">
+        <v-icon color="white"> mdi-magnify </v-icon>
+      </button>
+    </form>
 
     <div
-      v-if="!isDesktop && !isProfile"
+      v-if="!isDesktop && !isProfile && !isProduct"
       @click="toggleMobileSearchBar()"
     >
       <svg
@@ -1605,6 +1747,8 @@ const images = {
     </div>
 
     <v-spacer v-if="isHeader || isProfile" />
+
+    <!-- Search for Desktop View -->
 
     <form v-if="!isHeader && !isProfile && !isBatamProperties"
       class="navbar__search navbar__search__desktop"
@@ -1851,7 +1995,7 @@ const images = {
 
     <template v-if="!isProfile" #extension>
       <div class="mobile__app text-center w-100">
-        <template v-if="activeLocationButton && isSmall">
+        <!-- <template v-if="activeLocationButton && isSmall">
           <v-menu v-if="locationPlaceholder" v-model="userLocation">
             <template v-slot:activator="{ props }">
               <v-btn
@@ -1921,7 +2065,7 @@ const images = {
             v-else
             type="list-item-two-line"
           ></v-skeleton-loader>
-        </template>
+        </template> -->
         <div
           v-if="!isHeader && !isProfile && !userName && isSmall"
           class="btn_sign__up-cont mx-auto my-4"
@@ -1958,7 +2102,7 @@ const images = {
             :items="activeMalls"
             :custom-filter="filterMalls"
             style="font-style: italic"
-            placeholder="Type your brands... Chivas,Monkey,Roku,"
+            placeholder="3333Type your brands... Chivas,Monkey,Roku,"
             density="compact"
             color="blue-grey-lighten-2"
           >
@@ -2102,7 +2246,7 @@ const images = {
       </div>
     </div> -->
 
-        <div v-if="isSmall" class="ma-4">
+        <!-- <div v-if="isSmall" class="ma-4">
           <form v-if="openMobileSearchBar" class="navbar__search mx-auto">
             <v-autocomplete
               id="product_name"
@@ -2245,7 +2389,7 @@ const images = {
           <ExploreOurMenuList :desktop="false" />
         </div>
 
-        <div id="trending-container" class="d-sm-none"></div>
+        <div id="trending-container" class="d-sm-none"></div> -->
 
         <div
           v-if="
@@ -2881,6 +3025,10 @@ header.v-sheet.v-app-bar {
   /* Add this to the parent container to enable flex wrapping */
   .v-app-bar > .v-container {
     flex-wrap: wrap;
+  }
+  .navbar__search {
+    width: 60% !important;
+    height: 35px !important;
   }
 }
 </style>
