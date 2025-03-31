@@ -71,10 +71,12 @@ onUnmounted(() => {
       <!-- Product Details -->
       <v-col cols="12" v-else>
         <v-row justify="center" >
-          <v-col cols="12" md="6" class="pa-5">
-            <v-img  :src="fileURL + product?.image || fileURL + selectedRange?.image1"></v-img>
+          <v-col cols="12" md="6" :lg="6" class="pa-5 border border-raduis-5">
+            <div class="product-image-container justify-center">
+              <v-img :src="fileURL + product?.image || fileURL + selectedRange?.image1"></v-img>
+            </div>
           </v-col>
-          <v-col cols="12" md="6"  class="pa-5">
+          <v-col cols="12" md="6" :lg="6" class="pa-5">
               <h1 class="text-red">{{ product?.brand.brand_name }}</h1>
               <h2 class="mb-4">{{ product?.product_name }} - <span class="">{{ selectedRange?.quantity.quantity_name }}</span></h2>
               <v-row no-gutters class="mb-3">
@@ -184,5 +186,8 @@ onUnmounted(() => {
   overflow: hidden;
   background: white;
   transition: transform 0.2s ease;
+}
+.product-image-container {
+  height: 400px;
 }
 </style>
