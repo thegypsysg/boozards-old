@@ -1508,7 +1508,7 @@ const images = {
       </div>
     </a>
 
-    <v-menu v-if="!isProfile && !isProduct">
+    <v-menu v-if="!isProfile && isDesktop">
       <template #activator="{ props }">
         <v-btn
           class="ml-4 location-selector"
@@ -1578,7 +1578,7 @@ const images = {
     
     <!-- Search for Mobile View -->
 
-    <form v-if="isProduct" class="navbar__search ml-2">
+    <form v-if="!isDesktop" class="navbar__search ml-2">
       <v-autocomplete
         id="product_name"
         v-model="search"
@@ -1718,7 +1718,7 @@ const images = {
       </button>
     </form>
 
-    <div
+    <!-- <div
       v-if="!isDesktop && !isProfile && !isProduct"
       @click="toggleMobileSearchBar()"
     >
@@ -1734,7 +1734,7 @@ const images = {
           d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"
         />
       </svg>
-    </div>
+    </div> -->
 
     <div
       v-if="isHeader || isProfile"
@@ -1995,7 +1995,7 @@ const images = {
 
     <template v-if="!isProfile" #extension>
       <div class="mobile__app text-center w-100">
-        <!-- <template v-if="activeLocationButton && isSmall">
+        <template v-if="activeLocationButton && isSmall">
           <v-menu v-if="locationPlaceholder" v-model="userLocation">
             <template v-slot:activator="{ props }">
               <v-btn
@@ -2065,7 +2065,7 @@ const images = {
             v-else
             type="list-item-two-line"
           ></v-skeleton-loader>
-        </template> -->
+        </template>
         <div
           v-if="!isHeader && !isProfile && !userName && isSmall"
           class="btn_sign__up-cont mx-auto my-4"
@@ -2102,7 +2102,7 @@ const images = {
             :items="activeMalls"
             :custom-filter="filterMalls"
             style="font-style: italic"
-            placeholder="3333Type your brands... Chivas,Monkey,Roku,"
+            placeholder="Type your brands... Chivas,Monkey,Roku,"
             density="compact"
             color="blue-grey-lighten-2"
           >
@@ -2246,7 +2246,7 @@ const images = {
       </div>
     </div> -->
 
-        <!-- <div v-if="isSmall" class="ma-4">
+        <div v-if="isSmall" class="ma-4">
           <form v-if="openMobileSearchBar" class="navbar__search mx-auto">
             <v-autocomplete
               id="product_name"
@@ -2386,10 +2386,10 @@ const images = {
               <v-icon color="white"> mdi-magnify </v-icon>
             </button>
           </form>
-          <ExploreOurMenuList :desktop="false" />
+          <ExploreOurMenuList :desktop="false" v-if="!isProduct" />
         </div>
 
-        <div id="trending-container" class="d-sm-none"></div> -->
+        <div id="trending-container" class="d-sm-none"></div>
 
         <div
           v-if="
