@@ -1578,7 +1578,7 @@ const images = {
     
     <!-- Search for Mobile View -->
 
-    <form v-if="isProduct" class="navbar__search">
+    <form v-if="isProduct" class="navbar__search ml-2">
       <v-autocomplete
         id="product_name"
         v-model="search"
