@@ -1713,7 +1713,7 @@ const images = {
           </div>
         </template>
       </v-autocomplete>
-      <button class="btn btn--search" type="submit">
+      <button class="btn btn--search search-button" type="submit">
         <v-icon color="white"> mdi-magnify </v-icon>
       </button>
     </form>
@@ -3027,8 +3027,14 @@ header.v-sheet.v-app-bar {
     flex-wrap: wrap;
   }
   .navbar__search {
-    width: 60% !important;
+    width: 55% !important;
     height: 35px !important;
+    margin-left: 15px !important;
+  }
+
+  .search-button {
+    padding: 6px 6px !important;
+    right: 2px !important;
   }
 }
 </style>
