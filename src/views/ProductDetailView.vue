@@ -83,7 +83,7 @@ onUnmounted(() => {
                 <v-col cols="12" md="8" >
                   <v-row>
                     <v-col cols="12">{{ giftPack }}</v-col>
-                    <v-col cols="12" class="text-blue"><h2>S$ {{ selectedRange?.price_list?.rate }}</h2></v-col>
+                    <v-col v-if="selectedRange?.price_list?.rate" cols="12" class="text-blue"><h2>S$ {{ selectedRange?.price_list?.rate }}</h2></v-col>
                     <v-col cols="6"><strong>Alcohol Percentage</strong></v-col>
                     <v-col cols="1" class="text-center">:</v-col>
                     <v-col cols="5" class="text-right">{{ product?.percentage || '' }}%</v-col>
