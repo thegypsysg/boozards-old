@@ -215,6 +215,9 @@ export default {
     isProduct() {
       return this.$route.path.includes("product");
     },
+    isMobileProduct() {
+      return this.screenWidth < 640 && this.$route.path.includes("product");
+    },
     // isSignIn() {
     //   return this.$route.path == "/social-sign-up";
     // },
@@ -1502,13 +1505,13 @@ const images = {
           transition="fade-transition"
         >
           <template #placeholder>
-            <!-- <v-skeleton-loader type="image"></v-skeleton-loader> -->
+            <v-skeleton-loader type="image"></v-skeleton-loader>
           </template>
         </v-img>
       </div>
     </a>
 
-    <v-menu v-if="!isProfile && isDesktop">
+    <v-menu v-if="!isProfile && !isMobileProduct">
       <template #activator="{ props }">
         <v-btn
           class="ml-4 location-selector"
@@ -1577,8 +1580,8 @@ const images = {
     </v-menu>
     
     <!-- Search for Mobile View -->
-
-    <form v-if="!isDesktop" class="navbar__search ml-2">
+     
+    <form v-if="!isDesktop && isProduct" :class="isMobileProduct ? 'navbar__search mobile__navbar__search' : 'navbar__search'" class="ml-2">
       <v-autocomplete
         id="product_name"
         v-model="search"
@@ -1718,7 +1721,7 @@ const images = {
       </button>
     </form>
 
-    <!-- <div
+    <div
       v-if="!isDesktop && !isProfile && !isProduct"
       @click="toggleMobileSearchBar()"
     >
@@ -1734,7 +1737,7 @@ const images = {
           d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"
         />
       </svg>
-    </div> -->
+    </div>
 
     <div
       v-if="isHeader || isProfile"
@@ -2246,7 +2249,7 @@ const images = {
       </div>
     </div> -->
 
-        <div v-if="isSmall" class="ma-4">
+        <div v-if="isSmall && !isProduct" class="ma-4">
           <form v-if="openMobileSearchBar" class="navbar__search mx-auto">
             <v-autocomplete
               id="product_name"
@@ -3026,7 +3029,7 @@ header.v-sheet.v-app-bar {
   .v-app-bar > .v-container {
     flex-wrap: wrap;
   }
-  .navbar__search {
+  .mobile__navbar__search {
     width: 55% !important;
     height: 35px !important;
     margin-left: 15px !important;
