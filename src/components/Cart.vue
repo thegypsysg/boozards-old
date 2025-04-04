@@ -676,6 +676,7 @@ const addressForm = reactive({
   latitude: "",
   longitude: "",
 });
+const addedToCart = ref(false);
 const addressDialog = ref(false);
 const summaryDialog = ref(false);
 const selectedDelivery = ref(null);
@@ -920,7 +921,7 @@ const addToCart = async() => {
     const responseDetails = await axios.post(`/add-to-cart`, cartDetailsData, {
       headers: { Authorization: `Bearer ${authToken}` },
     });
-    console.log({responseDetails})
+    addedToCart.value = responseDetails.data.status === 200 ? true : false
   } catch (error) {
     console.error("Error fetching addresses:", error);
   }
@@ -928,7 +929,25 @@ const addToCart = async() => {
 
 const nextStep = (value) => {
   if(value === 4) {
-    addToCart()
+    if (cart.value.length === 0) {
+      snackbar.value = true;
+      message.value = {
+        text: "No Items in the Cart",
+        color: "error",
+      };
+      return;
+    }
+    else {
+      addToCart()
+    }
+    if (!addedToCart.value) {
+      snackbar.value = true;
+      message.value = {
+        text: "You need to log in first",
+        color: "error",
+      };
+      return;
+    }
   }
   if (value == 3) {
     snackbar.value = false;
@@ -955,7 +974,6 @@ const nextStep = (value) => {
       return;
     }
   }
-
   step.value = value;
 };
 
