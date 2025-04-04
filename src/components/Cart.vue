@@ -892,7 +892,44 @@ const handleEditLocation = async (address_id) => {
   });
 };
 
+const addToCart = async() => {
+  try {
+    const cartItems = cart.value;
+    const cartMasterData = cartItems.map(item => ({
+      app_id: 3,
+      range_id: item.range_id,
+      platform_fee: platformFee.value,
+      // dc_id: 'NULL',
+      // delivery_rate: 'NULL',
+      gst: taxAmount.value,
+      // order_instructions: 'NULL',
+      order_status: 'PP',
+      rate: item.price,
+      qty: item.quantity,
+    }));
+    const responseMaster = await axios.post(`/create-cart`, cartMasterData, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+    console.log({responseMaster})
+    const cartDetailsData = cartItems.map(item => ({
+      cart_id: responseMaster.data.data.cart_id,
+      range_id: item.range_id,
+      rate: item.price,
+      qty: item.quantity,
+    }));
+    const responseDetails = await axios.post(`/add-to-cart`, cartDetailsData, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+    console.log({responseDetails})
+  } catch (error) {
+    console.error("Error fetching addresses:", error);
+  }
+}
+
 const nextStep = (value) => {
+  if(value === 4) {
+    addToCart()
+  }
   if (value == 3) {
     snackbar.value = false;
     message.value = {
