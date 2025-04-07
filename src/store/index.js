@@ -3,6 +3,8 @@
 import { createStore } from "vuex";
 import axios from "@/util/axios";
 
+const authToken = localStorage.getItem("token");
+
 export default (app) =>
   createStore({
     state: {
@@ -21,9 +23,24 @@ export default (app) =>
       footerData: null,
       appDetails: null,
       categoryData: null,
-      cart: JSON.parse(localStorage.getItem('cart')) || [],
+      cart: [],
+      detailsCart: [],
+      isEmptyCart: [],
+      totalCartItems: 0,
     },
     mutations: {
+      cart(state, data) {
+        state.cart = data;
+      },
+      isEmptyCart(state, data) {
+        state.isEmptyCart = data;
+      },
+      totalCartItems(state, data) {
+        state.totalCartItems = data;
+      },
+      detailsCart(state, data) {
+        state.detailsCart = data;
+      },
       setActiveTag(state, tag) {
         state.activeTag = tag; // Memperbarui tag yang aktif
       },
@@ -67,7 +84,7 @@ export default (app) =>
       setSelectedCountry(state, item) {
         state.selectedCountry = item;
       },
-      addToCart(state, product){
+      /* addToCart(state, product){
         const item = state.cart.find((item) => item.id === product.id && item.range_id === product.range_id);
         if (item) {
           item.quantity += 1;
@@ -75,7 +92,7 @@ export default (app) =>
           state.cart.push({ ...product, quantity: 1 });
         }
         localStorage.setItem('cart', JSON.stringify(state.cart));
-      },
+      }, */
       updateCartQuantity(state, data) {
         const { product_id, range_id, change } = data;
         const index = state.cart.findIndex(
@@ -95,19 +112,55 @@ export default (app) =>
             localStorage.setItem('cart', JSON.stringify(state.cart)); // Persist changes
         }
       },
-      removeFromCart(state, data){
-        const { product_id, range_id } = data;
-        state.cart = state.cart.filter(
-          (item) => !(item.id === product_id && item.range_id === range_id) 
-        );
-        localStorage.setItem('cart', JSON.stringify(state.cart));
-      },
+      // removeFromCart(state, data){
+      //   const { product_id, range_id } = data;
+      //   state.cart = state.cart.filter(
+      //     (item) => !(item.id === product_id && item.range_id === range_id) 
+      //   );
+      //   localStorage.setItem('cart', JSON.stringify(state.cart));
+      // },
       clearCart(state){
         state.cart = [];
         localStorage.removeItem('cart');
       }
     },
     actions: {
+      async getCartItems({commit, state}) {
+        await axios.get(`/get-cart-items`, null, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }).then((response) => {
+          commit('cart', response?.data)
+          commit('totalCartItems', response?.data.length)
+        }).catch((error) => {
+          console.log('createCartError', error)
+          state.errorCart = error
+        })
+      },
+      
+      async addToCart({commit, state}, data) {
+        await axios.post(`/add-to-cart`, data, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }).then((response) => {
+          console.log('addToCart', data)
+          commit('cart', response?.data)
+        }).catch((error) => {
+          state.errorCart = error?.response?.data
+        })
+      },
+      
+      async updateCart({commit, state}, product) {
+        console.log('addToCart', product)
+        // await axios.post(`/update-cart`, product, {
+        //   headers: { Authorization: `Bearer ${authToken}` },
+        // }).then((response) => {
+        //   console.log('addToCart', response?.data)
+        //   commit('cart', response?.data)
+        //   store.commit("addToCart", response?.data);
+        // }).catch((error) => {
+        //   state.errorCart = error?.response?.data
+        // })
+      },
+      
       async getLongLat({ commit }) {
         if (navigator.geolocation) {
           try {
@@ -285,14 +338,29 @@ export default (app) =>
           throw error;
         }
       },
-      addToCart({ commit }, product) {
-        commit('addToCart', product);
-      },
       updateCartQuantity({ commit }, data) {
         commit('updateCartQuantity', data);
       },
-      removeFromCart({ commit }, data) {
-        commit('removeFromCart', data);
+      async removeFromCart({ commit, state }, product) {
+        console.log('removeFromCart', product)
+        await axios.post(`/remove-cart-item`, {cart_id: product.cart_id, range_id: product.range_id}, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }).then((response) => {
+          // this.getCartItems();
+          axios.get(`/get-cart-items`, null, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          }).then((response) => {
+            commit('cart', response?.data)
+            commit('totalCartItems', response?.data.length)
+          }).catch((error) => {
+            console.log('createCartError', error)
+            state.errorCart = error
+          })
+        }).catch((error) => {
+          console.log('createCartError', error)
+          state.errorCart = error
+        })
+        // commit('removeFromCart', data);
       },
       clearCart({ commit }) {
         commit('clearCart');

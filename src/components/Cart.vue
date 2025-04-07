@@ -108,7 +108,7 @@
                         variant="flat"
                         icon
                         @click="
-                          handleUpdateQuantity(product.id, product.range_id, 1)
+                          updateQuantity(product, 1)
                         "
                       >
                         <v-icon>mdi-plus</v-icon>
@@ -122,7 +122,7 @@
                     <div>
                       <v-btn
                         @click="
-                          handleRemoveFromCart(product.id, product.range_id)
+                          handleRemoveFromCart(product)
                         "
                         color="red"
                         icon="mdi-trash-can"
@@ -632,6 +632,8 @@ import MazTextarea from "maz-ui/components/MazTextarea";
 import MazRadioButtons from "maz-ui/components/MazRadioButtons";
 import { Loader } from "@googlemaps/js-api-loader";
 import { number } from "maz-ui";
+import { useCart } from "@/composables/useCart";
+const { updateQuantity } = useCart();
 
 const authToken = localStorage.getItem("token");
 
@@ -676,7 +678,11 @@ const addressForm = reactive({
   latitude: "",
   longitude: "",
 });
-const addedToCart = ref(false);
+
+const isEmptyCart = computed(() => {
+  return store.state.isEmptyCart
+})
+
 const addressDialog = ref(false);
 const summaryDialog = ref(false);
 const selectedDelivery = ref(null);
@@ -814,7 +820,14 @@ watch(
 );
 
 // Get cart items
-const cart = computed(() => store.state.cart);
+const cart = computed(() => {
+  return store.state.cart
+});
+
+// Get cart items
+const detailsCart = computed(() => {
+  return store.state.detailsCart
+});
 
 // Get total quantity of all cart items
 const cartQuantity = computed(() =>
@@ -835,13 +848,14 @@ const formatCurrency = (amount) =>
   }).format(amount);
 
 // Update quantity function
-const handleUpdateQuantity = (product_id, range_id, change) => {
+/* const handleUpdateQuantity = (product_id, range_id, change) => {
   store.commit("updateCartQuantity", { product_id, range_id, change });
-};
+  // updateQuantity()
+}; */
 
 // Remove item from cart
-const handleRemoveFromCart = (product_id, range_id) => {
-  store.commit("removeFromCart", { product_id, range_id });
+const handleRemoveFromCart = (product) => {
+  store.dispatch("removeFromCart", product);
 };
 
 // Open Confirmation Modal
@@ -893,35 +907,21 @@ const handleEditLocation = async (address_id) => {
   });
 };
 
-const addToCart = async() => {
+const createCart = async() => {
   try {
     const cartItems = cart.value;
     const cartMasterData = cartItems.map(item => ({
       app_id: 3,
       range_id: item.range_id,
       platform_fee: platformFee.value,
-      // dc_id: 'NULL',
-      // delivery_rate: 'NULL',
       gst: taxAmount.value,
-      // order_instructions: 'NULL',
       order_status: 'PP',
       rate: item.price,
       qty: item.quantity,
+      totalPrice: item.quantity*item.price,
     }));
-    const responseMaster = await axios.post(`/create-cart`, cartMasterData, {
-      headers: { Authorization: `Bearer ${authToken}` },
-    });
+    await store.dispatch('addToCart', cartMasterData)
     console.log({responseMaster})
-    const cartDetailsData = cartItems.map(item => ({
-      cart_id: responseMaster.data.data.cart_id,
-      range_id: item.range_id,
-      rate: item.price,
-      qty: item.quantity,
-    }));
-    const responseDetails = await axios.post(`/add-to-cart`, cartDetailsData, {
-      headers: { Authorization: `Bearer ${authToken}` },
-    });
-    addedToCart.value = responseDetails.data.status === 200 ? true : false
   } catch (error) {
     console.error("Error fetching addresses:", error);
   }
@@ -929,7 +929,7 @@ const addToCart = async() => {
 
 const nextStep = (value) => {
   if(value === 4) {
-    if (cart.value.length === 0) {
+    if (!isEmptyCart.value) {
       snackbar.value = true;
       message.value = {
         text: "No Items in the Cart",
@@ -937,16 +937,16 @@ const nextStep = (value) => {
       };
       return;
     }
+    // else if (authToken == null) {
+    //   snackbar.value = true;
+    //   message.value = {
+    //     text: "You need to log in first",
+    //     color: "error",
+    //   };
+    //   return;
+    // }
     else {
-      addToCart()
-    }
-    if (!addedToCart.value) {
-      snackbar.value = true;
-      message.value = {
-        text: "You need to log in first",
-        color: "error",
-      };
-      return;
+      createCart()
     }
   }
   if (value == 3) {
@@ -1135,6 +1135,11 @@ const getTaxAmount = async () => {
 };
 
 const platformFee = ref(null);
+
+const getCartData = async () => {
+  await store.dispatch('getCartItems')
+}
+
 const getPlatformFee = async () => {
   let data = null;
 
@@ -1184,6 +1189,7 @@ onMounted(() => {
     getTaxAmount();
     getAddress();
     getPlatformFee();
+    getCartData();
   }
 });
 </script>
