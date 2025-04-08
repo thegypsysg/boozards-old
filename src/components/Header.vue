@@ -2117,7 +2117,7 @@ const store = useStore();
         >
           <v-icon size="45">mdi mdi-cart-variant</v-icon>
         </v-badge>
-        <span class="ml-2">
+        <span class="ml-2" v-if="subTotal > 0">
           S$ {{
             (
               subTotal +
