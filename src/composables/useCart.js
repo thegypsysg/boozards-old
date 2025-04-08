@@ -162,13 +162,13 @@ export function useCart() {
     const updateQuantity = (product, change, selectedRange = null) => {
       console.log('cartMasterData product', product);
       const cartItems = product.ranges ? findSimilarItems(cart.value, product) : product;
-      console.log('cartMasterData', cartItems[0])
+      console.log('cartMasterData', cartItems)
 
       const cartMasterData = {
         change: change,
-        cart_id: cartItems[0].cart_id,
-        range_id: cartItems[0].range_id,
-        price: cartItems[0].price,
+        cart_id: Array.isArray(cartItems) ? cartItems[0].cart_id : cartItems.cart_id,
+        range_id: Array.isArray(cartItems) ? cartItems[0].range_id : cartItems.range_id,
+        price: Array.isArray(cartItems) ? cartItems[0].price : cartItems.price,
         quantity: 1,
       }
       console.log('cartMasterData', cartMasterData);
