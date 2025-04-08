@@ -25,6 +25,8 @@ import tiktokIcon from "@/assets/images/icons/tiktok.png";
 import whatsappIcon from "@/assets/whatsapp.svg";
 import ExploreOurMenuList from "./explore-our-menu-list.vue";
 import { reactive } from "vue";
+import { fileURL } from "@/main";
+const authToken = localStorage.getItem("token");
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
@@ -41,6 +43,8 @@ export default {
   mixins: [cartMixin],
   data() {
     return {
+      platformFee: null,
+      taxAmount: null,
       viewCart: false,
       isApply: false,
       isEmployment: false,
@@ -424,6 +428,115 @@ export default {
     window.removeEventListener("resize", this.handleResize);
   },
   methods: {
+    async getTaxAmount() {
+      let data = null;
+    
+      try {
+        await axios
+          .get(`/gypsy-user`, { headers: { Authorization: `Bearer ${authToken}` } })
+          .then((response) => {
+            data = response.data.data["country_current"];
+          })
+          .catch((_) => {});
+    
+        const response = await axios.get(`/get-tax-amount`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+          params: {
+            country_id:
+              parseInt(props.selectedLocation) != null
+                ? parseInt(props.selectedLocation)
+                : data,
+          },
+        });
+        if (response.data.data["applicable"] === "Y") {
+          this.taxAmount = response.data.data["tax_rate"];
+        }
+      } catch (error) {
+        // eslint-disable-next-line
+        console.log(error);
+      }
+    },
+    async getPlatformFee() {
+      let data = null;
+      try {
+        await axios
+          .get(`/get-app-id`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+            params: {
+              company_name: "Boozards",
+            },
+          })
+          .then((response) => {
+            data = response.data.data["app_id"];
+          })
+          .catch((error) => {
+            // eslint-disable-next-line
+            console.log(error);
+          });
+    
+        const response = await axios.get(`/get-platform-fee`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+          params: {
+            app_id: data,
+          },
+        });
+    
+        this.platformFee = parseFloat(response.data.data["platform_fee"]);
+      } catch (error) {
+        console.error("Error getting tax rate:", error);
+        // const message = error.response?.data?.message || "Something went wrong!";
+        // snackbar.value = true;
+        // message.value = {
+        //     text: message,
+        //     color: "error"
+        // };
+      } finally {
+        // savingAddress.value = false;
+      }
+    },
+    getSelectedRange (product) {
+      return product.rangeItems.find((range) => range.selected?.value);
+    },
+    isInCart (product, selectedRange = null) {
+      if(selectedRange == null){
+        selectedRange = getSelectedRange(product);
+        if (selectedRange == null) return false;
+      }
+      
+      return this.$store.state.cart.some(
+        (item) => item.id === product.product_id && item.range_id === selectedRange?.range_id
+      );
+    },
+    addToCart(product, selectedRange = null) {
+      this.getPlatformFee()
+      this.getTaxAmount()
+      if(selectedRange == null) {
+        selectedRange = getSelectedRange(product);
+        if (selectedRange == null) return false;
+      }
+
+      const cartMasterData = {
+        app_id: 3,
+        platform_fee: this.platformFee,
+        gst: this.taxAmount,
+        order_status: 'PP',
+        rate: product?.selectedPrice?.value ? product?.selectedPrice?.value : selectedRange?.price_list?.rate ? selectedRange?.price_list?.rate : 0,
+        qty: 1,
+        id: product.product_id,
+        range_id: selectedRange?.range_id,
+        quantity_name: selectedRange?.quantity?.quantity_name ?? "N/A",
+        name: product.product_name,
+        image: fileURL + (product?.image ?? ""),
+        price: product?.selectedPrice?.value ? product?.selectedPrice?.value : selectedRange?.price_list?.rate ? selectedRange?.price_list?.rate : 0,
+      };
+      this.$store.dispatch('addToCart', cartMasterData)
+    },
     toggleMobileSearchBar() {
       this.openMobileSearchBar = !this.openMobileSearchBar;
     },
@@ -1252,7 +1365,7 @@ export default {
 
 <script setup>
 // import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from "vue";
-// import { useStore } from "vuex";
+import { useStore } from "vuex";
 // import { useRouter, useRoute } from "vue-router";
 // import axios from "@/util/axios";
 // import moment from "moment-timezone";
@@ -1295,7 +1408,7 @@ const images = {
 // });
 
 // // Store, router setup
-// const store = useStore();
+const store = useStore();
 // const router = useRouter();
 // const route = useRoute();
 
