@@ -95,7 +95,7 @@
                         variant="flat"
                         icon
                         @click="
-                          handleUpdateQuantity(product.id, product.range_id, -1)
+                          updateQuantity(product, 'decrease')
                         "
                       >
                         <v-icon>mdi-minus</v-icon>
@@ -108,7 +108,7 @@
                         variant="flat"
                         icon
                         @click="
-                          updateQuantity(product, 1)
+                          updateQuantity(product, 'increase')
                         "
                       >
                         <v-icon>mdi-plus</v-icon>
@@ -846,12 +846,6 @@ const formatCurrency = (amount) =>
     style: "currency",
     currency: "USD",
   }).format(amount);
-
-// Update quantity function
-/* const handleUpdateQuantity = (product_id, range_id, change) => {
-  store.commit("updateCartQuantity", { product_id, range_id, change });
-  // updateQuantity()
-}; */
 
 // Remove item from cart
 const handleRemoveFromCart = (product) => {

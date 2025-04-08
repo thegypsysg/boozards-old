@@ -10,7 +10,7 @@ export function useCart() {
     const cart = computed(() => store.state.cart);
 
     const getSelectedRange = (product) => {
-        return product.rangeItems.find((range) => range.selected?.value);
+      return product.rangeItems ? product.rangeItems.find((range) => range.selected?.value) : product.ranges.find((range) => range.selected?.value);
     };
 
     const platformFee = ref(null);
@@ -139,33 +139,40 @@ export function useCart() {
 
         console.log({cartMasterData})
         store.dispatch('addToCart', cartMasterData)
-
-        /* if(selectedRange == null){
-            selectedRange = getSelectedRange(product);
-            if (selectedRange == null) return false;
-        }
-
-        const data = {
-            id: product.product_id,
-            range_id: selectedRange?.range_id,
-            quantity_name: selectedRange?.quantity?.quantity_name ?? "N/A",
-            name: product.product_name,
-            image: fileURL + (product?.image ?? ""),
-            price: product?.selectedPrice?.value ? product?.selectedPrice?.value : selectedRange?.price_list?.rate ? selectedRange?.price_list?.rate : 0,
-        };
-
-        console.log(data)
-
-        store.commit("addToCart", data); */
     };
 
-    const updateQuantity = (product, selectedRange, change) => {
-        /* if(selectedRange == null) {
-            selectedRange = getSelectedRange(product);
-            if (selectedRange == null) return false;
-        } */
+    const findSimilarItems = (cart, product) => {
+      const similarItems = [];
+      cart.forEach(item => {
+        if (product.product_name.includes(item.name)) {
+          const matchingRange = product.ranges.find(range => range.range_id === item.range_id);
+          if (matchingRange) {
+            similarItems.push({
+              cart_id: item.cart_id,
+              range_id: item.range_id,
+              price: item.price,
+            });
+          }
+        }
+      });
+    
+      return similarItems;
+    }
 
-          store.dispatch('updateCart', product, selectedRange, change)
+    const updateQuantity = (product, change, selectedRange = null) => {
+      console.log('cartMasterData product', product);
+      const cartItems = product.ranges ? findSimilarItems(cart.value, product) : product;
+      console.log('cartMasterData', cartItems[0])
+
+      const cartMasterData = {
+        change: change,
+        cart_id: cartItems[0].cart_id,
+        range_id: cartItems[0].range_id,
+        price: cartItems[0].price,
+        quantity: 1,
+      }
+      console.log('cartMasterData', cartMasterData);
+      store.dispatch('updateCart', cartMasterData)
 
         /* store.commit("updateCartQuantity", {
             product_id: product.product_id,
@@ -177,5 +184,5 @@ export function useCart() {
     const increaseQuantity = (product, range = null) => updateQuantity(product, range, 1);
     const decreaseQuantity = (product, range = null) => updateQuantity(product, range, -1);
 
-    return { isInCart, cartQuantity, addToCart, increaseQuantity, decreaseQuantity };
+    return { isInCart, updateQuantity, cartQuantity, addToCart, increaseQuantity, decreaseQuantity };
 }

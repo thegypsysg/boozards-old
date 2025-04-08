@@ -7,7 +7,7 @@ import { fileURL } from "@/main";
 import { appId } from '@/main'
 
 const route = useRoute()
-const { isInCart, cartQuantity, addToCart, increaseQuantity, decreaseQuantity } = useCart();
+const { isInCart, cartQuantity, addToCart, updateQuantity } = useCart();
 const product = ref(null)
 const selectedRange = ref(null);
 const giftPack = ref(null);
@@ -129,7 +129,7 @@ onUnmounted(() => {
                       class="rounded-0"
                       variant="flat"
                       icon
-                      @click="decreaseQuantity(product,selectedRange)"
+                      @click="updateQuantity(product, 'decrease')"
                     >
                       <v-icon>mdi-minus</v-icon>
                     </v-btn>
@@ -144,7 +144,7 @@ onUnmounted(() => {
                       class="rounded-0"
                       variant="flat"
                       icon
-                      @click="increaseQuantity(product,selectedRange)"
+                      @click="updateQuantity(product, 'increase')"
                     >
                       <v-icon>mdi-plus</v-icon>
                     </v-btn>

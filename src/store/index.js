@@ -149,16 +149,22 @@ export default (app) =>
       },
       
       async updateCart({commit, state}, product) {
-        console.log('addToCart', product)
-        // await axios.post(`/update-cart`, product, {
-        //   headers: { Authorization: `Bearer ${authToken}` },
-        // }).then((response) => {
-        //   console.log('addToCart', response?.data)
-        //   commit('cart', response?.data)
-        //   store.commit("addToCart", response?.data);
-        // }).catch((error) => {
-        //   state.errorCart = error?.response?.data
-        // })
+        console.log('updateCart', product)
+        await axios.put(`/update-cart`, product, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }).then(() => {
+          axios.get(`/get-cart-items`, null, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          }).then((response) => {
+            commit('cart', response?.data)
+            commit('totalCartItems', response?.data.length)
+          }).catch((error) => {
+            console.log('createCartError', error)
+            state.errorCart = error
+          })
+        }).catch((error) => {
+          state.errorCart = error?.response?.data
+        })
       },
       
       async getLongLat({ commit }) {

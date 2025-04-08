@@ -27,6 +27,8 @@ import ExploreOurMenuList from "./explore-our-menu-list.vue";
 import { reactive } from "vue";
 import { fileURL } from "@/main";
 const authToken = localStorage.getItem("token");
+import { useCart } from "@/composables/useCart";
+import { ref } from "vue";
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
@@ -42,7 +44,20 @@ export default {
   ],
   mixins: [cartMixin],
   data() {
+    const selectedDelivery = ref(null);
+    const deliveryOptions = ref([
+      { label: "Standard Delivery Fee", value: "standard", price: 12.0 },
+      { label: "Express (1.5 Hours)", value: "express", price: 15.0 },
+      { label: "Super Express (3 Hours)", value: "super_express", price: 25.0 },
+    ]);
+    const { isInCart, cartQuantity, addToCart, updateQuantity } = useCart();
     return {
+      selectedDelivery,
+      deliveryOptions,
+      isInCart,
+      cartQuantity,
+      addToCart,
+      updateQuantity,
       platformFee: null,
       taxAmount: null,
       viewCart: false,
@@ -185,6 +200,15 @@ export default {
       cartTotalQuantity: (state) =>
         state.cart.reduce((total, item) => total + item.quantity, 0),
     }),
+    subTotal() {
+      return this.$store.state.cart.reduce((total, item) => total + item.price * item.quantity, 0)
+    },
+    selectedDeliveryPrice() {
+      const option = this.deliveryOptions.find(
+        (opt) => opt.value === this.selectedDelivery,
+      );
+      return option ? option.price : 0;
+    },
     tokenProvider() {
       // Mendapatkan URL dari browser
       const url = new URL(window.location.href);
@@ -279,6 +303,8 @@ export default {
     this.search = null;
     this.getLogo();
     this.getCountry();
+    this.getPlatformFee();
+    this.getTaxAmount();
     this.getAppContact();
     //this.getCity();
     this.getTrendingCardData();
@@ -500,7 +526,7 @@ export default {
         // savingAddress.value = false;
       }
     },
-    getSelectedRange (product) {
+    /* getSelectedRange (product) {
       return product.rangeItems.find((range) => range.selected?.value);
     },
     isInCart (product, selectedRange = null) {
@@ -512,8 +538,8 @@ export default {
       return this.$store.state.cart.some(
         (item) => item.id === product.product_id && item.range_id === selectedRange?.range_id
       );
-    },
-    addToCart(product, selectedRange = null) {
+    }, */
+    /* addToCart(product, selectedRange = null) {
       this.getPlatformFee()
       this.getTaxAmount()
       if(selectedRange == null) {
@@ -537,6 +563,22 @@ export default {
       };
       this.$store.dispatch('addToCart', cartMasterData)
     },
+    updateQuantity(product, change, selectedRange = null) {
+      console.log({product, change})
+      if(selectedRange == null) {
+          selectedRange = getSelectedRange(product);
+          if (selectedRange == null) return false;
+      }
+      const cartMasterData = {
+        change: change,
+        cart_id: product.cart_id,
+        range_id: selectedRange?.range_id,
+        price: product.price,
+        quantity: 1,
+      }
+      this.$store.dispatch('updateCart', cartMasterData)
+      this.$store.dispatch('getCartItems')
+    }, */
     toggleMobileSearchBar() {
       this.openMobileSearchBar = !this.openMobileSearchBar;
     },
@@ -1801,7 +1843,7 @@ const store = useStore();
                           class="text-caption pa-1 rounded-0"
                           variant="flat"
                           icon
-                          @click="decreaseQuantity(item.raw, range)"
+                          @click="updateQuantity(item.raw, 'decrease')"
                         >
                           <v-icon>mdi-minus</v-icon>
                         </v-btn>
@@ -1816,7 +1858,7 @@ const store = useStore();
                           class="text-caption pa-1 rounded-0"
                           variant="flat"
                           icon
-                          @click="increaseQuantity(item.raw, range)"
+                          @click="updateQuantity(item.raw, 'increase')"
                         >
                           <v-icon>mdi-plus</v-icon>
                         </v-btn>
@@ -1976,7 +2018,7 @@ const store = useStore();
                           class="text-caption pa-1 rounded-0"
                           variant="flat"
                           icon
-                          @click="decreaseQuantity(item.raw, range)"
+                          @click="updateQuantity(item.raw, 'decrease')"
                         >
                           <v-icon>mdi-minus</v-icon>
                         </v-btn>
@@ -1991,7 +2033,7 @@ const store = useStore();
                           class="text-caption pa-1 rounded-0"
                           variant="flat"
                           icon
-                          @click="increaseQuantity(item.raw, range)"
+                          @click="updateQuantity(item.raw, 'increase')"
                         >
                           <v-icon>mdi-plus</v-icon>
                         </v-btn>
@@ -2075,7 +2117,19 @@ const store = useStore();
         >
           <v-icon size="45">mdi mdi-cart-variant</v-icon>
         </v-badge>
-        <span class="ml-2">{{ cartSubTotal }}</span>
+        <span class="ml-2">
+          S$ {{
+            (
+              subTotal +
+              selectedDeliveryPrice +
+              platformFee +
+              ((subTotal + selectedDeliveryPrice + 0.5) *
+                taxAmount) /
+                100
+            ).toFixed(2)
+          }}
+        </span>
+        <!-- <span class="ml-2">{{ cartSubTotal }}</span> -->
         <Cart
           :viewCart="viewCart"
           :selectedLocation="selectedLocation.country_id.toString()"
@@ -2315,7 +2369,7 @@ const store = useStore();
                               class="text-caption pa-1 rounded-0"
                               variant="flat"
                               icon
-                              @click="decreaseQuantity(item.raw, range)"
+                              @click="updateQuantity(item.raw, 'decrease')"
                             >
                               <v-icon>mdi-minus</v-icon>
                             </v-btn>
@@ -2330,7 +2384,7 @@ const store = useStore();
                               class="text-caption pa-1 rounded-0"
                               variant="flat"
                               icon
-                              @click="increaseQuantity(item.raw, range)"
+                              @click="updateQuantity(item.raw, 'increase')"
                             >
                               <v-icon>mdi-plus</v-icon>
                             </v-btn>
@@ -2470,7 +2524,7 @@ const store = useStore();
                                 class="text-caption pa-1 rounded-0"
                                 variant="flat"
                                 icon
-                                @click="decreaseQuantity(item.raw, range)"
+                                @click="updateQuantity(item.raw, 'decrease')"
                               >
                                 <v-icon>mdi-minus</v-icon>
                               </v-btn>
@@ -2485,7 +2539,7 @@ const store = useStore();
                                 class="text-caption pa-1 rounded-0"
                                 variant="flat"
                                 icon
-                                @click="increaseQuantity(item.raw, range)"
+                                @click="updateQuantity(item.raw, 'increase')"
                               >
                                 <v-icon>mdi-plus</v-icon>
                               </v-btn>

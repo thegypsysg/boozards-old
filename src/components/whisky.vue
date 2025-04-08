@@ -26,7 +26,7 @@ const props = defineProps({
   },
 });
 
-const { isInCart, cartQuantity, addToCart, increaseQuantity, decreaseQuantity } = useCart();
+const { isInCart, cartQuantity, addToCart, updateQuantity } = useCart();
 const selected = ref(null);
 const splideRef = ref(null);
 const isBeginning = ref(true);
@@ -306,7 +306,7 @@ onUnmounted(() => {
                       class="text-caption pa-1 rounded-0"
                       variant="flat"
                       icon
-                      @click="decreaseQuantity(menu)"
+                      @click="updateQuantity(menu, 'decrease')"
                     >
                       <v-icon>mdi-minus</v-icon>
                     </v-btn>
@@ -321,7 +321,7 @@ onUnmounted(() => {
                       class="text-caption pa-1 rounded-0"
                       variant="flat"
                       icon
-                      @click="increaseQuantity(menu)"
+                      @click="updateQuantity(menu, 'increase')"
                     >
                       <v-icon>mdi-plus</v-icon>
                     </v-btn>

@@ -2,13 +2,21 @@
 import axios from "@/util/axios";
 import { appId } from "@/main";
 import cartMixin from "@/mixins/cartMixin";
+import { useCart } from "@/composables/useCart";
+
+
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: "PriceListView",
   mixins: [cartMixin],
   data() {
+    const { isInCart, cartQuantity, addToCart, updateQuantity } = useCart();
     return {
+      isInCart,
+      cartQuantity,
+      addToCart,
+      updateQuantity,
       isLoading: false,
       search: null,
       category: null,
@@ -300,7 +308,7 @@ export default {
                           class="text-caption pa-1 rounded-0"
                           variant="flat"
                           icon
-                          @click="decreaseQuantity(item, range)"
+                          @click="updateQuantity(item, 'decrease')"
                         >
                           <v-icon>mdi-minus</v-icon>
                         </v-btn>
@@ -315,7 +323,7 @@ export default {
                           class="text-caption pa-1 rounded-0"
                           variant="flat"
                           icon
-                          @click="increaseQuantity(item, range)"
+                          @click="updateQuantity(item, 'increase')"
                         >
                           <v-icon>mdi-plus</v-icon>
                         </v-btn>
@@ -369,7 +377,7 @@ export default {
                   <span v-show="range?.price_list?.rate">
                       <v-btn
                         v-if="!isInCart(item, range)"
-                        @click="addToCart(item, range)"
+                        @click="addToCart(item)"
                         size="xs"
                         color="black"
                         class="text-caption py-1 px-8"
@@ -386,7 +394,7 @@ export default {
                           class="text-caption pa-1 rounded-0"
                           variant="flat"
                           icon
-                          @click="decreaseQuantity(item, range)"
+                          @click="updateQuantity(item, 'decrease')"
                         >
                           <v-icon>mdi-minus</v-icon>
                         </v-btn>
@@ -401,7 +409,7 @@ export default {
                           class="text-caption pa-1 rounded-0"
                           variant="flat"
                           icon
-                          @click="increaseQuantity(item, range)"
+                          @click="updateQuantity(item, 'increase')"
                         >
                           <v-icon>mdi-plus</v-icon>
                         </v-btn>
