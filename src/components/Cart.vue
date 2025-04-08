@@ -901,48 +901,17 @@ const handleEditLocation = async (address_id) => {
   });
 };
 
-const createCart = async() => {
-  try {
-    const cartItems = cart.value;
-    const cartMasterData = cartItems.map(item => ({
-      app_id: 3,
-      range_id: item.range_id,
-      platform_fee: platformFee.value,
-      gst: taxAmount.value,
-      order_status: 'PP',
-      rate: item.price,
-      qty: item.quantity,
-      totalPrice: item.quantity*item.price,
-    }));
-    await store.dispatch('addToCart', cartMasterData)
-    console.log({responseMaster})
-  } catch (error) {
-    console.error("Error fetching addresses:", error);
-  }
-}
-
 const nextStep = (value) => {
-  if(value === 4) {
-    if (!isEmptyCart.value) {
+  /* if(value === 4) {
+    if (isEmptyCart.value) {
       snackbar.value = true;
       message.value = {
-        text: "No Items in the Cart",
+        text: "Please add products in your Cart",
         color: "error",
       };
       return;
     }
-    // else if (authToken == null) {
-    //   snackbar.value = true;
-    //   message.value = {
-    //     text: "You need to log in first",
-    //     color: "error",
-    //   };
-    //   return;
-    // }
-    else {
-      createCart()
-    }
-  }
+  } */
   if (value == 3) {
     snackbar.value = false;
     message.value = {
@@ -1038,6 +1007,10 @@ const getAddress = async () => {
     // alert(error.response?.data?.message || "Something went wrong!");
   }
 };
+
+const isLoading = computed(() => {
+  return store.state.isLoading;
+})
 
 const savingAddress = ref(false);
 const saveAddress = async () => {
