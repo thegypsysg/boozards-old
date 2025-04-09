@@ -203,6 +203,12 @@ export default {
     subTotal() {
       return this.$store.state.cart.reduce((total, item) => total + item.price * item.quantity, 0)
     },
+    finalCartTotal() {
+      return (
+        this.subTotal + this.selectedDeliveryPrice + this.platformFee + 
+        ((this.subTotal + this.selectedDeliveryPrice + 0.5) * this.taxAmount) / 100
+      ).toFixed(2)
+    },
     selectedDeliveryPrice() {
       const option = this.deliveryOptions.find(
         (opt) => opt.value === this.selectedDelivery,
@@ -2119,17 +2125,9 @@ const store = useStore();
         </v-badge>
         <span class="ml-2" v-if="subTotal > 0">
           S$ {{
-            (
-              subTotal +
-              selectedDeliveryPrice +
-              platformFee +
-              ((subTotal + selectedDeliveryPrice + 0.5) *
-                taxAmount) /
-                100
-            ).toFixed(2)
+            finalCartTotal
           }}
         </span>
-        <!-- <span class="ml-2">{{ cartSubTotal }}</span> -->
         <Cart
           :viewCart="viewCart"
           :selectedLocation="selectedLocation.country_id.toString()"
