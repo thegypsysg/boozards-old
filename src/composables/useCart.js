@@ -173,12 +173,6 @@ export function useCart() {
       }
       console.log('cartMasterData', cartMasterData);
       store.dispatch('updateCart', cartMasterData)
-
-        /* store.commit("updateCartQuantity", {
-            product_id: product.product_id,
-            range_id: selectedRange?.range_id,
-            change,
-        }); */
     };
 
     const increaseQuantity = (product, range = null) => updateQuantity(product, range, 1);
