@@ -43,7 +43,7 @@
             </v-col>
           </v-row>
         </div>
-        {{ product }}
+
         <div class="cart-items flex-grow-1 overflow-y-auto">
           <v-row no-gutters>
             <v-col
@@ -55,7 +55,7 @@
                 <div class="flex-grow-0 flex-shrink-0">
                   <v-img
                     class="rounded bg-white"
-                    :src="fileURL+product.image"
+                    :src="product.image"
                     width="65"
                     height="65"
                     cover
@@ -633,8 +633,6 @@ import MazRadioButtons from "maz-ui/components/MazRadioButtons";
 import { Loader } from "@googlemaps/js-api-loader";
 import { number } from "maz-ui";
 import { useCart } from "@/composables/useCart";
-import { fileURL } from "@/main";
-
 const { updateQuantity } = useCart();
 
 const authToken = localStorage.getItem("token");
@@ -680,6 +678,10 @@ const addressForm = reactive({
   latitude: "",
   longitude: "",
 });
+
+const cartError = computed(() => {
+  return store.state.cartError
+})
 
 const isEmptyCart = computed(() => {
   return store.state.isEmptyCart

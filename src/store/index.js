@@ -28,10 +28,14 @@ export default (app) =>
       isEmptyCart: true,
       totalCartItems: 0,
       isLoading: false,
+      cartError: null,
     },
     mutations: {
       isLoading(state, data) {
         state.isLoading = data;
+      },
+      cartError(state, data) {
+        state.cartError = data;
       },
       cart(state, data) {
         state.cart = data;
@@ -88,41 +92,6 @@ export default (app) =>
       setSelectedCountry(state, item) {
         state.selectedCountry = item;
       },
-      /* addToCart(state, product){
-        const item = state.cart.find((item) => item.id === product.id && item.range_id === product.range_id);
-        if (item) {
-          item.quantity += 1;
-        } else {
-          state.cart.push({ ...product, quantity: 1 });
-        }
-        localStorage.setItem('cart', JSON.stringify(state.cart));
-      }, */
-      updateCartQuantity(state, data) {
-        const { product_id, range_id, change } = data;
-        const index = state.cart.findIndex(
-            (item) => item.id === product_id && item.range_id === range_id
-        );
-    
-        if (index !== -1) {
-            const item = { ...state.cart[index] }; // Create a new object to trigger reactivity
-            item.quantity += change;
-    
-            if (item.quantity <= 0) {
-                state.cart.splice(index, 1); // Remove item from cart
-            } else {
-                state.cart[index] = item; // Replace object in array
-            }
-    
-            localStorage.setItem('cart', JSON.stringify(state.cart)); // Persist changes
-        }
-      },
-      // removeFromCart(state, data){
-      //   const { product_id, range_id } = data;
-      //   state.cart = state.cart.filter(
-      //     (item) => !(item.id === product_id && item.range_id === range_id) 
-      //   );
-      //   localStorage.setItem('cart', JSON.stringify(state.cart));
-      // },
       clearCart(state){
         state.cart = [];
         localStorage.removeItem('cart');
@@ -139,8 +108,8 @@ export default (app) =>
           commit('cart', response?.data)
           commit('totalCartItems', response?.data.length)
         }).catch((error) => {
-          console.log('createCartError', error)
-          state.errorCart = error
+          state.errorCart = error?.error
+          commit('cartError', {isError: true, type: 'error', message: error?.response?.data?.error})
         })
       },
       
@@ -158,6 +127,7 @@ export default (app) =>
           commit('isLoading', false)
         }).catch((error) => {
           state.errorCart = error?.response?.data
+          commit('cartError', {isError: true, type: 'error', message: error?.response?.data?.error})
           commit('isLoading', false)
         })
       },
@@ -182,11 +152,44 @@ export default (app) =>
             console.log('createCartError', error)
             state.errorCart = error
             commit('isLoading', false)
+            commit('cartError', {isError: true, type: 'error', message: error?.response?.data?.error})
           })
 
         }).catch((error) => {
           state.errorCart = error?.response?.data
         })
+      },
+
+      async removeFromCart({ commit, state }, product) {
+        commit('isLoading', true)
+        console.log('removeFromCart', product)
+        await axios.post(`/remove-cart-item`, {cart_id: product.cart_id, range_id: product.range_id}, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }).then((response) => {
+          // this.getCartItems();
+          
+          axios.get(`/get-cart-items`, null, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          }).then((response) => {
+            if(response?.data.length > 0) {
+              commit('isEmptyCart', false)
+            }
+            commit('cart', response?.data)
+            commit('totalCartItems', response?.data.length)
+            commit('isLoading', false)
+          }).catch((error) => {
+            console.log('createCartError', error)
+            state.errorCart = error
+            commit('isLoading', false)
+            commit('cartError', {isError: true, type: 'error', message: error?.response?.data?.error})
+          })
+
+        }).catch((error) => {
+          console.log('createCartError', error)
+          state.errorCart = error
+          commit('isLoading', false)
+        })
+        // commit('removeFromCart', data);
       },
       
       async getLongLat({ commit }) {
@@ -365,39 +368,6 @@ export default (app) =>
         } catch (error) {
           throw error;
         }
-      },
-      updateCartQuantity({ commit }, data) {
-        commit('updateCartQuantity', data);
-      },
-      async removeFromCart({ commit, state }, product) {
-        commit('isLoading', true)
-        console.log('removeFromCart', product)
-        await axios.post(`/remove-cart-item`, {cart_id: product.cart_id, range_id: product.range_id}, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }).then((response) => {
-          // this.getCartItems();
-          
-          axios.get(`/get-cart-items`, null, {
-            headers: { Authorization: `Bearer ${authToken}` },
-          }).then((response) => {
-            if(response?.data.length > 0) {
-              commit('isEmptyCart', false)
-            }
-            commit('cart', response?.data)
-            commit('totalCartItems', response?.data.length)
-            commit('isLoading', false)
-          }).catch((error) => {
-            console.log('createCartError', error)
-            state.errorCart = error
-            commit('isLoading', false)
-          })
-
-        }).catch((error) => {
-          console.log('createCartError', error)
-          state.errorCart = error
-          commit('isLoading', false)
-        })
-        // commit('removeFromCart', data);
       },
       clearCart({ commit }) {
         commit('clearCart');
