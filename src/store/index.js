@@ -146,7 +146,6 @@ export default (app) =>
             commit('totalCartItems', response?.data.length)
             commit('isLoading', false)
           }).catch((error) => {
-            console.log('createCartError', error)
             state.errorCart = error
             commit('isLoading', false)
             showSnackbar(error?.response?.data?.error, 'error')
@@ -175,14 +174,12 @@ export default (app) =>
             commit('totalCartItems', response?.data.length)
             commit('isLoading', false)
           }).catch((error) => {
-            console.log('createCartError', error)
             state.errorCart = error
             commit('isLoading', false)
             showSnackbar(error?.response?.data?.error, 'error')
           })
 
         }).catch((error) => {
-          console.log('createCartError', error)
           state.errorCart = error
           commit('isLoading', false)
         })
