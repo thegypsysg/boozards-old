@@ -5,6 +5,13 @@
       <v-btn icon="mdi-close-circle" @click="snackbar = false"></v-btn>
     </template>
   </v-snackbar>
+  
+  <v-snackbar v-model="snackbarVisible" :timeout="3000" :color="snackbarColor">
+    {{ snackbarMessage }}
+    <template #actions>
+      <v-btn icon="mdi-close-circle" @click="snackbarVisible = false"></v-btn>
+    </template>
+  </v-snackbar>
 
   <MazDrawer
     variant="right"
@@ -633,6 +640,9 @@ import MazRadioButtons from "maz-ui/components/MazRadioButtons";
 import { Loader } from "@googlemaps/js-api-loader";
 import { number } from "maz-ui";
 import { useCart } from "@/composables/useCart";
+import { useGlobalSnackbar } from '@/composables/useGlobalSnackbar';
+
+const { snackbarVisible, snackbarMessage, snackbarColor } = useGlobalSnackbar();
 const { updateQuantity } = useCart();
 
 const authToken = localStorage.getItem("token");

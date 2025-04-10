@@ -2,6 +2,7 @@
 // import { createStore } from "vuex";
 import { createStore } from "vuex";
 import axios from "@/util/axios";
+import { showSnackbar } from '@/composables/useGlobalSnackbar';
 
 const authToken = localStorage.getItem("token");
 
@@ -28,14 +29,10 @@ export default (app) =>
       isEmptyCart: true,
       totalCartItems: 0,
       isLoading: false,
-      cartError: null,
     },
     mutations: {
       isLoading(state, data) {
         state.isLoading = data;
-      },
-      cartError(state, data) {
-        state.cartError = data;
       },
       cart(state, data) {
         state.cart = data;
@@ -109,7 +106,7 @@ export default (app) =>
           commit('totalCartItems', response?.data.length)
         }).catch((error) => {
           state.errorCart = error?.error
-          commit('cartError', {isError: true, type: 'error', message: error?.response?.data?.error})
+          showSnackbar(error?.response?.data?.error, 'error')
         })
       },
       
@@ -127,7 +124,7 @@ export default (app) =>
           commit('isLoading', false)
         }).catch((error) => {
           state.errorCart = error?.response?.data
-          commit('cartError', {isError: true, type: 'error', message: error?.response?.data?.error})
+          showSnackbar(error?.response?.data?.error, 'error')
           commit('isLoading', false)
         })
       },
@@ -152,7 +149,7 @@ export default (app) =>
             console.log('createCartError', error)
             state.errorCart = error
             commit('isLoading', false)
-            commit('cartError', {isError: true, type: 'error', message: error?.response?.data?.error})
+            showSnackbar(error?.response?.data?.error, 'error')
           })
 
         }).catch((error) => {
@@ -181,7 +178,7 @@ export default (app) =>
             console.log('createCartError', error)
             state.errorCart = error
             commit('isLoading', false)
-            commit('cartError', {isError: true, type: 'error', message: error?.response?.data?.error})
+            showSnackbar(error?.response?.data?.error, 'error')
           })
 
         }).catch((error) => {
