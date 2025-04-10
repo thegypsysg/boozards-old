@@ -62,7 +62,7 @@
                 <div class="flex-grow-0 flex-shrink-0">
                   <v-img
                     class="rounded bg-white"
-                    :src="product.image"
+                    :src="fileURL+product.image"
                     width="65"
                     height="65"
                     cover
@@ -641,6 +641,7 @@ import { Loader } from "@googlemaps/js-api-loader";
 import { number } from "maz-ui";
 import { useCart } from "@/composables/useCart";
 import { useGlobalSnackbar } from '@/composables/useGlobalSnackbar';
+import { fileURL } from "@/main";
 
 const { snackbarVisible, snackbarMessage, snackbarColor } = useGlobalSnackbar();
 const { updateQuantity } = useCart();
@@ -688,10 +689,6 @@ const addressForm = reactive({
   latitude: "",
   longitude: "",
 });
-
-const cartError = computed(() => {
-  return store.state.cartError
-})
 
 const isEmptyCart = computed(() => {
   return store.state.isEmptyCart
