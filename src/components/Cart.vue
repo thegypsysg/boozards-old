@@ -29,8 +29,8 @@
                   <div class="text-h6">My Cart</div>
                   <div class="text-h6" v-show="cartQuantity > 0">
                     <span class="text-red">{{ cartQuantity }}</span> Items |
-                    <span class="text-blue"
-                      >S${{
+                    <span class="text-blue" v-if="subTotal"
+                      >{{ selectedCountry.currency_symbol }}{{
                         (
                           subTotal +
                           selectedDeliveryPrice +
@@ -86,11 +86,9 @@
                       <span class="text-blue">{{ product.quantity_name }}</span>
                     </div>
                     <div class="text-body-2 text-end">
-                      <strong
-                        >S{{
-                          formatCurrency(product.price * product.quantity)
-                        }}</strong
-                      >
+                      <strong>{{selectedLocation.currency_symbol }}
+                        <!-- S{{ formatCurrency(product.price * product.quantity) }} -->
+                      </strong>
                     </div>
                   </div>
                   <div class="d-flex align-center justify-space-between">
@@ -122,9 +120,8 @@
                       </v-btn>
                     </div>
                     <div class="text-body-2">
-                      <strong class="text-red"
-                        >S{{ formatCurrency(product.price) }}</strong
-                      >
+                      <strong class="text-red" >{{selectedLocation.currency_symbol }}</strong >
+                      <!-- <strong class="text-red" >S{{ formatCurrency(product.price) }}</strong > -->
                     </div>
                     <div>
                       <v-btn
@@ -163,7 +160,10 @@
               >
                 <div class="d-flex justify-space-between ma-2">
                   <strong>{{ option.label }}</strong>
-                  <span class="price">S$ {{ option.price }}</span>
+                  <span class="price">{{ selectedCountry.currency_symbol }} {{ option.price }}</span>
+                </div>
+                <div class="d-flex justify-space-between ma-2">
+                  <strong class="text-red font-bold font-sm">{{ option.description_2 }}</strong>
                 </div>
               </MazRadioButtons>
             </v-col>
@@ -465,19 +465,19 @@
                     <tbody>
                       <tr>
                         <td>Sub Total</td>
-                        <td>S$</td>
+                        <td>{{ selectedCountry.currency_symbol }}</td>
                         <td class="text-end">{{ subTotal.toFixed(2) }}</td>
                       </tr>
                       <tr>
                         <td>Delivery Charges</td>
-                        <td>S$</td>
+                        <td>{{ selectedCountry.currency_symbol }}</td>
                         <td class="text-end">
                           {{ selectedDeliveryPrice.toFixed(2) }}
                         </td>
                       </tr>
                       <tr>
                         <td>Platform Fee</td>
-                        <td>S$</td>
+                        <td>{{ selectedCountry.currency_symbol }}</td>
                         <td class="text-end">{{ platformFee.toFixed(2) }}</td>
                       </tr>
                       <tr>
@@ -489,7 +489,7 @@
                               : "(Not Applicable)"
                           }}
                         </td>
-                        <td>S$</td>
+                        <td>{{ selectedCountry.currency_symbol }}</td>
                         <td class="text-end">
                           {{
                             taxAmount != null
@@ -502,7 +502,7 @@
                       </tr>
                       <tr class="total-row">
                         <td><strong>This is what you pay</strong></td>
-                        <td><strong>S$</strong></td>
+                        <td><strong>{{ selectedCountry.currency_symbol }}</strong></td>
                         <td class="text-end">
                           <strong>{{
                             (
@@ -540,6 +540,9 @@
 </template>
 
 <style>
+.font-sm {
+  font-size: 12px;
+}
 .cart-drawer {
   width: 100%; /* Ensures the parent takes the full width of its container */
   display: flex; /* Helps manage layout */
@@ -697,11 +700,23 @@ const isEmptyCart = computed(() => {
 const addressDialog = ref(false);
 const summaryDialog = ref(false);
 const selectedDelivery = ref(null);
-const deliveryOptions = ref([
-  { label: "Standard Delivery Fee", value: "standard", price: 12.0 },
-  { label: "Express (1.5 Hours)", value: "express", price: 15.0 },
-  { label: "Super Express (3 Hours)", value: "super_express", price: 25.0 },
-]);
+
+const selectedCountry = computed(() => {
+  return store.state.selectedCountry
+})
+
+const deliveryOptions = computed(() => {
+  return store.state.deliveryCharges
+})
+const getDeliveryCharges = () => {
+  store.dispatch('getDeliveryCharges', selectedCountry ? selectedCountry.country_id : 1)
+}
+
+// const deliveryOptions = ref([
+//   { label: "Standard Delivery Fee", value: "standard", price: 12.0 },
+//   { label: "Express (1.5 Hours)", value: "express", price: 15.0 },
+//   { label: "Super Express (3 Hours)", value: "super_express", price: 25.0 },
+// ]);
 const selectedDeliveryPrice = computed(() => {
   const option = deliveryOptions.value.find(
     (opt) => opt.value === selectedDelivery.value,
@@ -1169,5 +1184,6 @@ onMounted(() => {
     getPlatformFee();
     getCartData();
   }
+  getDeliveryCharges();
 });
 </script>

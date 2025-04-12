@@ -1311,7 +1311,7 @@ export default {
         <div class="v-list-item__icon">
           <v-img height="18" width="25" src="@/assets/images/icons/shop.png" />
         </div>
-        <v-list-item-title style="font-size: 12px"> My Cart </v-list-item-title>
+        <v-list-item-title style="font-size: 12px"> My Cartr </v-list-item-title>
       </li>
 
       <li v-if="userName != null" class="v-list-item mt-n2">

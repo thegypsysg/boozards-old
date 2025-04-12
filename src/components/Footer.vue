@@ -384,7 +384,7 @@ onUnmounted(() => {
         <span class="ml-4">My Cart</span>
       </div>
       <div class="cart-count d-flex align-center justify-center">
-        <span>S$0</span>
+        <span>0000</span>
       </div>
     </div>
   </div>
