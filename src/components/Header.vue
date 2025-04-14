@@ -24,7 +24,7 @@ import instaIcon from "@/assets/images/icons/insta.png";
 import tiktokIcon from "@/assets/images/icons/tiktok.png";
 import whatsappIcon from "@/assets/whatsapp.svg";
 import ExploreOurMenuList from "./explore-our-menu-list.vue";
-import { reactive } from "vue";
+import { onMounted, reactive, watch } from "vue";
 import { fileURL } from "@/main";
 const authToken = localStorage.getItem("token");
 import { useCart } from "@/composables/useCart";
@@ -45,15 +45,14 @@ export default {
   mixins: [cartMixin],
   data() {
     const selectedDelivery = ref(null);
-    const deliveryOptions = ref([
-      { label: "Standard Delivery Fee", value: "standard", price: 12.0 },
-      { label: "Express (1.5 Hours)", value: "express", price: 15.0 },
-      { label: "Super Express (3 Hours)", value: "super_express", price: 25.0 },
-    ]);
+    // const deliveryOptions = ref([
+    //   { label: "Standard Delivery Fee", value: "standard", price: 12.0 },
+    //   { label: "Express (1.5 Hours)", value: "express", price: 15.0 },
+    //   { label: "Super Express (3 Hours)", value: "super_express", price: 25.0 },
+    // ]);
     const { isInCart, cartQuantity, addToCart, updateQuantity } = useCart();
     return {
       selectedDelivery,
-      deliveryOptions,
       isInCart,
       cartQuantity,
       addToCart,
@@ -112,6 +111,7 @@ export default {
       activeMalls: [],
       selectedLocation: reactive({
         country_id: 1,
+        currency_symbol: 'S$',
         country: "Singapore",
         city: "Singapore City",
       }),
@@ -119,11 +119,13 @@ export default {
         {
           country_id: 1,
           country: "Singapore",
+          currency_symbol: 'S$',
           flagUrl: "https://flagcdn.com/w40/sg.png",
           properties: 1,
           cities: [
             {
               country_id: 1,
+              currency_symbol: 'S$',
               name: "Singapore City",
               imageUrl: "https://example.com/singapore-city.jpg",
             },
@@ -132,11 +134,13 @@ export default {
         {
           country_id: 3,
           country: "Indonesia",
+          currency_symbol: 'IDR',
           flagUrl: "https://flagcdn.com/w40/id.png",
           properties: 1,
           cities: [
             {
               country_id: 3,
+              currency_symbol: 'IDR',
               name: "Batam",
               imageUrl: "https://example.com/batam.jpg",
             },
@@ -145,21 +149,25 @@ export default {
         {
           country_id: 2,
           country: "India",
+          currency_symbol: 'Rs.',
           flagUrl: "https://flagcdn.com/w40/in.png",
           properties: 3,
           cities: [
             {
               country_id: 2,
+              currency_symbol: 'Rs.',
               name: "Mumbai",
               imageUrl: "https://example.com/mumbai.jpg",
             },
             {
               country_id: 2,
+              currency_symbol: 'Rs.',
               name: "Goa - Margao",
               imageUrl: "https://example.com/goa-margao.jpg",
             },
             {
               country_id: 2,
+              currency_symbol: 'Rs.',
               name: "Goa - Panjim",
               imageUrl: "https://example.com/goa-panjim.jpg",
             },
@@ -175,6 +183,7 @@ export default {
     },
   },
   computed: {
+    ...mapState(["deliveryCharges"]),
     ...mapState(["itemSelected"]),
     ...mapState(["itemSelected2"]),
     ...mapState(["itemSelectedComplete"]),
@@ -184,6 +193,7 @@ export default {
     ...mapState(["idCountryRecognised"]),
     ...mapState(["skillRecognised"]),
     ...mapState(["idSkillRecognised"]),
+    ...mapState(["selectedCountry"]),
     ...mapState({
       cartSubTotal: (state) =>
         new Intl.NumberFormat("en-US", {
@@ -200,6 +210,9 @@ export default {
       cartTotalQuantity: (state) =>
         state.cart.reduce((total, item) => total + item.quantity, 0),
     }),
+    deliveryOptions() {
+      return this.$store.state.deliveryCharges
+    },
     subTotal() {
       return this.$store.state.cart.reduce((total, item) => total + item.price * item.quantity, 0)
     },
@@ -1191,12 +1204,14 @@ export default {
               this.locationDropdown = data.map((country) => {
                 return {
                   country_id: country.country_id,
+                  currency_symbol: country.currency_symbol,
                   country: country.country_name,
                   flagUrl: country.flag,
                   properties: country.app_cities.length,
                   cities: country.app_cities.map((city) => {
                     return {
                       country_id: country.country_id,
+                      currency_symbol: country.currency_symbol,
                       name: city.city_name,
                       imageUrl: city.city_image,
                     };
@@ -1292,12 +1307,16 @@ export default {
       event.preventDefault();
     },
     selectLocation(country, city) {
+      console.log(country.currency_symbol)
       this.selectedLocation = {
+        currency_symbol: country.currency_symbol ?? 'S$',
         country_id: country.country_id,
         country: country.country,
         city: city.name,
       };
-      console.log("selected: " + JSON.stringify(this.selectedLocation));
+      this.$store.state.selectedCountry = this.selectedLocation
+      this.$store.dispatch('getDeliveryCharges', this.selectedLocation.country_id)
+      console.log("selected: " + JSON.stringify(this.selectedLocation));[]
     },
     gotoMallDetail(item) {
       this.dialog2 = false;
@@ -1618,6 +1637,14 @@ const store = useStore();
 //   }
 // };
 
+const getDeliveryCharges = () => {
+  store.dispatch('getDeliveryCharges', 1)
+}
+
+watch(() => {
+  getDeliveryCharges();
+})
+
 // // Lifecycle hooks
 // onMounted(() => {
 //   handleResize();
@@ -1826,7 +1853,7 @@ const store = useStore();
                   <div class="d-flex justify-space-between align-center">
                     <span class="text-red-darken-1 font-weight-bold">
                       <template v-if="range?.price_list?.rate">
-                        S$ {{ range?.price_list?.rate }}
+                        {{ selectedCountry.currency_symbol }} {{ range?.price_list?.rate }}
                       </template>
                     </span>
                     <span v-show="range?.price_list?.rate">
@@ -2001,7 +2028,7 @@ const store = useStore();
                   <div class="d-flex justify-space-between align-center">
                     <span class="text-red-darken-1 font-weight-bold">
                       <template v-if="range?.price_list?.rate">
-                        S$ {{ range?.price_list?.rate }}
+                        {{ selectedCountry.currency_symbol }} {{ range?.price_list?.rate }}
                       </template>
                     </span>
                     <span v-show="range?.price_list?.rate">
@@ -2124,7 +2151,7 @@ const store = useStore();
           <v-icon size="45">mdi mdi-cart-variant</v-icon>
         </v-badge>
         <span class="ml-2" v-if="subTotal > 0">
-          S$ {{
+          {{ selectedCountry.currency_symbol }} {{
             finalCartTotal
           }}
         </span>
@@ -2344,7 +2371,7 @@ const store = useStore();
                       <div class="d-flex justify-space-between align-center">
                         <span class="text-red-darken-1 font-weight-bold">
                           <template v-if="range?.price_list?.rate">
-                            S$ {{ range?.price_list?.rate }}
+                            {{ selectedCountry.currency_symbol }} {{ range?.price_list?.rate }}
                           </template>
                         </span>
                         <span v-show="range?.price_list?.rate">
@@ -2499,7 +2526,7 @@ const store = useStore();
                         <div class="d-flex justify-space-between align-center">
                           <span class="text-red-darken-1 font-weight-bold">
                             <template v-if="range?.price_list?.rate">
-                              S$ {{ range?.price_list?.rate }}
+                              {{ selectedCountry.currency_symbol }} {{ range?.price_list?.rate }}
                             </template>
                           </span>
                           <span v-show="range?.price_list?.rate">

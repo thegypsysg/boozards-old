@@ -29,8 +29,12 @@ export default (app) =>
       isEmptyCart: true,
       totalCartItems: 0,
       isLoading: false,
+      deliveryCharges: [],
     },
     mutations: {
+      deliveryCharges(state, data) {
+        state.deliveryCharges = data;
+      },
       isLoading(state, data) {
         state.isLoading = data;
       },
@@ -95,6 +99,31 @@ export default (app) =>
       }
     },
     actions: {
+      async getDeliveryCharges({commit, state}, countryId) {
+        await axios.post(`/delivery-charges-list-by-country`, {country_id: countryId, app_id: 3}, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }).then((response) => {
+          if(response?.data.length > 0) {
+            commit('isEmptyCart', false)
+          }
+          commit('deliveryCharges', response?.data?.data)
+        }).catch((error) => {
+          state.errorCart = error?.error
+          showSnackbar(error?.response?.data?.error, 'error')
+        })
+      },
+      
+      async updateDeliveryChargesInCart({commit, state}, data) {
+        await axios.put(`/update-delivery-charges-in-cart`, data, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }).then((response) => {
+          commit('cart', response?.data?.data)
+        }).catch((error) => {
+          state.errorCart = error?.error
+          showSnackbar(error?.response?.data?.error, 'error')
+        })
+      },
+      
       async getCartItems({commit, state}) {
         await axios.get(`/get-cart-items`, null, {
           headers: { Authorization: `Bearer ${authToken}` },

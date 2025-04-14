@@ -29,18 +29,17 @@
                   <div class="text-h6">My Cart</div>
                   <div class="text-h6" v-show="cartQuantity > 0">
                     <span class="text-red">{{ cartQuantity }}</span> Items |
-                    <span class="text-blue"
-                      >S${{
+                    <span class="text-blue" v-if="subTotal">
+                      {{ selectedCountry.currency_symbol }} {{ 
                         (
                           subTotal +
                           selectedDeliveryPrice +
                           platformFee +
                           ((subTotal + selectedDeliveryPrice + 0.5) *
-                            taxAmount) /
-                            100
+                          taxAmount) / 100
                         ).toFixed(2)
-                      }}</span
-                    >
+                      }}
+                    </span>
                   </div>
                   <div>
                     <v-btn @click="close" icon="mdi-close-circle"></v-btn>
@@ -86,11 +85,9 @@
                       <span class="text-blue">{{ product.quantity_name }}</span>
                     </div>
                     <div class="text-body-2 text-end">
-                      <strong
-                        >S{{
-                          formatCurrency(product.price * product.quantity)
-                        }}</strong
-                      >
+                      <strong>{{selectedLocation.currency_symbol }}
+                        <!-- S{{ formatCurrency(product.price * product.quantity) }} -->
+                      </strong>
                     </div>
                   </div>
                   <div class="d-flex align-center justify-space-between">
@@ -122,9 +119,8 @@
                       </v-btn>
                     </div>
                     <div class="text-body-2">
-                      <strong class="text-red"
-                        >S{{ formatCurrency(product.price) }}</strong
-                      >
+                      <strong class="text-red" >{{selectedLocation.currency_symbol }}</strong >
+                      <strong class="text-red" >S{{ product.price }}</strong >
                     </div>
                     <div>
                       <v-btn
@@ -160,10 +156,14 @@
                 color="info"
                 block
                 class="pt-5"
+                @update:model-value="onSelectDelivery"
               >
                 <div class="d-flex justify-space-between ma-2">
                   <strong>{{ option.label }}</strong>
-                  <span class="price">S$ {{ option.price }}</span>
+                  <span class="price">{{ selectedCountry.currency_symbol }} {{ option.price }}</span>
+                </div>
+                <div class="d-flex justify-space-between ma-2">
+                  <strong class="text-red font-bold font-sm">{{ option.description_2 }}</strong>
                 </div>
               </MazRadioButtons>
             </v-col>
@@ -175,7 +175,7 @@
                 </div>
                 <v-btn
                   prepend-icon="mdi-arrow-left"
-                  @click="step = 2"
+                  @click="step = 2;"
                   color="grey"
                   variant="flat"
                   >Back</v-btn
@@ -421,11 +421,11 @@
             >
             <v-btn
               v-else-if="step == 2"
-              @click="nextStep(3)"
+              @click="nextStep(3);"
               color="#ff9800"
               variant="flat"
               size="large"
-              >Where to Deliver. ?</v-btn
+              >Where to Deliver?</v-btn
             >
             <v-btn
               v-else-if="step == 3"
@@ -465,19 +465,19 @@
                     <tbody>
                       <tr>
                         <td>Sub Total</td>
-                        <td>S$</td>
-                        <td class="text-end">{{ subTotal.toFixed(2) }}</td>
+                        <td>{{ selectedCountry.currency_symbol }}</td>
+                        <td class="text-end">{{ cart[0].amount }}</td>
                       </tr>
                       <tr>
                         <td>Delivery Charges</td>
-                        <td>S$</td>
+                        <td>{{ selectedCountry.currency_symbol }}</td>
                         <td class="text-end">
                           {{ selectedDeliveryPrice.toFixed(2) }}
                         </td>
                       </tr>
                       <tr>
                         <td>Platform Fee</td>
-                        <td>S$</td>
+                        <td>{{ selectedCountry.currency_symbol }}</td>
                         <td class="text-end">{{ platformFee.toFixed(2) }}</td>
                       </tr>
                       <tr>
@@ -489,7 +489,7 @@
                               : "(Not Applicable)"
                           }}
                         </td>
-                        <td>S$</td>
+                        <td>{{ selectedCountry.currency_symbol }}</td>
                         <td class="text-end">
                           {{
                             taxAmount != null
@@ -502,7 +502,7 @@
                       </tr>
                       <tr class="total-row">
                         <td><strong>This is what you pay</strong></td>
-                        <td><strong>S$</strong></td>
+                        <td><strong>{{ selectedCountry.currency_symbol }}</strong></td>
                         <td class="text-end">
                           <strong>{{
                             (
@@ -540,6 +540,9 @@
 </template>
 
 <style>
+.font-sm {
+  font-size: 12px;
+}
 .cart-drawer {
   width: 100%; /* Ensures the parent takes the full width of its container */
   display: flex; /* Helps manage layout */
@@ -697,16 +700,34 @@ const isEmptyCart = computed(() => {
 const addressDialog = ref(false);
 const summaryDialog = ref(false);
 const selectedDelivery = ref(null);
-const deliveryOptions = ref([
-  { label: "Standard Delivery Fee", value: "standard", price: 12.0 },
-  { label: "Express (1.5 Hours)", value: "express", price: 15.0 },
-  { label: "Super Express (3 Hours)", value: "super_express", price: 25.0 },
-]);
+
+const selectedCountry = computed(() => {
+  return store.state.selectedCountry
+})
+
+const deliveryOptions = computed(() => {
+  return store.state.deliveryCharges
+})
+const getDeliveryCharges = () => {
+  store.dispatch('getDeliveryCharges', selectedCountry ? selectedCountry.country_id : 1)
+}
+
+// const deliveryOptions = ref([
+//   { label: "Standard Delivery Fee", value: "standard", price: 12.0 },
+//   { label: "Express (1.5 Hours)", value: "express", price: 15.0 },
+//   { label: "Super Express (3 Hours)", value: "super_express", price: 25.0 },
+// ]);
 const selectedDeliveryPrice = computed(() => {
   const option = deliveryOptions.value.find(
     (opt) => opt.value === selectedDelivery.value,
   );
   return option ? option.price : 0;
+});
+const selectedDeliveryId = computed(() => {
+  const option = deliveryOptions.value.find(
+    (opt) => opt.value === selectedDelivery.value,
+  );
+  return option ? option.id : 0;
 });
 const selectedPaymentMethod = ref("creditcard");
 const paymentOptions = ref([
@@ -852,7 +873,7 @@ const subTotal = computed(() =>
   ),
 );
 
-const formatCurrency = (amount) =>
+/* const formatCurrency = (amount) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -861,7 +882,25 @@ const formatCurrency = (amount) =>
 // Remove item from cart
 const handleRemoveFromCart = (product) => {
   store.dispatch("removeFromCart", product);
-};
+}; */
+
+const onSelectDelivery = (selectedId) => {
+  try {
+    const selectedOption = deliveryOptions.value.find(opt => opt.dc_id === selectedId)  
+    if (selectedOption) {
+      const payload = {
+        cart_id: cart.value[0].cart_id,
+        dc_id: selectedOption.dc_id,
+        delivery_rate: selectedOption.price,
+      }
+      store.dispatch('updateDeliveryChargesInCart', payload)
+      console.log('Delivery option deliveryOptions:', payload)
+    }
+  }
+  catch (error) {
+    console.error('Error saving delivery option:', error)
+  }
+}
 
 // Open Confirmation Modal
 const handleOpenDialog = (option, index) => {
@@ -1169,5 +1208,6 @@ onMounted(() => {
     getPlatformFee();
     getCartData();
   }
+  getDeliveryCharges();
 });
 </script>
