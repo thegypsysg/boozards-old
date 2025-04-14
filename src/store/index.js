@@ -113,6 +113,17 @@ export default (app) =>
         })
       },
       
+      async updateDeliveryChargesInCart({commit, state}, data) {
+        await axios.put(`/update-delivery-charges-in-cart`, data, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }).then((response) => {
+          commit('cart', response?.data?.data)
+        }).catch((error) => {
+          state.errorCart = error?.error
+          showSnackbar(error?.response?.data?.error, 'error')
+        })
+      },
+      
       async getCartItems({commit, state}) {
         await axios.get(`/get-cart-items`, null, {
           headers: { Authorization: `Bearer ${authToken}` },

@@ -29,18 +29,17 @@
                   <div class="text-h6">My Cart</div>
                   <div class="text-h6" v-show="cartQuantity > 0">
                     <span class="text-red">{{ cartQuantity }}</span> Items |
-                    <span class="text-blue" v-if="subTotal"
-                      >{{ selectedCountry.currency_symbol }}{{
+                    <span class="text-blue" v-if="subTotal">
+                      {{ selectedCountry.currency_symbol }} {{ 
                         (
                           subTotal +
                           selectedDeliveryPrice +
                           platformFee +
                           ((subTotal + selectedDeliveryPrice + 0.5) *
-                            taxAmount) /
-                            100
+                          taxAmount) / 100
                         ).toFixed(2)
-                      }}</span
-                    >
+                      }}
+                    </span>
                   </div>
                   <div>
                     <v-btn @click="close" icon="mdi-close-circle"></v-btn>
@@ -121,7 +120,7 @@
                     </div>
                     <div class="text-body-2">
                       <strong class="text-red" >{{selectedLocation.currency_symbol }}</strong >
-                      <!-- <strong class="text-red" >S{{ formatCurrency(product.price) }}</strong > -->
+                      <strong class="text-red" >S{{ product.price }}</strong >
                     </div>
                     <div>
                       <v-btn
@@ -157,6 +156,7 @@
                 color="info"
                 block
                 class="pt-5"
+                @update:model-value="onSelectDelivery"
               >
                 <div class="d-flex justify-space-between ma-2">
                   <strong>{{ option.label }}</strong>
@@ -175,7 +175,7 @@
                 </div>
                 <v-btn
                   prepend-icon="mdi-arrow-left"
-                  @click="step = 2"
+                  @click="step = 2;"
                   color="grey"
                   variant="flat"
                   >Back</v-btn
@@ -421,11 +421,11 @@
             >
             <v-btn
               v-else-if="step == 2"
-              @click="nextStep(3)"
+              @click="nextStep(3);"
               color="#ff9800"
               variant="flat"
               size="large"
-              >Where to Deliver. ?</v-btn
+              >Where to Deliver?</v-btn
             >
             <v-btn
               v-else-if="step == 3"
@@ -466,7 +466,7 @@
                       <tr>
                         <td>Sub Total</td>
                         <td>{{ selectedCountry.currency_symbol }}</td>
-                        <td class="text-end">{{ subTotal.toFixed(2) }}</td>
+                        <td class="text-end">{{ cart[0].amount }}</td>
                       </tr>
                       <tr>
                         <td>Delivery Charges</td>
@@ -723,6 +723,12 @@ const selectedDeliveryPrice = computed(() => {
   );
   return option ? option.price : 0;
 });
+const selectedDeliveryId = computed(() => {
+  const option = deliveryOptions.value.find(
+    (opt) => opt.value === selectedDelivery.value,
+  );
+  return option ? option.id : 0;
+});
 const selectedPaymentMethod = ref("creditcard");
 const paymentOptions = ref([
   { label: "Credit Card", value: "creditcard" },
@@ -867,7 +873,7 @@ const subTotal = computed(() =>
   ),
 );
 
-const formatCurrency = (amount) =>
+/* const formatCurrency = (amount) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -876,7 +882,25 @@ const formatCurrency = (amount) =>
 // Remove item from cart
 const handleRemoveFromCart = (product) => {
   store.dispatch("removeFromCart", product);
-};
+}; */
+
+const onSelectDelivery = (selectedId) => {
+  try {
+    const selectedOption = deliveryOptions.value.find(opt => opt.dc_id === selectedId)  
+    if (selectedOption) {
+      const payload = {
+        cart_id: cart.value[0].cart_id,
+        dc_id: selectedOption.dc_id,
+        delivery_rate: selectedOption.price,
+      }
+      store.dispatch('updateDeliveryChargesInCart', payload)
+      console.log('Delivery option deliveryOptions:', payload)
+    }
+  }
+  catch (error) {
+    console.error('Error saving delivery option:', error)
+  }
+}
 
 // Open Confirmation Modal
 const handleOpenDialog = (option, index) => {
