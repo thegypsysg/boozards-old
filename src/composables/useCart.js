@@ -131,6 +131,7 @@ export function useCart() {
             qty: 1,
             id: product.product_id,
             range_id: selectedRange?.range_id,
+            pq_id: selectedRange?.quantity?.pq_id ?? "N/A",
             quantity_name: selectedRange?.quantity?.quantity_name ?? "N/A",
             name: product.product_name,
             image: fileURL + (product?.image ?? ""),

@@ -85,7 +85,7 @@
                       <span class="text-blue">{{ product.quantity_name }}</span>
                     </div>
                     <div class="text-body-2 text-end">
-                      <strong>{{selectedLocation.currency_symbol }}
+                      <strong>{{selectedLocation?.currency_symbol }}
                         <!-- S{{ formatCurrency(product.price * product.quantity) }} -->
                       </strong>
                     </div>
@@ -119,7 +119,7 @@
                       </v-btn>
                     </div>
                     <div class="text-body-2">
-                      <strong class="text-red" >{{selectedLocation.currency_symbol }}</strong >
+                      <strong class="text-red" >{{selectedLocation?.currency_symbol }}</strong >
                       <strong class="text-red" >S{{ product.price }}</strong >
                     </div>
                     <div>
@@ -877,12 +877,12 @@ const subTotal = computed(() =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-  }).format(amount);
+  }).format(amount); */
 
 // Remove item from cart
 const handleRemoveFromCart = (product) => {
   store.dispatch("removeFromCart", product);
-}; */
+};
 
 const onSelectDelivery = (selectedId) => {
   try {
