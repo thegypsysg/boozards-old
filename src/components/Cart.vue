@@ -5,7 +5,7 @@
       <v-btn icon="mdi-close-circle" @click="snackbar = false"></v-btn>
     </template>
   </v-snackbar>
-  
+
   <v-snackbar v-model="snackbarVisible" :timeout="3000" :color="snackbarColor">
     {{ snackbarMessage }}
     <template #actions>
@@ -30,13 +30,15 @@
                   <div class="text-h6" v-show="cartQuantity > 0">
                     <span class="text-red">{{ cartQuantity }}</span> Items |
                     <span class="text-blue" v-if="subTotal">
-                      {{ selectedCountry.currency_symbol }} {{ 
+                      {{ selectedCountry.currency_symbol }}
+                      {{
                         (
                           subTotal +
                           selectedDeliveryPrice +
                           platformFee +
                           ((subTotal + selectedDeliveryPrice + 0.5) *
-                          taxAmount) / 100
+                            taxAmount) /
+                            100
                         ).toFixed(2)
                       }}
                     </span>
@@ -61,7 +63,7 @@
                 <div class="flex-grow-0 flex-shrink-0">
                   <v-img
                     class="rounded bg-white"
-                    :src="fileURL+product.image"
+                    :src="fileURL + product.image"
                     width="65"
                     height="65"
                     cover
@@ -85,7 +87,8 @@
                       <span class="text-blue">{{ product.quantity_name }}</span>
                     </div>
                     <div class="text-body-2 text-end">
-                      <strong>{{selectedLocation?.currency_symbol }}
+                      <strong
+                        >{{ selectedLocation?.currency_symbol }}
                         <!-- S{{ formatCurrency(product.price * product.quantity) }} -->
                       </strong>
                     </div>
@@ -98,9 +101,7 @@
                         class="text-caption pa-1 rounded-0"
                         variant="flat"
                         icon
-                        @click="
-                          updateQuantity(product, 'decrease')
-                        "
+                        @click="updateQuantity(product, 'decrease')"
                       >
                         <v-icon>mdi-minus</v-icon>
                       </v-btn>
@@ -111,22 +112,20 @@
                         class="text-caption pa-1 rounded-0"
                         variant="flat"
                         icon
-                        @click="
-                          updateQuantity(product, 'increase')
-                        "
+                        @click="updateQuantity(product, 'increase')"
                       >
                         <v-icon>mdi-plus</v-icon>
                       </v-btn>
                     </div>
                     <div class="text-body-2">
-                      <strong class="text-red" >{{selectedLocation?.currency_symbol }}</strong >
-                      <strong class="text-red" >S{{ product.price }}</strong >
+                      <strong class="text-red">{{
+                        selectedLocation?.currency_symbol
+                      }}</strong>
+                      <strong class="text-red">S{{ product.price }}</strong>
                     </div>
                     <div>
                       <v-btn
-                        @click="
-                          handleRemoveFromCart(product)
-                        "
+                        @click="handleRemoveFromCart(product)"
                         color="red"
                         icon="mdi-trash-can"
                         size="x-small"
@@ -160,10 +159,15 @@
               >
                 <div class="d-flex justify-space-between ma-2">
                   <strong>{{ option.label }}</strong>
-                  <span class="price">{{ selectedCountry.currency_symbol }} {{ option.price }}</span>
+                  <span class="price"
+                    >{{ selectedCountry.currency_symbol }}
+                    {{ option.price }}</span
+                  >
                 </div>
                 <div class="d-flex justify-space-between ma-2">
-                  <strong class="text-red font-bold font-sm">{{ option.description_2 }}</strong>
+                  <strong class="text-red font-bold font-sm">{{
+                    option.description_2
+                  }}</strong>
                 </div>
               </MazRadioButtons>
             </v-col>
@@ -175,7 +179,7 @@
                 </div>
                 <v-btn
                   prepend-icon="mdi-arrow-left"
-                  @click="step = 2;"
+                  @click="step = 2"
                   color="grey"
                   variant="flat"
                   >Back</v-btn
@@ -216,7 +220,9 @@
                     <div class="pa-5 d-flex flex-column ga-3">
                       <v-row>
                         <v-col cols="12">
-                          <label class="text-grey-darken-1 font-weight-bold">Street Address</label>
+                          <label class="text-grey-darken-1 font-weight-bold"
+                            >Street Address</label
+                          >
                           <MazInput
                             class="mt-1"
                             ref="streetRef"
@@ -229,19 +235,22 @@
                       <v-row>
                         <v-col cols="8">
                           <div>
-                            <label class="text-grey-darken-1 font-weight-bold">Full Address</label>
+                            <label class="text-grey-darken-1 font-weight-bold"
+                              >Full Address</label
+                            >
                             <MazTextarea
                               class="mt-1"
                               rows="4"
                               v-model="addressForm.full_address"
                               placeholder="Your Full Address"
                             />
-                          
                           </div>
                         </v-col>
                         <v-col cols="4">
                           <div>
-                            <label class="text-grey-darken-1 font-weight-bold">Unit #</label>
+                            <label class="text-grey-darken-1 font-weight-bold"
+                              >Unit #</label
+                            >
                             <MazInput
                               class="mt-1 mb-2"
                               v-model="addressForm.unit"
@@ -249,7 +258,9 @@
                             />
                           </div>
                           <div>
-                            <label class="text-grey-darken-1 font-weight-bold">Postal Code</label>
+                            <label class="text-grey-darken-1 font-weight-bold"
+                              >Postal Code</label
+                            >
                             <MazInput
                               class="mt-1"
                               v-model="addressForm.postal_code"
@@ -258,11 +269,13 @@
                           </div>
                         </v-col>
                       </v-row>
-                    
+
                       <v-row>
                         <v-col cols="4">
                           <div>
-                            <label class="text-grey-darken-1 font-weight-bold">Town</label>
+                            <label class="text-grey-darken-1 font-weight-bold"
+                              >Town</label
+                            >
                             <MazInput
                               class="mt-1"
                               v-model="addressForm.town"
@@ -272,7 +285,9 @@
                         </v-col>
                         <v-col cols="4">
                           <div>
-                            <label class="text-grey-darken-1 font-weight-bold">City</label>
+                            <label class="text-grey-darken-1 font-weight-bold"
+                              >City</label
+                            >
                             <MazInput
                               class="mt-1"
                               v-model="addressForm.city"
@@ -282,7 +297,9 @@
                         </v-col>
                         <v-col cols="4">
                           <div>
-                            <label class="text-grey-darken-1 font-weight-bold">Country</label>
+                            <label class="text-grey-darken-1 font-weight-bold"
+                              >Country</label
+                            >
                             <MazInput
                               class="mt-1"
                               v-model="addressForm.country"
@@ -294,7 +311,9 @@
 
                       <v-row>
                         <v-col>
-                          <label class="text-grey-darken-1 font-weight-bold">Condo / Apartment Name</label>
+                          <label class="text-grey-darken-1 font-weight-bold"
+                            >Condo / Apartment Name</label
+                          >
                           <MazInput
                             class="mt-1"
                             v-model="addressForm.condo_name"
@@ -305,7 +324,9 @@
 
                       <v-row>
                         <v-col>
-                          <label class="text-grey-darken-1 font-weight-bold">Landmark Details</label>
+                          <label class="text-grey-darken-1 font-weight-bold"
+                            >Landmark Details</label
+                          >
                           <MazTextarea
                             class="mt-1"
                             v-model="addressForm.landmark"
@@ -315,7 +336,9 @@
                       </v-row>
                       <v-row>
                         <v-col>
-                          <label class="text-grey-darken-1 font-weight-bold">Name Location as</label>
+                          <label class="text-grey-darken-1 font-weight-bold"
+                            >Name Location as</label
+                          >
                           <MazInput
                             class="mt-1"
                             v-model="addressForm.location_name"
@@ -342,42 +365,71 @@
                   </v-card>
                 </v-dialog>
               </div>
-              
-              <div v-for="(option, index) in addressesOptions" :class="{
+
+              <div
+                v-for="(option, index) in addressesOptions"
+                :class="{
                   'mt-2': true,
-                  'pa-5':true,
+                  'pa-5': true,
                   'bg-teal-lighten-2': option.primary_address,
                   'rounded-lg': true,
                   'border-md': !option.primary_address,
-                }">
+                }"
+              >
                 <v-row>
                   <v-col>
                     <strong>{{ option.location_name }}</strong>
                   </v-col>
                 </v-row>
-                <v-divider v-if="option.primary_address" :thickness="2" class="mt-2 mb-2 border-opacity-25" />
-                <v-divider v-else :thickness="2" class="mt-2 mb-2 border-opacity-15" />
+                <v-divider
+                  v-if="option.primary_address"
+                  :thickness="2"
+                  class="mt-2 mb-2 border-opacity-25"
+                />
+                <v-divider
+                  v-else
+                  :thickness="2"
+                  class="mt-2 mb-2 border-opacity-15"
+                />
                 <v-row>
                   <v-col cols="9">
                     <p>{{ option.full_address }}</p>
                   </v-col>
-                  <v-col v-if="option.primary_address" col="3" class="justify-end">
+                  <v-col
+                    v-if="option.primary_address"
+                    col="3"
+                    class="justify-end"
+                  >
                     <strong>Primary</strong>
                   </v-col>
                 </v-row>
                 <v-row class="d-flex">
                   <v-col cols="9" class="d-flex align-center pa-0 pl-3">
-                    <p v-if="option.landmark" class="text-red-darken-4 font-weight-bold" >
+                    <p
+                      v-if="option.landmark"
+                      class="text-red-darken-4 font-weight-bold"
+                    >
                       {{ option.landmark }}
                     </p>
                   </v-col>
                   <v-col cols="3" class="d-flex align-center pa-0">
-                    <v-btn class="" @click="handleOpenDialog(option, index)" color="red" icon="mdi-trash-can" size="small"></v-btn>
-                    <v-btn class="" @click="handleEditLocation(option.value)" color="lime" icon="mdi-pencil-outline" size="small"></v-btn>
+                    <v-btn
+                      class=""
+                      @click="handleOpenDialog(option, index)"
+                      color="red"
+                      icon="mdi-trash-can"
+                      size="small"
+                    ></v-btn>
+                    <v-btn
+                      class=""
+                      @click="handleEditLocation(option.value)"
+                      color="lime"
+                      icon="mdi-pencil-outline"
+                      size="small"
+                    ></v-btn>
                   </v-col>
                 </v-row>
               </div>
-              
             </v-col>
             <v-col v-if="step == 4" class="pa-5">
               <div class="my-3 text-h6 d-flex justify-space-between">
@@ -421,7 +473,7 @@
             >
             <v-btn
               v-else-if="step == 2"
-              @click="nextStep(3);"
+              @click="nextStep(3)"
               color="#ff9800"
               variant="flat"
               size="large"
@@ -502,7 +554,9 @@
                       </tr>
                       <tr class="total-row">
                         <td><strong>This is what you pay</strong></td>
-                        <td><strong>{{ selectedCountry.currency_symbol }}</strong></td>
+                        <td>
+                          <strong>{{ selectedCountry.currency_symbol }}</strong>
+                        </td>
                         <td class="text-end">
                           <strong>{{
                             (
@@ -527,9 +581,7 @@
     </template>
   </MazDrawer>
   <v-dialog v-model="openDialog" max-width="400" persistent>
-    <v-card prepend-icon="mdi-trash-can"
-      :text=modalText
-      :title=modalTitle >
+    <v-card prepend-icon="mdi-trash-can" :text="modalText" :title="modalTitle">
       <template v-slot:actions>
         <v-spacer></v-spacer>
         <v-btn @click="openDialog = false"> Disagree </v-btn>
@@ -643,7 +695,7 @@ import MazRadioButtons from "maz-ui/components/MazRadioButtons";
 import { Loader } from "@googlemaps/js-api-loader";
 import { number } from "maz-ui";
 import { useCart } from "@/composables/useCart";
-import { useGlobalSnackbar } from '@/composables/useGlobalSnackbar';
+import { useGlobalSnackbar } from "@/composables/useGlobalSnackbar";
 import { fileURL } from "@/main";
 
 const { snackbarVisible, snackbarMessage, snackbarColor } = useGlobalSnackbar();
@@ -656,12 +708,12 @@ const props = defineProps({
   selectedLocation: String,
 });
 
-const openDialog = ref(false)
-const addressIndex = ref(null)
-const addressId = ref(null)
-const addressName = ref(null)
-const modalTitle = "Are you Sure?"
-const modalText = ref(null)
+const openDialog = ref(false);
+const addressIndex = ref(null);
+const addressId = ref(null);
+const addressName = ref(null);
+const modalTitle = "Are you Sure?";
+const modalText = ref(null);
 
 watch(props.selectedLocation, async (location, oldLocation) => {
   await getTaxAmount();
@@ -694,23 +746,26 @@ const addressForm = reactive({
 });
 
 const isEmptyCart = computed(() => {
-  return store.state.isEmptyCart
-})
+  return store.state.isEmptyCart;
+});
 
 const addressDialog = ref(false);
 const summaryDialog = ref(false);
 const selectedDelivery = ref(null);
 
 const selectedCountry = computed(() => {
-  return store.state.selectedCountry
-})
+  return store.state.selectedCountry;
+});
 
 const deliveryOptions = computed(() => {
-  return store.state.deliveryCharges
-})
+  return store.state.deliveryCharges;
+});
 const getDeliveryCharges = () => {
-  store.dispatch('getDeliveryCharges', selectedCountry ? selectedCountry.country_id : 1)
-}
+  store.dispatch(
+    "getDeliveryCharges",
+    selectedCountry ? selectedCountry.country_id : 1,
+  );
+};
 
 // const deliveryOptions = ref([
 //   { label: "Standard Delivery Fee", value: "standard", price: 12.0 },
@@ -738,9 +793,9 @@ const paymentOptions = ref([
 ]);
 
 const openAddressDialog = () => {
-  resetForm()
-  addressDialog.value = true
-}
+  resetForm();
+  addressDialog.value = true;
+};
 
 let autocomplete;
 const streetRef = ref(null);
@@ -772,14 +827,13 @@ const initAutocomplete = async () => {
       autocomplete.addListener("place_changed", () => {
         const place = autocomplete.getPlace();
         if (place.geometry) {
-
           var placeName = place.name;
           var streetName = "";
           var route = "";
           for (let i = 0; i < place.address_components.length; i++) {
             const component = place.address_components[i];
-            
-						// Check the types to determine what kind of address component it is
+
+            // Check the types to determine what kind of address component it is
             if (component.types.includes("street_number")) {
               streetName = component.long_name;
             }
@@ -798,19 +852,22 @@ const initAutocomplete = async () => {
             }
             if (component.types.includes("postal_code")) {
               addressForm.postal_code = component.long_name; // Postal Code
-            }
-            else {
+            } else {
               addressForm.postal_code = "";
             }
           }
 
-          var wrappedAddress = addressForm.city+' '+addressForm.postal_code;
-          var mainAddress = [placeName, streetName, route].filter(Boolean).join(' ');
-          var fullSingleLine = streetName+' '+route
-          var fullAddress = [fullSingleLine, wrappedAddress].filter(Boolean).join('\n');
+          var wrappedAddress = addressForm.city + " " + addressForm.postal_code;
+          var mainAddress = [placeName, streetName, route]
+            .filter(Boolean)
+            .join(" ");
+          var fullSingleLine = streetName + " " + route;
+          var fullAddress = [fullSingleLine, wrappedAddress]
+            .filter(Boolean)
+            .join("\n");
 
-          addressForm.main_address = mainAddress
-        	addressForm.full_address = fullAddress
+          addressForm.main_address = mainAddress;
+          addressForm.full_address = fullAddress;
           addressForm.condo_name = placeName;
           addressForm.latitude = place.geometry.location.lat();
           addressForm.longitude = place.geometry.location.lng();
@@ -823,17 +880,17 @@ const initAutocomplete = async () => {
 };
 
 const resetForm = () => {
-  addressForm.main_address = ""
-  addressForm.full_address = ""
-  addressForm.unit = ""
-  addressForm.postal_code = ""
-  addressForm.town = ""
-  addressForm.city = ""
-  addressForm.country = ""
-  addressForm.condo_name = ""
-  addressForm.landmark = ""
-  addressForm.location_name = ""
-}
+  addressForm.main_address = "";
+  addressForm.full_address = "";
+  addressForm.unit = "";
+  addressForm.postal_code = "";
+  addressForm.town = "";
+  addressForm.city = "";
+  addressForm.country = "";
+  addressForm.condo_name = "";
+  addressForm.landmark = "";
+  addressForm.location_name = "";
+};
 
 watch(addressDialog, (isOpen) => {
   if (isOpen) {
@@ -853,12 +910,12 @@ watch(
 
 // Get cart items
 const cart = computed(() => {
-  return store.state.cart
+  return store.state.cart;
 });
 
 // Get cart items
 const detailsCart = computed(() => {
-  return store.state.detailsCart
+  return store.state.detailsCart;
 });
 
 // Get total quantity of all cart items
@@ -886,69 +943,72 @@ const handleRemoveFromCart = (product) => {
 
 const onSelectDelivery = (selectedId) => {
   try {
-    const selectedOption = deliveryOptions.value.find(opt => opt.dc_id === selectedId)  
+    const selectedOption = deliveryOptions.value.find(
+      (opt) => opt.dc_id === selectedId,
+    );
     if (selectedOption) {
       const payload = {
         cart_id: cart.value[0].cart_id,
         dc_id: selectedOption.dc_id,
         delivery_rate: selectedOption.price,
-      }
-      store.dispatch('updateDeliveryChargesInCart', payload)
-      console.log('Delivery option deliveryOptions:', payload)
+      };
+      store.dispatch("updateDeliveryChargesInCart", payload);
+      console.log("Delivery option deliveryOptions:", payload);
     }
+  } catch (error) {
+    console.error("Error saving delivery option:", error);
   }
-  catch (error) {
-    console.error('Error saving delivery option:', error)
-  }
-}
+};
 
 // Open Confirmation Modal
 const handleOpenDialog = (option, index) => {
-  addressIndex.value = index
-  addressId.value = option.value
-  addressName.value = option.location_name
-  modalText.value = `Do you surely want to delete the address "${addressName.value}"?`
-  openDialog.value = true
-}
+  addressIndex.value = index;
+  addressId.value = option.value;
+  addressName.value = option.location_name;
+  modalText.value = `Do you surely want to delete the address "${addressName.value}"?`;
+  openDialog.value = true;
+};
 
 // Delete address from the DB & the list
 const handleDeleteAddress = async () => {
-  const response =await axios.get('/delete-address/'+addressId.value, {
+  const response = await axios.get("/delete-address/" + addressId.value, {
     headers: {
       Authorization: `Bearer ${authToken}`,
     },
   });
-  
+
   snackbar.value = true;
   message.value = {
     text: response.data.message,
     color: "success",
-  }
-  addresses.value.splice(addressIndex.value, 1)
-  openDialog.value = false
+  };
+  addresses.value.splice(addressIndex.value, 1);
+  openDialog.value = false;
 };
 
 // Edit Address
 const handleEditLocation = async (address_id) => {
-  isEditAddressForm.value = true
-  addressID.value = address_id
-  axios.get('/get-address/'+address_id).then(response => {
-    let formData = response.data.data
-    addressForm.main_address = formData.address_master?.street_address,
-    addressForm.full_address = formData.full_address,
-    addressForm.unit = formData.unit_number,
-    addressForm.postal_code = formData.address_master?.postal_code,
-    addressForm.town = formData.address_master?.town.town_name,
-    addressForm.city = formData.address_master?.city.city_name,
-    addressForm.country = formData.address_master?.country.country_name,
-    addressForm.condo_name = formData?.condo_name || "",
-    addressForm.landmark = formData.landmark,
-    addressForm.location_name = formData.location_name
-    addressDialog.value = true
-  })
-  .catch(error => {
-    console.error(error);
-  });
+  isEditAddressForm.value = true;
+  addressID.value = address_id;
+  axios
+    .get("/get-address/" + address_id)
+    .then((response) => {
+      let formData = response.data.data;
+      (addressForm.main_address = formData.address_master?.street_address),
+        (addressForm.full_address = formData.full_address),
+        (addressForm.unit = formData.unit_number),
+        (addressForm.postal_code = formData.address_master?.postal_code),
+        (addressForm.town = formData.address_master?.town.town_name),
+        (addressForm.city = formData.address_master?.city.city_name),
+        (addressForm.country = formData.address_master?.country.country_name),
+        (addressForm.condo_name = formData?.condo_name || ""),
+        (addressForm.landmark = formData.landmark),
+        (addressForm.location_name = formData.location_name);
+      addressDialog.value = true;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 };
 
 const nextStep = (value) => {
@@ -1018,7 +1078,6 @@ const toggleAddressDetails = (ga_id) => {
   addressExpanded.value[ga_id] = !addressExpanded.value[ga_id]; // Toggle true/false
 };
 const getAddress = async () => {
-
   try {
     const response = await axios.get(`/get-address`, {
       headers: { Authorization: `Bearer ${authToken}` },
@@ -1060,13 +1119,13 @@ const getAddress = async () => {
 
 const isLoading = computed(() => {
   return store.state.isLoading;
-})
+});
 
 const savingAddress = ref(false);
 const saveAddress = async () => {
   savingAddress.value = true;
   try {
-    if(!isEditAddressForm.value) {
+    if (!isEditAddressForm.value) {
       const response = await axios.post(`/save-address`, addressForm, {
         headers: {
           Authorization: `Bearer ${authToken}`,
@@ -1087,14 +1146,17 @@ const saveAddress = async () => {
         text: response.data.message,
         color: "success",
       };
-    }
-    else {
-      console.log('isEditAddressForm', addressForm);
-      const response = await axios.put(`/update-address/`+addressID.value, addressForm, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
+    } else {
+      console.log("isEditAddressForm", addressForm);
+      const response = await axios.put(
+        `/update-address/` + addressID.value,
+        addressForm,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
         },
-      });
+      );
       getAddress();
       snackbar.value = true;
       message.value = {
@@ -1104,11 +1166,11 @@ const saveAddress = async () => {
     }
     // ✅ Optionally, reset form after successful save
     resetForm();
-    isEditAddressForm.value = false
+    isEditAddressForm.value = false;
     addressDialog.value = false;
-  }
-  catch (error) {
-    const errorMessage = error.response?.data?.message || "Something went wrong!";
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || "Something went wrong!";
     snackbar.value = true;
     message.value = {
       text: errorMessage,
@@ -1127,7 +1189,7 @@ const getTaxAmount = async () => {
     await axios
       .get(`/gypsy-user`, { headers: { Authorization: `Bearer ${authToken}` } })
       .then((response) => {
-        data = response.data.data["country_current"];
+        data = response.data.data?.country_current;
       })
       .catch((_) => {});
 
@@ -1142,8 +1204,8 @@ const getTaxAmount = async () => {
             : data,
       },
     });
-    if (response.data.data["applicable"] === "Y") {
-      taxAmount.value = response.data.data["tax_rate"];
+    if (response.data.data?.applicable === "Y") {
+      taxAmount.value = response.data.data?.tax_rate;
     }
   } catch (error) {
     // eslint-disable-next-line
@@ -1154,8 +1216,8 @@ const getTaxAmount = async () => {
 const platformFee = ref(null);
 
 const getCartData = async () => {
-  await store.dispatch('getCartItems')
-}
+  await store.dispatch("getCartItems");
+};
 
 const getPlatformFee = async () => {
   let data = null;
@@ -1171,7 +1233,7 @@ const getPlatformFee = async () => {
         },
       })
       .then((response) => {
-        data = response.data.data["app_id"];
+        data = response.data.data?.app_id;
       })
       .catch((error) => {
         // eslint-disable-next-line
@@ -1187,7 +1249,7 @@ const getPlatformFee = async () => {
       },
     });
 
-    platformFee.value = parseFloat(response.data.data["platform_fee"]);
+    platformFee.value = parseFloat(response.data.data?.platform_fee);
   } catch (error) {
     console.error("Error getting tax rate:", error);
     // const message = error.response?.data?.message || "Something went wrong!";
@@ -1202,7 +1264,12 @@ const getPlatformFee = async () => {
 };
 
 onMounted(() => {
-  if (authToken && authToken != null && authToken != "" && authToken != "null") {
+  if (
+    authToken &&
+    authToken != null &&
+    authToken != "" &&
+    authToken != "null"
+  ) {
     getTaxAmount();
     getAddress();
     getPlatformFee();

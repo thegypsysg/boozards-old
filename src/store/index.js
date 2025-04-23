@@ -15,7 +15,7 @@ export default (app) =>
       itemSelected2: "---Select City---",
       itemSelected2Complete: null,
       selectedTrending: "",
-      selectedCountry: "",
+      selectedCountry: "Test",
       latitude: "",
       longitude: "",
       country: [],
@@ -52,6 +52,10 @@ export default (app) =>
       },
       setActiveTag(state, tag) {
         state.activeTag = tag; // Memperbarui tag yang aktif
+      },
+
+      setSelectedCountry(state, item) {
+        state.selectedCountry = item;
       },
       setItemSelected(state, item) {
         state.itemSelected = item; // Memperbarui tag yang aktif
@@ -90,9 +94,6 @@ export default (app) =>
       setCategoryData(state, item) {
         state.categoryData = item;
       },
-      setSelectedCountry(state, item) {
-        state.selectedCountry = item;
-      },
       clearCart(state) {
         state.cart = [];
         localStorage.removeItem("cart");
@@ -105,7 +106,9 @@ export default (app) =>
             `/delivery-charges-list-by-country`,
             { country_id: countryId, app_id: 3 },
             {
-              headers: { Authorization: `Bearer ${authToken}` },
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
             },
           )
           .then((response) => {
@@ -123,7 +126,9 @@ export default (app) =>
       async updateDeliveryChargesInCart({ commit, state }, data) {
         await axios
           .put(`/update-delivery-charges-in-cart`, data, {
-            headers: { Authorization: `Bearer ${authToken}` },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
           })
           .then((response) => {
             commit("cart", response?.data?.data);
@@ -137,7 +142,9 @@ export default (app) =>
       async getCartItems({ commit, state }) {
         await axios
           .get(`/get-cart-items`, null, {
-            headers: { Authorization: `Bearer ${authToken}` },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
           })
           .then((response) => {
             if (response?.data.length > 0) {
@@ -156,7 +163,9 @@ export default (app) =>
         commit("isLoading", true);
         await axios
           .post(`/add-to-cart`, data, {
-            headers: { Authorization: `Bearer ${authToken}` },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
           })
           .then((response) => {
             if (response?.data.length > 0) {
@@ -179,12 +188,16 @@ export default (app) =>
         console.log("updateCart", product);
         await axios
           .put(`/update-cart`, product, {
-            headers: { Authorization: `Bearer ${authToken}` },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
           })
           .then(() => {
             axios
               .get(`/get-cart-items`, null, {
-                headers: { Authorization: `Bearer ${authToken}` },
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
               })
               .then((response) => {
                 if (response?.data.length > 0) {
@@ -213,7 +226,9 @@ export default (app) =>
             `/remove-cart-item`,
             { cart_id: product.cart_id, range_id: product.range_id },
             {
-              headers: { Authorization: `Bearer ${authToken}` },
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
             },
           )
           .then((response) => {
@@ -221,7 +236,9 @@ export default (app) =>
 
             axios
               .get(`/get-cart-items`, null, {
-                headers: { Authorization: `Bearer ${authToken}` },
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
               })
               .then((response) => {
                 if (response?.data.length > 0) {

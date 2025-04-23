@@ -1,34 +1,13 @@
 <script>
-import { setAuthHeader } from "@/util/axios";
-import cartMixin from "@/mixins/cartMixin";
 import { mapState, mapMutations } from "vuex";
-import app from "@/util/eventBus";
-
-// import eventBus from "@/util/eventBus";
-// import eventBus from "@/util/eventBus";
-import axios from "@/util/axios";
 import moment from "moment-timezone";
-
-import Cart from "@/components/Cart.vue";
-
+import { setAuthHeader } from "@/util/axios";
+import axios from "@/util/axios";
+import cartMixin from "@/mixins/cartMixin";
+import app from "@/util/eventBus";
 import { appId } from "@/main";
-
-// Import images
-import boozardsLogo from "@/assets/images/logo/boozards-logo.png";
-import homeIcon from "@/assets/images/icons/home.png";
-import shopperIcon from "@/assets/images/icons/menu-shopper.png";
-import shopIcon from "@/assets/images/icons/shop.png";
-import userIcon from "@/assets/images/icons/user_icon.png";
-import facebookIcon from "@/assets/images/icons/facebook.png";
-import instaIcon from "@/assets/images/icons/insta.png";
-import tiktokIcon from "@/assets/images/icons/tiktok.png";
-import whatsappIcon from "@/assets/whatsapp.svg";
+import Cart from "@/components/Cart.vue";
 import ExploreOurMenuList from "./explore-our-menu-list.vue";
-import { onMounted, reactive, watch } from "vue";
-import { fileURL } from "@/main";
-const authToken = localStorage.getItem("token");
-import { useCart } from "@/composables/useCart";
-import { ref } from "vue";
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
@@ -44,19 +23,8 @@ export default {
   ],
   mixins: [cartMixin],
   data() {
-    const selectedDelivery = ref(null);
-    // const deliveryOptions = ref([
-    //   { label: "Standard Delivery Fee", value: "standard", price: 12.0 },
-    //   { label: "Express (1.5 Hours)", value: "express", price: 15.0 },
-    //   { label: "Super Express (3 Hours)", value: "super_express", price: 25.0 },
-    // ]);
-    const { isInCart, cartQuantity, addToCart, updateQuantity } = useCart();
     return {
-      selectedDelivery,
-      isInCart,
-      cartQuantity,
-      addToCart,
-      updateQuantity,
+      selectedDelivery: null,
       platformFee: null,
       taxAmount: null,
       viewCart: false,
@@ -64,7 +32,6 @@ export default {
       isEmployment: false,
       isCheck: false,
       path: "",
-      // selectedTag: null,
       tokenStart: null,
       footerData: {
         company_name: "",
@@ -109,70 +76,70 @@ export default {
       // ---------------------------
       dialog2: false,
       activeMalls: [],
-      selectedLocation: reactive({
+      selectedLocation: {
         country_id: 1,
         currency_symbol: "S$",
         country: "Singapore",
         city: "Singapore City",
-      }),
+      },
       locationDropdown: [
-        {
-          country_id: 1,
-          country: "Singapore",
-          currency_symbol: "S$",
-          flagUrl: "https://flagcdn.com/w40/sg.png",
-          properties: 1,
-          cities: [
-            {
-              country_id: 1,
-              currency_symbol: "S$",
-              name: "Singapore City",
-              imageUrl: "https://example.com/singapore-city.jpg",
-            },
-          ],
-        },
-        {
-          country_id: 3,
-          country: "Indonesia",
-          currency_symbol: "IDR",
-          flagUrl: "https://flagcdn.com/w40/id.png",
-          properties: 1,
-          cities: [
-            {
-              country_id: 3,
-              currency_symbol: "IDR",
-              name: "Batam",
-              imageUrl: "https://example.com/batam.jpg",
-            },
-          ],
-        },
-        {
-          country_id: 2,
-          country: "India",
-          currency_symbol: "Rs.",
-          flagUrl: "https://flagcdn.com/w40/in.png",
-          properties: 3,
-          cities: [
-            {
-              country_id: 2,
-              currency_symbol: "Rs.",
-              name: "Mumbai",
-              imageUrl: "https://example.com/mumbai.jpg",
-            },
-            {
-              country_id: 2,
-              currency_symbol: "Rs.",
-              name: "Goa - Margao",
-              imageUrl: "https://example.com/goa-margao.jpg",
-            },
-            {
-              country_id: 2,
-              currency_symbol: "Rs.",
-              name: "Goa - Panjim",
-              imageUrl: "https://example.com/goa-panjim.jpg",
-            },
-          ],
-        },
+        // {
+        //   country_id: 1,
+        //   country: "Singapore",
+        //   currency_symbol: "S$",
+        //   flagUrl: "https://flagcdn.com/w40/sg.png",
+        //   properties: 1,
+        //   cities: [
+        //     {
+        //       country_id: 1,
+        //       currency_symbol: "S$",
+        //       name: "Singapore City",
+        //       imageUrl: "https://example.com/singapore-city.jpg",
+        //     },
+        //   ],
+        // },
+        // {
+        //   country_id: 3,
+        //   country: "Indonesia",
+        //   currency_symbol: "IDR",
+        //   flagUrl: "https://flagcdn.com/w40/id.png",
+        //   properties: 1,
+        //   cities: [
+        //     {
+        //       country_id: 3,
+        //       currency_symbol: "IDR",
+        //       name: "Batam",
+        //       imageUrl: "https://example.com/batam.jpg",
+        //     },
+        //   ],
+        // },
+        // {
+        //   country_id: 2,
+        //   country: "India",
+        //   currency_symbol: "Rs.",
+        //   flagUrl: "https://flagcdn.com/w40/in.png",
+        //   properties: 3,
+        //   cities: [
+        //     {
+        //       country_id: 2,
+        //       currency_symbol: "Rs.",
+        //       name: "Mumbai",
+        //       imageUrl: "https://example.com/mumbai.jpg",
+        //     },
+        //     {
+        //       country_id: 2,
+        //       currency_symbol: "Rs.",
+        //       name: "Goa - Margao",
+        //       imageUrl: "https://example.com/goa-margao.jpg",
+        //     },
+        //     {
+        //       country_id: 2,
+        //       currency_symbol: "Rs.",
+        //       name: "Goa - Panjim",
+        //       imageUrl: "https://example.com/goa-panjim.jpg",
+        //     },
+        //   ],
+        // },
       ],
       filterList: ["View All", "Europe", "Asia"],
     };
@@ -194,6 +161,7 @@ export default {
     ...mapState(["skillRecognised"]),
     ...mapState(["idSkillRecognised"]),
     ...mapState(["selectedCountry"]),
+    ...mapState(["activeTag"]),
     ...mapState({
       cartSubTotal: (state) =>
         new Intl.NumberFormat("en-US", {
@@ -250,6 +218,9 @@ export default {
     token() {
       return localStorage.getItem("token");
     },
+    authToken() {
+      return localStorage.getItem("token");
+    },
     isPrivacy() {
       return this.$route.path == "/privacy-policy";
     },
@@ -292,7 +263,6 @@ export default {
     isDetailPage() {
       return this.$route.path.includes("detail");
     },
-    ...mapState(["activeTag"]),
     // titleHeader() {
     //   let path = this.$route.path;
     //   let name = this.$route.path.split("/")[1];
@@ -326,42 +296,14 @@ export default {
       this.getHeaderUserData();
     }
     this.search = null;
-    this.getLogo();
-    this.getCountry();
     this.getPlatformFee();
     this.getTaxAmount();
     this.getAppContact();
-    //this.getCity();
     this.getTrendingCardData();
-    this.getActiveSkills();
     this.getLocationDropDownData();
-    // app.config.globalProperties.$eventBus.$on(
-    //   'getHeaderDetail',
-    //   this.getHeaderDetail
-    // );
 
-    const defaultCountry = this.locationDropdown[0];
-    const defaultCity = defaultCountry.cities[0];
-    this.selectLocation(defaultCountry, defaultCity);
     this.getProductCategoryListData();
-    app.config.globalProperties.$eventBus.$on("applyJob2", this.applyJob2);
-    app.config.globalProperties.$eventBus.$on(
-      "applyJobFalse2",
-      this.applyJobFalse2,
-    );
-    app.config.globalProperties.$eventBus.$on(
-      "employmentJob2",
-      this.employmentJob2,
-    );
-    app.config.globalProperties.$eventBus.$on(
-      "employmentJobFalse2",
-      this.employmentJobFalse2,
-    );
-    app.config.globalProperties.$eventBus.$on("checkJob2", this.checkJob2);
-    app.config.globalProperties.$eventBus.$on(
-      "checkJobFalse2",
-      this.checkJobFalse2,
-    );
+
     app.config.globalProperties.$eventBus.$on(
       "changeHeaderPath",
       this.changeHeaderPath,
@@ -381,26 +323,6 @@ export default {
     app.config.globalProperties.$eventBus.$on(
       "getHeaderUserData",
       this.getHeaderUserData,
-    );
-    app.config.globalProperties.$eventBus.$on(
-      "getHeaderDetail",
-      this.getSkillBySlug,
-    );
-    app.config.globalProperties.$eventBus.$on(
-      "getRegistrableCountrySkills",
-      this.getRegistrableData,
-    );
-    app.config.globalProperties.$eventBus.$on(
-      "getHeaderLanding",
-      this.getTrendingCardData,
-    );
-    app.config.globalProperties.$eventBus.$on(
-      "removeDetail",
-      this.removeDetail,
-    );
-    app.config.globalProperties.$eventBus.$on(
-      "changeHeaderWelcome2",
-      this.changeHeaderWelcome2,
     );
     app.config.globalProperties.$eventBus.$on(
       "changeHeaderWelcome3",
@@ -408,28 +330,6 @@ export default {
     );
   },
   beforeUnmount() {
-    // app.config.globalProperties.$eventBus.$off(
-    //   'getHeaderDetail',
-    //   this.getHeaderDetail
-    // );
-    app.config.globalProperties.$eventBus.$off("applyJob2", this.applyJob2);
-    app.config.globalProperties.$eventBus.$off(
-      "applyJobFalse2",
-      this.applyJobFalse2,
-    );
-    app.config.globalProperties.$eventBus.$off(
-      "employmentJob2",
-      this.employmentJob2,
-    );
-    app.config.globalProperties.$eventBus.$off(
-      "employmentJobFalse2",
-      this.employmentJobFalse2,
-    );
-    app.config.globalProperties.$eventBus.$off("checkJob2", this.checkJob2);
-    app.config.globalProperties.$eventBus.$off(
-      "checkJobFalse2",
-      this.checkJobFalse2,
-    );
     app.config.globalProperties.$eventBus.$off(
       "changeHeaderPath",
       this.changeHeaderPath,
@@ -450,26 +350,7 @@ export default {
       "getHeaderUserData",
       this.getHeaderUserData,
     );
-    app.config.globalProperties.$eventBus.$off(
-      "getHeaderDetail",
-      this.getSkillBySlug,
-    );
-    app.config.globalProperties.$eventBus.$off(
-      "getRegistrableCountrySkills",
-      this.getRegistrableData,
-    );
-    app.config.globalProperties.$eventBus.$off(
-      "getHeaderLanding",
-      this.getTrendingCardData,
-    );
-    app.config.globalProperties.$eventBus.$on(
-      "removeDetail",
-      this.removeDetail,
-    );
-    app.config.globalProperties.$eventBus.$off(
-      "changeHeaderWelcome2",
-      this.changeHeaderWelcome2,
-    );
+
     app.config.globalProperties.$eventBus.$off(
       "changeHeaderWelcome3",
       this.changeHeaderWelcome3,
@@ -479,32 +360,43 @@ export default {
     window.removeEventListener("resize", this.handleResize);
   },
   methods: {
+    ...mapMutations([
+      "setActiveTag",
+      "setItemSelected",
+      "setItemSelectedComplete",
+      "setItemSelected2",
+      "setItemSelected2Complete",
+      "setCountryRecognised",
+      "setSkillRecognised",
+      "setIdCountryRecognised",
+      "setIdSkillRecognised",
+      "setFooterData",
+      "setCategoryData",
+      "setSelectedCountry",
+    ]),
     async getTaxAmount() {
       let data = null;
 
       try {
         await axios
           .get(`/gypsy-user`, {
-            headers: { Authorization: `Bearer ${authToken}` },
+            headers: { Authorization: `Bearer ${this.authToken}` },
           })
           .then((response) => {
-            data = response.data.data["country_current"];
+            data = response.data.data?.country_current;
           })
           .catch((_) => {});
 
         const response = await axios.get(`/get-tax-amount`, {
           headers: {
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${this.authToken}`,
           },
           params: {
-            country_id:
-              parseInt(props.selectedLocation) != null
-                ? parseInt(props.selectedLocation)
-                : data,
+            country_id: data,
           },
         });
-        if (response.data.data["applicable"] === "Y") {
-          this.taxAmount = response.data.data["tax_rate"];
+        if (response?.data?.data?.applicable === "Y") {
+          this.taxAmount = response.data.data?.tax_rate;
         }
       } catch (error) {
         // eslint-disable-next-line
@@ -517,14 +409,14 @@ export default {
         await axios
           .get(`/get-app-id`, {
             headers: {
-              Authorization: `Bearer ${authToken}`,
+              Authorization: `Bearer ${this.authToken}`,
             },
             params: {
               company_name: "Boozards",
             },
           })
           .then((response) => {
-            data = response.data.data["app_id"];
+            data = response.data.data?.app_id;
           })
           .catch((error) => {
             // eslint-disable-next-line
@@ -533,14 +425,14 @@ export default {
 
         const response = await axios.get(`/get-platform-fee`, {
           headers: {
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${this.authToken}`,
           },
           params: {
             app_id: data,
           },
         });
 
-        this.platformFee = parseFloat(response.data.data["platform_fee"]);
+        this.platformFee = parseFloat(response.data.data?.platform_fee);
       } catch (error) {
         console.error("Error getting tax rate:", error);
         // const message = error.response?.data?.message || "Something went wrong!";
@@ -553,169 +445,8 @@ export default {
         // savingAddress.value = false;
       }
     },
-    /* getSelectedRange (product) {
-      return product.rangeItems.find((range) => range.selected?.value);
-    },
-    isInCart (product, selectedRange = null) {
-      if(selectedRange == null){
-        selectedRange = getSelectedRange(product);
-        if (selectedRange == null) return false;
-      }
-      
-      return this.$store.state.cart.some(
-        (item) => item.id === product.product_id && item.range_id === selectedRange?.range_id
-      );
-    }, */
-    /* addToCart(product, selectedRange = null) {
-      this.getPlatformFee()
-      this.getTaxAmount()
-      if(selectedRange == null) {
-        selectedRange = getSelectedRange(product);
-        if (selectedRange == null) return false;
-      }
-
-      const cartMasterData = {
-        app_id: 3,
-        platform_fee: this.platformFee,
-        gst: this.taxAmount,
-        order_status: 'PP',
-        rate: product?.selectedPrice?.value ? product?.selectedPrice?.value : selectedRange?.price_list?.rate ? selectedRange?.price_list?.rate : 0,
-        qty: 1,
-        id: product.product_id,
-        range_id: selectedRange?.range_id,
-        quantity_name: selectedRange?.quantity?.quantity_name ?? "N/A",
-        name: product.product_name,
-        image: fileURL + (product?.image ?? ""),
-        price: product?.selectedPrice?.value ? product?.selectedPrice?.value : selectedRange?.price_list?.rate ? selectedRange?.price_list?.rate : 0,
-      };
-      this.$store.dispatch('addToCart', cartMasterData)
-    },
-    updateQuantity(product, change, selectedRange = null) {
-      console.log({product, change})
-      if(selectedRange == null) {
-          selectedRange = getSelectedRange(product);
-          if (selectedRange == null) return false;
-      }
-      const cartMasterData = {
-        change: change,
-        cart_id: product.cart_id,
-        range_id: selectedRange?.range_id,
-        price: product.price,
-        quantity: 1,
-      }
-      this.$store.dispatch('updateCart', cartMasterData)
-      this.$store.dispatch('getCartItems')
-    }, */
     toggleMobileSearchBar() {
       this.openMobileSearchBar = !this.openMobileSearchBar;
-    },
-    toggleIsCount(product, event) {
-      event.stopPropagation(); // Mencegah memilih item di VAutocomplete
-      if (product) {
-        product.isCount = true;
-      }
-    },
-    decreaseCount(product, event) {
-      event.stopPropagation(); // Mencegah memilih item di VAutocomplete
-      if (product && product.count > 1) {
-        product.count--;
-      }
-    },
-    increaseCount(product, event) {
-      event.stopPropagation(); // Mencegah memilih item di VAutocomplete
-      if (product) {
-        product.count++;
-      }
-    },
-    applyJob() {
-      this.isLoading = true;
-      const token = localStorage.getItem("token");
-      axios
-        .get(`/gypsy-applicant`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((response) => {
-          const data = response.data.data;
-          console.log(data);
-          if (data && data.basic_steps == null) {
-            this.tokenStart = token;
-            app.config.globalProperties.$eventBus.$emit("getTokenStart", token);
-            localStorage.setItem("applicant_data", JSON.stringify(data));
-            window.location.href = "/";
-          } else if (
-            data &&
-            data.basic_steps == "C" &&
-            data.qualifications_steps == null
-          ) {
-            app.config.globalProperties.$eventBus.$emit("applyJob");
-            app.config.globalProperties.$eventBus.$emit("applyJob2");
-          } else if (
-            data &&
-            data.basic_steps == "C" &&
-            data.qualifications_steps == "C" &&
-            data.employment_steps == null
-          ) {
-            app.config.globalProperties.$eventBus.$emit("employmentJob");
-            app.config.globalProperties.$eventBus.$emit("employmentJob2");
-          } else if (
-            data &&
-            data.basic_steps == "C" &&
-            data.qualifications_steps == "C" &&
-            data.employment_steps == "C"
-          ) {
-            //console.log('OK')
-            app.config.globalProperties.$eventBus.$emit("checkJob");
-            app.config.globalProperties.$eventBus.$emit("checkJob2");
-          } else if (data == null) {
-            app.config.globalProperties.$eventBus.$emit(
-              "changeHeaderPath",
-              "/",
-            );
-          }
-
-          if (data.slug) {
-            this.path = `/${data.slug}`;
-            app.config.globalProperties.$eventBus.$emit(
-              "changeHeaderPath",
-              `/${data.slug}`,
-            );
-          } else {
-            this.path = "/";
-            app.config.globalProperties.$eventBus.$emit(
-              "changeHeaderPath",
-              "/",
-            );
-          }
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.log(error);
-
-          // app.config.globalProperties.$eventBus.$emit('getTrendingCardData2');
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    applyJob2() {
-      this.isApply = true;
-    },
-    applyJobFalse2() {
-      this.isApply = false;
-    },
-    employmentJob2() {
-      this.isEmployment = true;
-    },
-    employmentJobFalse2() {
-      this.isEmployment = false;
-    },
-    checkJob2() {
-      this.isCheck = true;
-    },
-    checkJobFalse2() {
-      this.isCheck = false;
     },
     changeHeaderPath(path) {
       //console.log(image)
@@ -742,7 +473,7 @@ export default {
         })
         .then((response) => {
           const data = response.data.data;
-          console.log(data);
+          // console.log(data);
           localStorage.setItem("name", null);
           localStorage.setItem("userName", null);
           localStorage.setItem("g_id", null);
@@ -772,8 +503,7 @@ export default {
         .then((response) => {
           const data = response.data.data;
           // console.log(data);
-          console.log("user data: " + data);
-          console.log("user data: " + JSON.stringify(data));
+          // console.log("user data: ", data);
 
           this.userName = data.name;
           localStorage.setItem("userName", data.name);
@@ -826,16 +556,6 @@ export default {
           this.isLoading = false;
         });
     },
-    changeHeaderWelcome2() {
-      this.userName = localStorage.getItem("name");
-      this.userDated = localStorage.getItem("last_login");
-      this.userImage = this.$fileURL + localStorage.getItem("user_image");
-      console.log(this.userName);
-      console.log(this.userDated);
-      console.log(this.userImage);
-      this.getHeaderUserData();
-      // this.titleWelcome = title;
-    },
     changeHeaderWelcome3() {
       this.getHeaderUserData2();
       // this.titleWelcome = title;
@@ -876,213 +596,6 @@ export default {
     },
     loginGypsy() {
       this.$router.push("/sign-in");
-      //const externalURL = `https://www.the-gypsy.sg/sign-in?app_id=${this.$appId}`;
-      //window.location.href = externalURL;
-      //axios
-      //  .post(`/gypsy-login/google`, {
-      //    app_id: 5,
-      //  })
-      //  .then((response) => {
-      //    console.log(response);
-      //    //if (response) {
-      //    //  window.location.assign(response.data.target_url);
-      //    //} else {
-      //    //  window.location.href = "/sign-in";
-      //    //}
-      //    //console.log(response.data.target_url);
-      //  })
-      //  .catch((error) => {
-      //    console.log(error);
-      //    //window.location.href = "/sign-in";
-      //  });
-    },
-    getRegistrableData() {
-      this.getRegistrableCountry();
-      this.getRegistrableSkills();
-    },
-    getRegistrableCountry() {
-      this.isLoading = true;
-      axios
-        .get(`/registrable-country/country-skills`)
-        .then((response) => {
-          const data = response.data.data;
-          //console.log(data);
-          this.countryRegistrable = data.map((country) => {
-            return {
-              id: country.country_id,
-              title: country.country_name,
-              path: "#",
-            };
-          });
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    getRegistrableSkills() {
-      this.isLoading = true;
-      axios
-        .get(`/registrable-country/skills`)
-        .then((response) => {
-          const data = response.data.data;
-          //console.log(data);
-          this.skillRegistrable = data.map((skills) => {
-            return {
-              id: skills.skills_id,
-              title: skills.skills_name,
-              path: "#",
-            };
-          });
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    getActiveSkills() {
-      this.isLoading = true;
-      axios
-        .get(`/skills/active/app/${this.$appId}`)
-        .then((response) => {
-          const data = response.data.data;
-          // console.log(data);
-          this.searchItems = data.map((item) => {
-            return {
-              id: item.skills_id || 1,
-              name: item.skills_name || "",
-              image: this.$fileURL + item.image || "",
-              slug: item.slug || "",
-            };
-          });
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    getSkillBySlug() {
-      //console.log('ok')
-      this.isDetail = true;
-      const slug = this.$route.params.name;
-      this.isLoading = true;
-      axios
-        .get(`/skills/slug/${slug}`)
-        .then((response) => {
-          const data = response.data.data;
-          // console.log(data);
-          this.skillSlug = {
-            ...data,
-            name: `${data.skills_name} Jobs ` || "",
-          };
-          // console.log(this.skillSlug);
-          this.getCountrySkill();
-          this.getCitySkill();
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    getHeaderDetail(countryId) {
-      axios
-        .get(`/job-positions/${this.skillSlug.skills_id}/${countryId}`)
-        .then((response) => {
-          const data = response.data.data;
-          // console.log(data);
-          this.trendingBtn = data.map((group) => {
-            return {
-              id: group.position_id,
-              title: group.position_name,
-              tag: group.position_name,
-            };
-          });
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.log(error);
-        });
-    },
-    getCountrySkill() {
-      this.isLoading = true;
-      axios
-        .get(`/jobs/get-countries/skills/${this.skillSlug.skills_id}`)
-        .then((response) => {
-          const data = response.data.data;
-          this.country = data.map((country) => {
-            return {
-              id: country.country_id,
-              title: country.country_name,
-              count: country.count,
-              oneCity: country.one_city == "Y" ? true : false,
-              path: "#",
-            };
-          });
-          //if (isSingapore.length > 0) {
-          //  this.setItemSelectedComplete(this.country[0]);
-          //  this.setItemSelected(this.country[0].title);
-          //} else {
-          //  this.setItemSelectedComplete(this.country[0]);
-          //  this.setItemSelected(this.country[0].title);
-          //}
-          this.getHeaderDetail(this.country[0].id);
-          this.setItemSelectedComplete(this.country[0]);
-          this.setItemSelected(this.country[0].title);
-          localStorage.setItem(
-            "itemSelectedObj",
-            JSON.stringify(this.country[0]),
-          );
-          localStorage.setItem("itemSelectedTit", this.country[0].title);
-          app.config.globalProperties.$eventBus.$emit("getSkillBySlugFirst");
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    getCitySkill() {
-      this.isLoading = true;
-      axios
-        .get(
-          `/jobs/get-country-cities/country/${
-            this.itemSelectedComplete?.id || this.countryId
-          }/skills/${this.skillSlug.skills_id}`,
-        )
-        .then((response) => {
-          const data = response.data.data;
-          //console.log(data);
-          this.city = data.map((city) => {
-            return {
-              id: city.city_id,
-              title: city.city_name,
-              count: city.count,
-              countryId: city.country_id,
-              path: "#",
-            };
-          });
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
     },
     capitalizeFirstLetter(sentence) {
       const words = sentence.split(" ");
@@ -1093,9 +606,6 @@ export default {
       const capitalizedSentence = words.join(" ");
       return capitalizedSentence;
     },
-    removeDetail() {
-      this.isDetail = false;
-    },
     changeItemSelected(item) {
       this.setItemSelected(item.title);
       this.setItemSelectedComplete(item);
@@ -1104,49 +614,6 @@ export default {
       this.getCitySkill();
       //console.log(this.itemSelectedComplete);
       app.config.globalProperties.$eventBus.$emit("getJobDetailSpecific1");
-    },
-    changeItemSelected2(item) {
-      this.setItemSelected2(item.title);
-      this.setItemSelected2Complete(item);
-      app.config.globalProperties.$eventBus.$emit("getJobDetailSpecific2");
-    },
-    changeCountryRecognised(item) {
-      this.setCountryRecognised(item.title);
-      this.setIdCountryRecognised(item.id);
-      app.config.globalProperties.$eventBus.$emit("getRegulatorInfo");
-      app.config.globalProperties.$eventBus.$emit("getQualificationInfo");
-      app.config.globalProperties.$eventBus.$emit("getCountry");
-    },
-    changeSkillRecognised(item) {
-      this.setSkillRecognised(item.title);
-      this.setIdSkillRecognised(item.id);
-      app.config.globalProperties.$eventBus.$emit("getRegulatorInfo");
-      app.config.globalProperties.$eventBus.$emit("getQualificationInfo");
-      app.config.globalProperties.$eventBus.$emit("getCountry");
-    },
-    ...mapMutations([
-      "setActiveTag",
-      "setItemSelected",
-      "setItemSelectedComplete",
-      "setItemSelected2",
-      "setItemSelected2Complete",
-      "setCountryRecognised",
-      "setSkillRecognised",
-      "setIdCountryRecognised",
-      "setIdSkillRecognised",
-      "setFooterData",
-      "setCategoryData",
-      "setSelectedCountry",
-    ]),
-    selectTag(tag) {
-      this.setActiveTag(tag); // Menetapkan tag yang dipilih sebagai tag aktif
-      // console.log('ok');
-
-      if (this.isSpecific) {
-        app.config.globalProperties.$eventBus.$emit("filterSpecificJobs", tag);
-      } else {
-        app.config.globalProperties.$eventBus.$emit("scrollToCardSection");
-      }
     },
     getTrendingCardData() {
       // this.isLoading = true;
@@ -1180,23 +647,10 @@ export default {
       //   this.isLoading = false;
       // });
     },
-    getLogo() {
-      axios
-        .get(`/app/logo/${this.$appId}`)
-        .then((response) => {
-          const data = response.data.data;
-          // console.log(data);
-          this.logo = data;
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.log(error);
-        });
-    },
     getLocationDropDownData() {
       this.isLoading = true;
       let appId = null;
-      console.log("country app id");
+      // console.log("country app id");
       axios
         .get(`/get-app-id`, {
           params: {
@@ -1204,34 +658,38 @@ export default {
           },
         })
         .then((response) => {
-          appId = response.data.data["app_id"];
+          appId = response.data.data?.app_id;
           axios
             .get(`/app-city-list/${appId}`)
             .then((response) => {
               const data = response.data.data;
-              console.log("country: " + JSON.stringify(data));
+              // console.log("country: ", data);
               this.locationDropdown = data.map((country) => {
                 return {
                   country_id: country.country_id,
                   currency_symbol: country.currency_symbol,
                   country: country.country_name,
                   flagUrl: country.flag,
-                  properties: country.app_cities.length,
-                  cities: country.app_cities.map((city) => {
-                    return {
+                  properties: country?.product_count,
+                  cities: [
+                    {
+                      city_id: country.city_id,
                       country_id: country.country_id,
                       currency_symbol: country.currency_symbol,
-                      name: city.city_name,
-                      imageUrl: city.city_image,
-                    };
-                  }),
+                      name: country.city_name,
+                      imageUrl: country.city_image,
+                    },
+                  ],
                 };
               });
-              console.log("country: " + JSON.stringify(this.locationDropdown));
+              const defaultCountry = this.locationDropdown[0];
+              const defaultCity = defaultCountry.cities[0];
+              this.selectLocation(defaultCountry, defaultCity);
+              console.log("country: ", this.locationDropdown);
             })
             .catch((error) => {
               // eslint-disable-next-line
-              console.log("country" + error);
+              console.log("country", error);
             })
             .finally(() => {
               this.isLoading = false;
@@ -1239,85 +697,16 @@ export default {
         })
         .catch((error) => {
           // eslint-disable-next-line
-          console.log("country" + error);
+          console.log("country", error);
         });
-    },
-    getCountry() {
-      this.isLoading = true;
-      axios
-        .get(`/country`)
-        .then((response) => {
-          const data = response.data.data;
-          // console.log(data);
-          //this.country = data.map((country) => {
-          //  return {
-          //    id: country.country_id,
-          //    title: country.country_name,
-          //    oneCity: country.one_city == 'Y' ? true : false,
-          //    path: '#',
-          //  };
-          //});
-          this.countryId = data
-            .filter((d) => d.country_name == this.itemSelected)
-            .map((country) => country.country_id)[0];
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    getCity() {
-      this.isLoading = true;
-      axios
-        .get(`/cities/country/${this.itemSelectedComplete?.id}`)
-        .then((response) => {
-          const data = response.data.data;
-          // console.log(data);
-
-          this.cityId = data
-            .filter((d) => d.city_name == this.itemSelected2)
-            .map((city) => city.city_id)[0];
-        })
-        .catch((error) => {
-          // eslint-disable-next-line
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    // emitFilterEvent(tag) {
-    //   this.$emit("filter-card", tag);
-    // },
-    // filterCards(tag) {
-    //   this.selectedTag = tag;
-    //   app.config.globalProperties.$eventBus.$emit("filter-card-header", tag);
-    //   // eventBus.emit("filter-card-header", tag);
-    // },
-    countCards(tag) {
-      const count = this.trendingCard.filter(
-        (trend) => trend.tag === tag,
-      ).length;
-      return count;
     },
     handleResize() {
       this.screenWidth = window.innerWidth;
     },
-    previousSlide() {
-      this.activeIndex--;
-    },
-    nextSlide() {
-      this.activeIndex++;
-    },
-    preventSubmit(event) {
-      event.preventDefault();
-    },
     selectLocation(country, city) {
-      console.log(country.currency_symbol);
+      // console.log(country.currency_symbol);
       this.selectedLocation = {
+        ...city,
         currency_symbol: country.currency_symbol ?? "S$",
         country_id: country.country_id,
         country: country.country,
@@ -1328,8 +717,7 @@ export default {
         "getDeliveryCharges",
         this.selectedLocation.country_id,
       );
-      console.log("selected: " + JSON.stringify(this.selectedLocation));
-      [];
+      console.log("selected: ", this.selectedLocation);
     },
     gotoMallDetail(item) {
       this.dialog2 = false;
@@ -1341,34 +729,6 @@ export default {
       this.$router.push(`/merchant-id/${item?.merchant_id}`);
       localStorage.setItem("merchantDetailData", JSON.stringify(item));
     },
-    // async getProductCategoryListData() {
-    //   this.isLoading = true;
-    //   try {
-    //     const response = await axios.get(
-    //       `/categories-with-products/app/${appId}`,
-    //     );
-    //     const data = response.data.data;
-    //     this.activeMalls = data
-    //       .sort((a, b) => a.category_id - b.category_id)
-    //       .flatMap((category) =>
-    //         category.brands.flatMap((brand) =>
-    //           brand.products.map((product) => ({
-    //             ...product,
-    //             brand_id: brand.brand_id,
-    //             brand_name: brand.brand_name,
-    //             product_name: product.product_name,
-    //             product_id: product.product_id,
-    //             category_id: category.category_id,
-    //             country_id: brand.country_id,
-    //           })),
-    //         ),
-    //       );
-    //   } catch (error) {
-    //     console.error("Error fetching product categories:", error);
-    //   } finally {
-    //     this.isLoading = false;
-    //   }
-    // },
     async getProductCategoryListData() {
       this.isLoading = true;
       try {
@@ -1420,7 +780,7 @@ export default {
         });
 
         this.activeMalls = processedMalls;
-        console.log("iniii", this.activeMalls);
+        // console.log("iniii", this.activeMalls);
       } catch (error) {
         console.error("Error fetching product categories:", error);
       } finally {
@@ -1435,22 +795,15 @@ export default {
         item.raw.product_name.toLowerCase().includes(text)
       );
     },
-    handleTrendingChange(item) {
-      console.log("Selected filter:", item);
-    },
   },
   components: { ExploreOurMenuList },
 };
 </script>
 
 <script setup>
-// import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from "vue";
 import { useStore } from "vuex";
-// import { useRouter, useRoute } from "vue-router";
-// import axios from "@/util/axios";
-// import moment from "moment-timezone";
-// import app from "@/util/eventBus";
-// import { appId } from "@/main";
+import { useCart } from "@/composables/useCart";
+import { watch } from "vue";
 
 // Import images
 import boozardsLogo from "@/assets/images/logo/boozards-logo.png";
@@ -1462,7 +815,6 @@ import facebookIcon from "@/assets/images/icons/facebook.png";
 import instaIcon from "@/assets/images/icons/insta.png";
 import tiktokIcon from "@/assets/images/icons/tiktok.png";
 import whatsappIcon from "@/assets/whatsapp.svg";
-import ExploreOurMenuList from "./explore-our-menu-list.vue";
 
 // Make images available to template
 const images = {
@@ -1477,178 +829,8 @@ const images = {
   whatsapp: whatsappIcon,
 };
 
-// // Props
-// const props = defineProps({
-//   titleHeader: String,
-//   isHeader: Boolean,
-//   isDesktop: Boolean,
-//   isProfile: Boolean,
-//   isSignin: Boolean,
-//   isBatamProperties: Boolean,
-// });
-
-// // Store, router setup
 const store = useStore();
-// const router = useRouter();
-// const route = useRoute();
-
-// // Essential reactive data
-// const drawer = ref(false);
-// const dialog2 = ref(false);
-// const search = ref(null);
-// const userImage = ref(null);
-// const userName = ref(null);
-// const userDated = ref(null);
-// const currentTime = ref("");
-// const screenWidth = ref(window.innerWidth);
-// const activeMalls = ref([]);
-// const isLoading = ref(false);
-
-// // Location data
-// const selectedLocation = ref({
-//   country: "Singapore",
-//   city: "Singapore City",
-// });
-
-// const locationDropdown = ref([
-//   {
-//     country: "Singapore",
-//     flagUrl: "https://flagcdn.com/w40/sg.png",
-//     properties: 1,
-//     cities: [
-//       {
-//         name: "Singapore City",
-//         imageUrl: "https://example.com/singapore-city.jpg",
-//       },
-//     ],
-//   },
-//   {
-//     country: "Indonesia",
-//     flagUrl: "https://flagcdn.com/w40/id.png",
-//     properties: 1,
-//     cities: [
-//       {
-//         name: "Batam",
-//         imageUrl: "https://example.com/batam.jpg",
-//       },
-//     ],
-//   },
-//   {
-//     country: "India",
-//     flagUrl: "https://flagcdn.com/w40/in.png",
-//     properties: 3,
-//     cities: [
-//       {
-//         name: "Mumbai",
-//         imageUrl: "https://example.com/mumbai.jpg",
-//       },
-//       {
-//         name: "Goa - Margao",
-//         imageUrl: "https://example.com/goa-margao.jpg",
-//       },
-//       {
-//         name: "Goa - Panjim",
-//         imageUrl: "https://example.com/goa-panjim.jpg",
-//       },
-//     ],
-//   },
-// ]);
-
-// // Computed properties
-// const isSmall = computed(() => {
-//   return screenWidth.value < 640;
-// });
-
-// const filteredMalls = computed(() => {
-//   if (!search.value) return activeMalls.value;
-//   const searchTextLower = search.value.toLowerCase();
-//   return activeMalls.value.filter((item) =>
-//     item.brand_name.toLowerCase().includes(searchTextLower),
-//   );
-// });
-
-// // Methods
-// const selectLocation = (country, city) => {
-//   selectedLocation.value = {
-//     country: country.country,
-//     city: city.name,
-//   };
-// };
-
-// const handleResize = () => {
-//   screenWidth.value = window.innerWidth;
-// };
-
-// const updateTime = () => {
-//   const singaporeTime = moment().tz("Asia/Singapore");
-//   currentTime.value = singaporeTime.format("HH:mm:ss");
-// };
-
-// const logout = () => {
-//   const token = localStorage.getItem("token");
-//   axios
-//     .get(`/gypsy-logout`, {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     })
-//     .then(() => {
-//       localStorage.removeItem("name");
-//       localStorage.removeItem("userName");
-//       localStorage.removeItem("g_id");
-//       localStorage.removeItem("user_image");
-//       localStorage.removeItem("token");
-//       window.location.href = "/";
-//     })
-//     .catch(console.error);
-// };
-
-// const gotoMallDetail = (item) => {
-//   dialog2.value = false;
-//   router.push(`/mall-id/${item?.id}`);
-//   localStorage.setItem("mallDetailData", JSON.stringify(item));
-// };
-
-// const gotoMerchantDetail = (item) => {
-//   dialog2.value = false;
-//   router.push(`/merchant-id/${item?.merchant_id}`);
-//   localStorage.setItem("merchantDetailData", JSON.stringify(item));
-// };
-
-// const getProductCategoryListData = async () => {
-//   isLoading.value = true;
-//   try {
-//     const response = await axios.get(`/categories-with-products/app/${appId}`);
-//     const data = response.data.data;
-
-//     const initialData = data
-//       .sort((a, b) => a.category_id - b.category_id)
-//       .map((category) => ({
-//         category_id: category.category_id,
-//         category_name: category.category_name,
-//         countries: category.countries,
-//         products: category.brands.flatMap((brand) =>
-//           brand.products.map((product) => ({
-//             ...product,
-//             brand_id: brand.brand_id,
-//             brand_name: brand.brand_name,
-//             category_id: category.category_id,
-//             country_id: brand.country_id,
-//             //isCount: false,
-//             //count: 1,
-//           })),
-//         ),
-//       }));
-
-//     activeMalls.value = initialData.flatMap((category) => category.products);
-
-//     console.log("Transformed Data:", activeMalls.value);
-//   } catch (error) {
-//     console.error("Error fetching product categories:", error);
-//   } finally {
-//     isLoading.value = false;
-//   }
-// };
+const { isInCart, cartQuantity, addToCart, updateQuantity } = useCart();
 
 const getDeliveryCharges = () => {
   store.dispatch("getDeliveryCharges", 1);
@@ -1657,33 +839,6 @@ const getDeliveryCharges = () => {
 watch(() => {
   getDeliveryCharges();
 });
-
-// // Lifecycle hooks
-// onMounted(() => {
-//   handleResize();
-//   // Set initial screen width
-//   // screenWidth.value = window.innerWidth;
-
-//   // Add resize listener
-//   window.addEventListener("resize", handleResize);
-//   setInterval(updateTime, 1000);
-
-//   // Set default location
-//   const defaultCountry = locationDropdown.value[0];
-//   const defaultCity = defaultCountry.cities[0];
-//   selectLocation(defaultCountry, defaultCity);
-//   getProductCategoryListData();
-// });
-
-// onUnmounted(() => {
-//   window.removeEventListener("resize", handleResize);
-// });
-// const filterList = ref(["View All", "Europe", "Asia"]);
-
-// const handleTrendingChange = (item) => {
-//   console.log("Selected filter:", item);
-//   // Add your filter logic here
-// };
 </script>
 
 <template>
@@ -1743,39 +898,39 @@ watch(() => {
           <span class="text-subtitle-2">Choose Your Location</span>
         </v-card-title>
 
-        <v-list v-for="(data, index) in country" :key="index">
-          <v-list-subheader>
-            <div class="d-flex align-center ga-2">
-              <v-avatar
-                :image="$fileURL + data?.flag"
-                size="x-small"
-              ></v-avatar>
-              <p class="text-subtitle-1 font-weight-medium">
-                {{ data.country_name }} ({{ data.cities.length }}
-                Properties)
-              </p>
-            </div>
-          </v-list-subheader>
-
-          <v-list-item
-            :active="activeCity.city_id === dataCity.city_id"
-            v-for="(dataCity, indexCities) in data.cities"
-            :key="indexCities"
-            :value="dataCity.city_id"
-            variant="text"
-            active-color="primary"
-            @click="changeItemSelected(dataCity, data)"
-          >
-            <v-list-item-title>
-              <div class="d-flex ml-7 align-center ga-2">
-                <v-avatar
-                  :image="$fileURL + dataCity?.city_image"
-                  size="x-small"
-                ></v-avatar>
-                <p class="">{{ dataCity.city_name }}</p>
+        <v-list>
+          <template v-for="(location, index) in locationDropdown" :key="index">
+            <!-- Country Header -->
+            <v-list-subheader>
+              <div class="d-flex align-center gap-2">
+                <v-avatar size="24">
+                  <v-img :src="$fileURL + location.flagUrl" cover></v-img>
+                </v-avatar>
+                <span class="text-subtitle-1 font-weight-medium">
+                  {{ location.country }} ({{ location.properties }} Properties)
+                </span>
               </div>
-            </v-list-item-title>
-          </v-list-item>
+            </v-list-subheader>
+
+            <!-- Cities -->
+            <v-list-item
+              v-for="(city, cityIndex) in location.cities"
+              :key="`${index}-${cityIndex}`"
+              :value="city.name"
+              :active="selectedLocation.city === city.name"
+              variant="text"
+              active-color="primary"
+              @click="selectLocation(location, city)"
+              class="pl-7"
+            >
+              <template #prepend>
+                <v-avatar size="24" class="mr-2">
+                  <v-img :src="$fileURL + city.imageUrl" cover></v-img>
+                </v-avatar>
+              </template>
+              <v-list-item-title>{{ city.name }}</v-list-item-title>
+            </v-list-item>
+          </template>
         </v-list>
       </v-card>
     </v-menu>
@@ -2240,39 +1395,43 @@ watch(() => {
                 </div>
               </v-card-title>
 
-              <v-list v-for="(data, index) in country" :key="index">
-                <v-list-subheader>
-                  <div class="d-flex align-center ga-2">
-                    <v-avatar
-                      :image="$fileURL + data?.flag"
-                      size="x-small"
-                    ></v-avatar>
-                    <p class="text-subtitle-1 font-weight-medium">
-                      {{ data.country_name }} ({{ data.cities.length }}
-                      Properties)
-                    </p>
-                  </div>
-                </v-list-subheader>
-
-                <v-list-item
-                  :active="activeCity.city_id === dataCity.city_id"
-                  v-for="(dataCity, indexCities) in data.cities"
-                  :key="indexCities"
-                  :value="dataCity.city_id"
-                  variant="text"
-                  active-color="primary"
-                  @click="changeItemSelected(dataCity, data)"
+              <v-list>
+                <template
+                  v-for="(location, index) in locationDropdown"
+                  :key="index"
                 >
-                  <v-list-item-title>
-                    <div class="d-flex ml-7 align-center ga-2">
-                      <v-avatar
-                        :image="$fileURL + dataCity?.city_image"
-                        size="x-small"
-                      ></v-avatar>
-                      <p class="">{{ dataCity.city_name }}</p>
+                  <!-- Country Header -->
+                  <v-list-subheader>
+                    <div class="d-flex align-center gap-2">
+                      <v-avatar size="24">
+                        <v-img :src="$fileURL + location.flagUrl" cover></v-img>
+                      </v-avatar>
+                      <span class="text-subtitle-1 font-weight-medium">
+                        {{ location.country }} ({{ location.properties }}
+                        Properties)
+                      </span>
                     </div>
-                  </v-list-item-title>
-                </v-list-item>
+                  </v-list-subheader>
+
+                  <!-- Cities -->
+                  <v-list-item
+                    v-for="(city, cityIndex) in location.cities"
+                    :key="`${index}-${cityIndex}`"
+                    :value="city.name"
+                    :active="selectedLocation.city === city.name"
+                    variant="text"
+                    active-color="primary"
+                    @click="selectLocation(location, city)"
+                    class="pl-7"
+                  >
+                    <template #prepend>
+                      <v-avatar size="24" class="mr-2">
+                        <v-img :src="$fileURL + city.imageUrl" cover></v-img>
+                      </v-avatar>
+                    </template>
+                    <v-list-item-title>{{ city.name }}</v-list-item-title>
+                  </v-list-item>
+                </template>
               </v-list>
             </v-card>
           </v-menu>

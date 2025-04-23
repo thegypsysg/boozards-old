@@ -81,13 +81,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue"; // Ensure these are imported
+import { ref, onMounted, watch } from "vue"; // Ensure these are imported
 import { appId } from "../main";
 import { eventBus } from "@/util/bus";
 import axios from "@/util/axios";
 import AOS from "aos";
 import boozardsBackground from "@/assets/images/boozards/boozard-whiskycc.jpg";
 import { useStore } from "vuex";
+import { computed } from "vue";
 
 const store = useStore();
 
@@ -108,6 +109,8 @@ const props = defineProps({
 function scrollToSection() {
   eventBus.scrollToSection = "happeningTarget"; // Ganti dengan ID section yang diinginkan
 }
+
+const selectedCountry = computed(() => store.state.selectedCountry);
 
 const handleIntersection = (entries, observer) => {
   entries.forEach((entry) => {
@@ -164,10 +167,12 @@ const getListMainCategories = async () => {
   isLoading.value = false;
 };
 
-const getProductCategoryListData = async () => {
+const getProductCategoryListData = async (cityId) => {
   isLoading.value = true;
   try {
-    const response = await axios.get(`/categories-with-products/app/${appId}`);
+    const response = await axios.get(
+      `/categories-with-products/app/${appId}/${cityId}`,
+    );
     const data = response.data.data;
 
     productCategories.value = data
@@ -198,6 +203,11 @@ const getProductCategoryListData = async () => {
   }
 };
 
+watch(selectedCountry, (newX) => {
+  console.log("country is", newX);
+  getProductCategoryListData(newX.city_id);
+});
+
 onMounted(() => {
   AOS.init();
   setTimeout(() => {
@@ -215,9 +225,7 @@ onMounted(() => {
 
   get4WallsPropertyData();
   getListMainCategories();
-  console.log("iniiiii datanyaaaaaaaaaa", store.state.itemSelectedComplete);
   get4WallsPropertyDataCommercial();
-  getProductCategoryListData();
 });
 </script>
 
