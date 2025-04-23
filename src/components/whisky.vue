@@ -141,7 +141,9 @@ const handleMoved = () => {
 };
 
 const getProductDetailsLink = (product) => {
-  const selectedRange = product.rangeItems.find((range) => range.selected?.value);
+  const selectedRange = product.rangeItems.find(
+    (range) => range.selected?.value,
+  );
   return `/product/${product.encrypted_id}?range_id=${selectedRange?.range_id}`;
 };
 
@@ -154,7 +156,7 @@ function handleSelectRange(menu, selectedItem) {
   });
 
   // Undone the unselect quantity here
-  selectedItem.selected.value = true
+  selectedItem.selected.value = true;
 
   // Jika belum dipilih sebelumnya, jadikan selected
   /* if (!isAlreadySelected) {
@@ -246,7 +248,7 @@ onUnmounted(() => {
           <v-card class="card-wrapper" height="420" elevation="3">
             <router-link
               class="text-decoration-none"
-               :to="getProductDetailsLink(menu)"
+              :to="getProductDetailsLink(menu)"
             >
               <v-img
                 :src="fileURL + menu?.selectedImage.value"
@@ -282,7 +284,10 @@ onUnmounted(() => {
                   <!-- @click="item.selected.value = !item.selected.value" -->
                 </template>
               </div>
-              <div v-if="menu?.selectedPrice.value" class="d-flex justify-space-between align-center">
+              <div
+                v-if="menu?.selectedPrice.value"
+                class="d-flex justify-space-between align-center"
+              >
                 <span class="text-red-darken-1 font-weight-bold">
                   S$ {{ menu?.selectedPrice.value }}
                 </span>
@@ -296,10 +301,7 @@ onUnmounted(() => {
                     variant="flat"
                     >Add</v-btn
                   >
-                  <div
-                    v-else="isInCart(menu)"
-                    class="d-flex align-center ga-2"
-                  >
+                  <div v-else="isInCart(menu)" class="d-flex align-center ga-2">
                     <v-btn
                       size="xs"
                       color="black"
@@ -330,9 +332,13 @@ onUnmounted(() => {
               </div>
               <hr />
               <div class="mt-5">
-                <span class="mr-2 font-weight-bold text-grey">{{ menu.percentage }}</span>
+                <span class="mr-2 font-weight-bold text-grey">{{
+                  menu.percentage
+                }}</span>
                 <span class="text-blue">% |</span>
-                <span class="ml-2 text-orange font-weight-bold">Scotland</span>
+                <span class="ml-2 text-orange font-weight-bold">{{
+                  menu?.country_name
+                }}</span>
               </div>
             </div>
           </v-card>

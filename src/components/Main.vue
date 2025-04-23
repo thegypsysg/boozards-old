@@ -87,6 +87,9 @@ import { eventBus } from "@/util/bus";
 import axios from "@/util/axios";
 import AOS from "aos";
 import boozardsBackground from "@/assets/images/boozards/boozard-whiskycc.jpg";
+import { useStore } from "vuex";
+
+const store = useStore();
 
 const isZoomed = ref(false);
 const listData = ref([]);
@@ -180,6 +183,7 @@ const getProductCategoryListData = async () => {
             brand_name: brand.brand_name,
             category_id: category.category_id,
             country_id: brand.country_id,
+            country_name: brand.country.country_name,
             //isCount: false,
             //count: 1,
           })),
@@ -211,6 +215,7 @@ onMounted(() => {
 
   get4WallsPropertyData();
   getListMainCategories();
+  console.log("iniiiii datanyaaaaaaaaaa", store.state.itemSelectedComplete);
   get4WallsPropertyDataCommercial();
   getProductCategoryListData();
 });

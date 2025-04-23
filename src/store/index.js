@@ -2,7 +2,7 @@
 // import { createStore } from "vuex";
 import { createStore } from "vuex";
 import axios from "@/util/axios";
-import { showSnackbar } from '@/composables/useGlobalSnackbar';
+import { showSnackbar } from "@/composables/useGlobalSnackbar";
 
 const authToken = localStorage.getItem("token");
 
@@ -93,128 +93,157 @@ export default (app) =>
       setSelectedCountry(state, item) {
         state.selectedCountry = item;
       },
-      clearCart(state){
+      clearCart(state) {
         state.cart = [];
-        localStorage.removeItem('cart');
-      }
+        localStorage.removeItem("cart");
+      },
     },
     actions: {
-      async getDeliveryCharges({commit, state}, countryId) {
-        await axios.post(`/delivery-charges-list-by-country`, {country_id: countryId, app_id: 3}, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }).then((response) => {
-          if(response?.data.length > 0) {
-            commit('isEmptyCart', false)
-          }
-          commit('deliveryCharges', response?.data?.data)
-        }).catch((error) => {
-          state.errorCart = error?.error
-          showSnackbar(error?.response?.data?.error, 'error')
-        })
-      },
-      
-      async updateDeliveryChargesInCart({commit, state}, data) {
-        await axios.put(`/update-delivery-charges-in-cart`, data, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }).then((response) => {
-          commit('cart', response?.data?.data)
-        }).catch((error) => {
-          state.errorCart = error?.error
-          showSnackbar(error?.response?.data?.error, 'error')
-        })
-      },
-      
-      async getCartItems({commit, state}) {
-        await axios.get(`/get-cart-items`, null, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }).then((response) => {
-          if(response?.data.length > 0) {
-            commit('isEmptyCart', false)
-          }
-          commit('cart', response?.data)
-          commit('totalCartItems', response?.data.length)
-        }).catch((error) => {
-          state.errorCart = error?.error
-          showSnackbar(error?.response?.data?.error, 'error')
-        })
-      },
-      
-      async addToCart({commit, state}, data) {
-        commit('isLoading', true)
-        await axios.post(`/add-to-cart`, data, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }).then((response) => {
-          if(response?.data.length > 0) {
-            commit('isEmptyCart', false)
-          }
-          commit('totalCartItems', response?.data.length)
-          console.log('addToCart', data)
-          commit('cart', response?.data)
-          commit('isLoading', false)
-        }).catch((error) => {
-          state.errorCart = error?.response?.data
-          showSnackbar(error?.response?.data?.error, 'error')
-          commit('isLoading', false)
-        })
-      },
-      
-      async updateCart({commit, state}, product) {
-        commit('isLoading', true)
-        console.log('updateCart', product)
-        await axios.put(`/update-cart`, product, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }).then(() => {
-
-          axios.get(`/get-cart-items`, null, {
-            headers: { Authorization: `Bearer ${authToken}` },
-          }).then((response) => {
-            if(response?.data.length > 0) {
-              commit('isEmptyCart', false)
+      async getDeliveryCharges({ commit, state }, countryId) {
+        await axios
+          .post(
+            `/delivery-charges-list-by-country`,
+            { country_id: countryId, app_id: 3 },
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            },
+          )
+          .then((response) => {
+            if (response?.data.length > 0) {
+              commit("isEmptyCart", false);
             }
-            commit('cart', response?.data)
-            commit('totalCartItems', response?.data.length)
-            commit('isLoading', false)
-          }).catch((error) => {
-            state.errorCart = error
-            commit('isLoading', false)
-            showSnackbar(error?.response?.data?.error, 'error')
+            commit("deliveryCharges", response?.data?.data);
           })
+          .catch((error) => {
+            state.errorCart = error?.error;
+            showSnackbar(error?.response?.data?.error, "error");
+          });
+      },
 
-        }).catch((error) => {
-          state.errorCart = error?.response?.data
-        })
+      async updateDeliveryChargesInCart({ commit, state }, data) {
+        await axios
+          .put(`/update-delivery-charges-in-cart`, data, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          })
+          .then((response) => {
+            commit("cart", response?.data?.data);
+          })
+          .catch((error) => {
+            state.errorCart = error?.error;
+            showSnackbar(error?.response?.data?.error, "error");
+          });
+      },
+
+      async getCartItems({ commit, state }) {
+        await axios
+          .get(`/get-cart-items`, null, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          })
+          .then((response) => {
+            if (response?.data.length > 0) {
+              commit("isEmptyCart", false);
+            }
+            commit("cart", response?.data);
+            commit("totalCartItems", response?.data.length);
+          })
+          .catch((error) => {
+            state.errorCart = error?.error;
+            showSnackbar(error?.response?.data?.error, "error");
+          });
+      },
+
+      async addToCart({ commit, state }, data) {
+        commit("isLoading", true);
+        await axios
+          .post(`/add-to-cart`, data, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          })
+          .then((response) => {
+            if (response?.data.length > 0) {
+              commit("isEmptyCart", false);
+            }
+            commit("totalCartItems", response?.data.length);
+            console.log("addToCart", data);
+            commit("cart", response?.data);
+            commit("isLoading", false);
+          })
+          .catch((error) => {
+            state.errorCart = error?.response?.data;
+            showSnackbar(error?.response?.data?.error, "error");
+            commit("isLoading", false);
+          });
+      },
+
+      async updateCart({ commit, state }, product) {
+        commit("isLoading", true);
+        console.log("updateCart", product);
+        await axios
+          .put(`/update-cart`, product, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          })
+          .then(() => {
+            axios
+              .get(`/get-cart-items`, null, {
+                headers: { Authorization: `Bearer ${authToken}` },
+              })
+              .then((response) => {
+                if (response?.data.length > 0) {
+                  commit("isEmptyCart", false);
+                }
+                commit("cart", response?.data);
+                commit("totalCartItems", response?.data.length);
+                commit("isLoading", false);
+              })
+              .catch((error) => {
+                state.errorCart = error;
+                commit("isLoading", false);
+                showSnackbar(error?.response?.data?.error, "error");
+              });
+          })
+          .catch((error) => {
+            state.errorCart = error?.response?.data;
+          });
       },
 
       async removeFromCart({ commit, state }, product) {
-        commit('isLoading', true)
-        console.log('removeFromCart', product)
-        await axios.post(`/remove-cart-item`, {cart_id: product.cart_id, range_id: product.range_id}, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }).then((response) => {
-          // this.getCartItems();
-          
-          axios.get(`/get-cart-items`, null, {
-            headers: { Authorization: `Bearer ${authToken}` },
-          }).then((response) => {
-            if(response?.data.length > 0) {
-              commit('isEmptyCart', false)
-            }
-            commit('cart', response?.data)
-            commit('totalCartItems', response?.data.length)
-            commit('isLoading', false)
-          }).catch((error) => {
-            state.errorCart = error
-            commit('isLoading', false)
-            showSnackbar(error?.response?.data?.error, 'error')
-          })
+        commit("isLoading", true);
+        console.log("removeFromCart", product);
+        await axios
+          .post(
+            `/remove-cart-item`,
+            { cart_id: product.cart_id, range_id: product.range_id },
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            },
+          )
+          .then((response) => {
+            // this.getCartItems();
 
-        }).catch((error) => {
-          state.errorCart = error
-          commit('isLoading', false)
-        })
+            axios
+              .get(`/get-cart-items`, null, {
+                headers: { Authorization: `Bearer ${authToken}` },
+              })
+              .then((response) => {
+                if (response?.data.length > 0) {
+                  commit("isEmptyCart", false);
+                }
+                commit("cart", response?.data);
+                commit("totalCartItems", response?.data.length);
+                commit("isLoading", false);
+              })
+              .catch((error) => {
+                state.errorCart = error;
+                commit("isLoading", false);
+                showSnackbar(error?.response?.data?.error, "error");
+              });
+          })
+          .catch((error) => {
+            state.errorCart = error;
+            commit("isLoading", false);
+          });
         // commit('removeFromCart', data);
       },
-      
+
       async getLongLat({ commit }) {
         if (navigator.geolocation) {
           try {
@@ -393,12 +422,15 @@ export default (app) =>
         }
       },
       clearCart({ commit }) {
-        commit('clearCart');
+        commit("clearCart");
       },
     },
     getters: {
       cartItems: (state) => state.cart,
       cartTotal: (state) =>
-        state.cart.reduce((total, item) => total + item.price * item.quantity, 0),
+        state.cart.reduce(
+          (total, item) => total + item.price * item.quantity,
+          0,
+        ),
     },
   });

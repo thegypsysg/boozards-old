@@ -111,7 +111,7 @@ export default {
       activeMalls: [],
       selectedLocation: reactive({
         country_id: 1,
-        currency_symbol: 'S$',
+        currency_symbol: "S$",
         country: "Singapore",
         city: "Singapore City",
       }),
@@ -119,13 +119,13 @@ export default {
         {
           country_id: 1,
           country: "Singapore",
-          currency_symbol: 'S$',
+          currency_symbol: "S$",
           flagUrl: "https://flagcdn.com/w40/sg.png",
           properties: 1,
           cities: [
             {
               country_id: 1,
-              currency_symbol: 'S$',
+              currency_symbol: "S$",
               name: "Singapore City",
               imageUrl: "https://example.com/singapore-city.jpg",
             },
@@ -134,13 +134,13 @@ export default {
         {
           country_id: 3,
           country: "Indonesia",
-          currency_symbol: 'IDR',
+          currency_symbol: "IDR",
           flagUrl: "https://flagcdn.com/w40/id.png",
           properties: 1,
           cities: [
             {
               country_id: 3,
-              currency_symbol: 'IDR',
+              currency_symbol: "IDR",
               name: "Batam",
               imageUrl: "https://example.com/batam.jpg",
             },
@@ -149,25 +149,25 @@ export default {
         {
           country_id: 2,
           country: "India",
-          currency_symbol: 'Rs.',
+          currency_symbol: "Rs.",
           flagUrl: "https://flagcdn.com/w40/in.png",
           properties: 3,
           cities: [
             {
               country_id: 2,
-              currency_symbol: 'Rs.',
+              currency_symbol: "Rs.",
               name: "Mumbai",
               imageUrl: "https://example.com/mumbai.jpg",
             },
             {
               country_id: 2,
-              currency_symbol: 'Rs.',
+              currency_symbol: "Rs.",
               name: "Goa - Margao",
               imageUrl: "https://example.com/goa-margao.jpg",
             },
             {
               country_id: 2,
-              currency_symbol: 'Rs.',
+              currency_symbol: "Rs.",
               name: "Goa - Panjim",
               imageUrl: "https://example.com/goa-panjim.jpg",
             },
@@ -211,16 +211,22 @@ export default {
         state.cart.reduce((total, item) => total + item.quantity, 0),
     }),
     deliveryOptions() {
-      return this.$store.state.deliveryCharges
+      return this.$store.state.deliveryCharges;
     },
     subTotal() {
-      return this.$store.state.cart.reduce((total, item) => total + item.price * item.quantity, 0)
+      return this.$store.state.cart.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0,
+      );
     },
     finalCartTotal() {
       return (
-        this.subTotal + this.selectedDeliveryPrice + this.platformFee + 
-        ((this.subTotal + this.selectedDeliveryPrice + 0.5) * this.taxAmount) / 100
-      ).toFixed(2)
+        this.subTotal +
+        this.selectedDeliveryPrice +
+        this.platformFee +
+        ((this.subTotal + this.selectedDeliveryPrice + 0.5) * this.taxAmount) /
+          100
+      ).toFixed(2);
     },
     selectedDeliveryPrice() {
       const option = this.deliveryOptions.find(
@@ -475,15 +481,17 @@ export default {
   methods: {
     async getTaxAmount() {
       let data = null;
-    
+
       try {
         await axios
-          .get(`/gypsy-user`, { headers: { Authorization: `Bearer ${authToken}` } })
+          .get(`/gypsy-user`, {
+            headers: { Authorization: `Bearer ${authToken}` },
+          })
           .then((response) => {
             data = response.data.data["country_current"];
           })
           .catch((_) => {});
-    
+
         const response = await axios.get(`/get-tax-amount`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -522,7 +530,7 @@ export default {
             // eslint-disable-next-line
             console.log(error);
           });
-    
+
         const response = await axios.get(`/get-platform-fee`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -531,7 +539,7 @@ export default {
             app_id: data,
           },
         });
-    
+
         this.platformFee = parseFloat(response.data.data["platform_fee"]);
       } catch (error) {
         console.error("Error getting tax rate:", error);
@@ -1128,6 +1136,7 @@ export default {
       "setIdSkillRecognised",
       "setFooterData",
       "setCategoryData",
+      "setSelectedCountry",
     ]),
     selectTag(tag) {
       this.setActiveTag(tag); // Menetapkan tag yang dipilih sebagai tag aktif
@@ -1197,7 +1206,7 @@ export default {
         .then((response) => {
           appId = response.data.data["app_id"];
           axios
-            .get(`/app-city-list-group-by-country/${appId}`)
+            .get(`/app-city-list/${appId}`)
             .then((response) => {
               const data = response.data.data;
               console.log("country: " + JSON.stringify(data));
@@ -1307,16 +1316,20 @@ export default {
       event.preventDefault();
     },
     selectLocation(country, city) {
-      console.log(country.currency_symbol)
+      console.log(country.currency_symbol);
       this.selectedLocation = {
-        currency_symbol: country.currency_symbol ?? 'S$',
+        currency_symbol: country.currency_symbol ?? "S$",
         country_id: country.country_id,
         country: country.country,
         city: city.name,
       };
-      this.$store.state.selectedCountry = this.selectedLocation
-      this.$store.dispatch('getDeliveryCharges', this.selectedLocation.country_id)
-      console.log("selected: " + JSON.stringify(this.selectedLocation));[]
+      this.setSelectedCountry(this.selectedLocation);
+      this.$store.dispatch(
+        "getDeliveryCharges",
+        this.selectedLocation.country_id,
+      );
+      console.log("selected: " + JSON.stringify(this.selectedLocation));
+      [];
     },
     gotoMallDetail(item) {
       this.dialog2 = false;
@@ -1638,12 +1651,12 @@ const store = useStore();
 // };
 
 const getDeliveryCharges = () => {
-  store.dispatch('getDeliveryCharges', 1)
-}
+  store.dispatch("getDeliveryCharges", 1);
+};
 
 watch(() => {
   getDeliveryCharges();
-})
+});
 
 // // Lifecycle hooks
 // onMounted(() => {
@@ -1730,46 +1743,54 @@ watch(() => {
           <span class="text-subtitle-2">Choose Your Location</span>
         </v-card-title>
 
-        <v-list>
-          <template v-for="(location, index) in locationDropdown" :key="index">
-            <!-- Country Header -->
-            <v-list-subheader>
-              <div class="d-flex align-center gap-2">
-                <v-avatar size="24">
-                  <v-img :src="$fileURL + location.flagUrl" cover></v-img>
-                </v-avatar>
-                <span class="text-subtitle-1 font-weight-medium">
-                  {{ location.country }} ({{ location.properties }} Properties)
-                </span>
-              </div>
-            </v-list-subheader>
+        <v-list v-for="(data, index) in country" :key="index">
+          <v-list-subheader>
+            <div class="d-flex align-center ga-2">
+              <v-avatar
+                :image="$fileURL + data?.flag"
+                size="x-small"
+              ></v-avatar>
+              <p class="text-subtitle-1 font-weight-medium">
+                {{ data.country_name }} ({{ data.cities.length }}
+                Properties)
+              </p>
+            </div>
+          </v-list-subheader>
 
-            <!-- Cities -->
-            <v-list-item
-              v-for="(city, cityIndex) in location.cities"
-              :key="`${index}-${cityIndex}`"
-              :value="city.name"
-              :active="selectedLocation.city === city.name"
-              variant="text"
-              active-color="primary"
-              @click="selectLocation(location, city)"
-              class="pl-7"
-            >
-              <template #prepend>
-                <v-avatar size="24" class="mr-2">
-                  <v-img :src="$fileURL + city.imageUrl" cover></v-img>
-                </v-avatar>
-              </template>
-              <v-list-item-title>{{ city.name }}</v-list-item-title>
-            </v-list-item>
-          </template>
+          <v-list-item
+            :active="activeCity.city_id === dataCity.city_id"
+            v-for="(dataCity, indexCities) in data.cities"
+            :key="indexCities"
+            :value="dataCity.city_id"
+            variant="text"
+            active-color="primary"
+            @click="changeItemSelected(dataCity, data)"
+          >
+            <v-list-item-title>
+              <div class="d-flex ml-7 align-center ga-2">
+                <v-avatar
+                  :image="$fileURL + dataCity?.city_image"
+                  size="x-small"
+                ></v-avatar>
+                <p class="">{{ dataCity.city_name }}</p>
+              </div>
+            </v-list-item-title>
+          </v-list-item>
         </v-list>
       </v-card>
     </v-menu>
-    
+
     <!-- Search for Mobile View -->
-     
-    <form v-if="!isDesktop && isProduct" :class="isMobileProduct ? 'navbar__search mobile__navbar__search' : 'navbar__search'" class="ml-2">
+
+    <form
+      v-if="!isDesktop && isProduct"
+      :class="
+        isMobileProduct
+          ? 'navbar__search mobile__navbar__search'
+          : 'navbar__search'
+      "
+      class="ml-2"
+    >
       <v-autocomplete
         id="product_name"
         v-model="search"
@@ -1853,7 +1874,8 @@ watch(() => {
                   <div class="d-flex justify-space-between align-center">
                     <span class="text-red-darken-1 font-weight-bold">
                       <template v-if="range?.price_list?.rate">
-                        {{ selectedCountry.currency_symbol }} {{ range?.price_list?.rate }}
+                        {{ selectedCountry.currency_symbol }}
+                        {{ range?.price_list?.rate }}
                       </template>
                     </span>
                     <span v-show="range?.price_list?.rate">
@@ -1941,7 +1963,8 @@ watch(() => {
 
     <!-- Search for Desktop View -->
 
-    <form v-if="!isHeader && !isProfile && !isBatamProperties"
+    <form
+      v-if="!isHeader && !isProfile && !isBatamProperties"
       class="navbar__search navbar__search__desktop"
     >
       <v-autocomplete
@@ -2028,7 +2051,8 @@ watch(() => {
                   <div class="d-flex justify-space-between align-center">
                     <span class="text-red-darken-1 font-weight-bold">
                       <template v-if="range?.price_list?.rate">
-                        {{ selectedCountry.currency_symbol }} {{ range?.price_list?.rate }}
+                        {{ selectedCountry.currency_symbol }}
+                        {{ range?.price_list?.rate }}
                       </template>
                     </span>
                     <span v-show="range?.price_list?.rate">
@@ -2151,9 +2175,7 @@ watch(() => {
           <v-icon size="45">mdi mdi-cart-variant</v-icon>
         </v-badge>
         <span class="ml-2" v-if="subTotal > 0">
-          {{ selectedCountry.currency_symbol }} {{
-            finalCartTotal
-          }}
+          {{ selectedCountry.currency_symbol }} {{ finalCartTotal }}
         </span>
         <Cart
           :viewCart="viewCart"
@@ -2371,7 +2393,8 @@ watch(() => {
                       <div class="d-flex justify-space-between align-center">
                         <span class="text-red-darken-1 font-weight-bold">
                           <template v-if="range?.price_list?.rate">
-                            {{ selectedCountry.currency_symbol }} {{ range?.price_list?.rate }}
+                            {{ selectedCountry.currency_symbol }}
+                            {{ range?.price_list?.rate }}
                           </template>
                         </span>
                         <span v-show="range?.price_list?.rate">
@@ -2526,7 +2549,8 @@ watch(() => {
                         <div class="d-flex justify-space-between align-center">
                           <span class="text-red-darken-1 font-weight-bold">
                             <template v-if="range?.price_list?.rate">
-                              {{ selectedCountry.currency_symbol }} {{ range?.price_list?.rate }}
+                              {{ selectedCountry.currency_symbol }}
+                              {{ range?.price_list?.rate }}
                             </template>
                           </span>
                           <span v-show="range?.price_list?.rate">
