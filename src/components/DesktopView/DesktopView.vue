@@ -61,7 +61,7 @@ export default {
     },
   },
   mounted() {
-    this.getCountryMall();
+    // this.getCountryMall();
     Promise.all([this.getAppDetails1()])
       .then(() => {
         this.isLoading = false;

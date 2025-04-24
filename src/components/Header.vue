@@ -670,7 +670,6 @@ export default {
                   currency_symbol: country.currency_symbol,
                   country: country.country_name,
                   flagUrl: country.flag,
-                  properties: country?.product_count,
                   cities: [
                     {
                       city_id: country.city_id,
@@ -678,6 +677,7 @@ export default {
                       currency_symbol: country.currency_symbol,
                       name: country.city_name,
                       imageUrl: country.city_image,
+                      count: country.product_count,
                     },
                   ],
                 };
@@ -803,7 +803,7 @@ export default {
 <script setup>
 import { useStore } from "vuex";
 import { useCart } from "@/composables/useCart";
-import { watch } from "vue";
+import { watch, computed } from "vue";
 
 // Import images
 import boozardsLogo from "@/assets/images/logo/boozards-logo.png";
@@ -832,8 +832,21 @@ const images = {
 const store = useStore();
 const { isInCart, cartQuantity, addToCart, updateQuantity } = useCart();
 
+const token = computed(() => {
+  return localStorage.getItem("token");
+});
+
 const getDeliveryCharges = () => {
   store.dispatch("getDeliveryCharges", 1);
+};
+
+const addToCartData = (data) => {
+  console.log(token.value);
+  if (token.value == "null") {
+    store.commit("setIsNotLoggedIn", true);
+  } else {
+    addToCart(data);
+  }
 };
 
 watch(() => {
@@ -907,7 +920,7 @@ watch(() => {
                   <v-img :src="$fileURL + location.flagUrl" cover></v-img>
                 </v-avatar>
                 <span class="text-subtitle-1 font-weight-medium">
-                  {{ location.country }} ({{ location.properties }} Properties)
+                  {{ location.country }}
                 </span>
               </div>
             </v-list-subheader>
@@ -924,11 +937,17 @@ watch(() => {
               class="pl-7"
             >
               <template #prepend>
-                <v-avatar size="24" class="mr-2">
+                <v-avatar size="24" class="">
                   <v-img :src="$fileURL + city.imageUrl" cover></v-img>
                 </v-avatar>
               </template>
-              <v-list-item-title>{{ city.name }}</v-list-item-title>
+              <v-list-item-title
+                >{{ city.name }}
+                <span class="font-weight-bold"
+                  >(<span class="text-blue-darken-4">{{ city.count }}</span>
+                  Products)</span
+                ></v-list-item-title
+              >
             </v-list-item>
           </template>
         </v-list>
@@ -1036,7 +1055,7 @@ watch(() => {
                     <span v-show="range?.price_list?.rate">
                       <v-btn
                         v-if="!isInCart(item.raw, range)"
-                        @click="addToCart(item.raw, range)"
+                        @click="addToCartData(item.raw, range)"
                         size="xs"
                         color="black"
                         class="text-caption py-1 px-8"
@@ -1213,7 +1232,7 @@ watch(() => {
                     <span v-show="range?.price_list?.rate">
                       <v-btn
                         v-if="!isInCart(item.raw, range)"
-                        @click="addToCart(item.raw, range)"
+                        @click="addToCartData(item.raw, range)"
                         size="xs"
                         color="black"
                         class="text-caption py-1 px-8"
@@ -1559,7 +1578,7 @@ watch(() => {
                         <span v-show="range?.price_list?.rate">
                           <v-btn
                             v-if="!isInCart(item.raw, range)"
-                            @click="addToCart(item.raw, range)"
+                            @click="addToCartData(item.raw, range)"
                             size="xs"
                             color="black"
                             class="text-caption py-1 px-8"
@@ -1715,7 +1734,7 @@ watch(() => {
                           <span v-show="range?.price_list?.rate">
                             <v-btn
                               v-if="!isInCart(item.raw, range)"
-                              @click="addToCart(item.raw, range)"
+                              @click="addToCartData(item.raw, range)"
                               size="xs"
                               color="black"
                               class="text-caption py-1 px-8"

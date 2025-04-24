@@ -5,6 +5,7 @@ import axios from "@/util/axios";
 import { fileURL } from "@/main";
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
+import { useStore } from "vuex";
 
 const props = defineProps({
   desktop: Boolean,
@@ -26,6 +27,7 @@ const props = defineProps({
   },
 });
 
+const store = useStore();
 const { isInCart, cartQuantity, addToCart, updateQuantity } = useCart();
 const selected = ref(null);
 const splideRef = ref(null);
@@ -33,6 +35,10 @@ const isBeginning = ref(true);
 const isBestViewed = ref(false);
 const isEnd = ref(false);
 const isMobile = ref(false);
+
+const token = computed(() => {
+  return localStorage.getItem("token");
+});
 
 const splideOptions = computed(() => ({
   type: "slide",
@@ -167,6 +173,15 @@ function handleSelectRange(menu, selectedItem) {
   } */
 }
 
+const addToCartData = (data) => {
+  console.log(token.value);
+  if (token.value == "null") {
+    store.commit("setIsNotLoggedIn", true);
+  } else {
+    addToCart(data);
+  }
+};
+
 onMounted(() => {
   checkMobile();
   window.addEventListener("resize", checkMobile);
@@ -294,7 +309,7 @@ onUnmounted(() => {
                 <span>
                   <v-btn
                     v-if="!isInCart(menu)"
-                    @click="addToCart(menu)"
+                    @click="addToCartData(menu)"
                     size="xs"
                     color="black"
                     class="text-caption py-1 px-8"

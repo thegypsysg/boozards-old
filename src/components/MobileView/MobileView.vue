@@ -64,7 +64,7 @@ export default {
     },
   },
   mounted() {
-    this.getCountryMall();
+    // this.getCountryMall();
     Promise.all([this.getAppDetails1()])
       .then(() => {
         let itemFinal = [];

@@ -30,6 +30,7 @@ export default (app) =>
       totalCartItems: 0,
       isLoading: false,
       deliveryCharges: [],
+      isNotLoggedIn: false,
     },
     mutations: {
       deliveryCharges(state, data) {
@@ -37,6 +38,9 @@ export default (app) =>
       },
       isLoading(state, data) {
         state.isLoading = data;
+      },
+      setIsNotLoggedIn(state, data) {
+        state.isNotLoggedIn = data;
       },
       cart(state, data) {
         state.cart = data;

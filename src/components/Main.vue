@@ -67,6 +67,7 @@
     >
       <template v-for="item in productCategories" :key="item?.category_id">
         <Whisky
+          v-if="item?.products.length > 0"
           :title="item?.category_name"
           :products="item?.products"
           :countries="item?.countries"

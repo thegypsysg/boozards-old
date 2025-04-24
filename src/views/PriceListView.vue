@@ -2,21 +2,13 @@
 import axios from "@/util/axios";
 import { appId } from "@/main";
 import cartMixin from "@/mixins/cartMixin";
-import { useCart } from "@/composables/useCart";
-
-
 
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: "PriceListView",
   mixins: [cartMixin],
   data() {
-    const { isInCart, cartQuantity, addToCart, updateQuantity } = useCart();
     return {
-      isInCart,
-      cartQuantity,
-      addToCart,
-      updateQuantity,
       isLoading: false,
       search: null,
       category: null,
@@ -163,6 +155,28 @@ export default {
 };
 </script>
 
+<script setup>
+import { useStore } from "vuex";
+import { useCart } from "@/composables/useCart";
+import { watch, computed } from "vue";
+
+const store = useStore();
+const { isInCart, cartQuantity, addToCart, updateQuantity } = useCart();
+
+const token = computed(() => {
+  return localStorage.getItem("token");
+});
+
+const addToCartData = (data) => {
+  console.log(token.value);
+  if (token.value == "null") {
+    store.commit("setIsNotLoggedIn", true);
+  } else {
+    addToCart(data);
+  }
+};
+</script>
+
 <template>
   <div class="pt-16 px-2 px-md-16">
     <div
@@ -291,7 +305,7 @@ export default {
                     <span v-show="range?.price_list?.rate">
                       <v-btn
                         v-if="!isInCart(item, range)"
-                        @click="addToCart(item, range)"
+                        @click="addToCartData(item, range)"
                         size="xs"
                         color="black"
                         class="text-caption py-1 px-8"
@@ -375,46 +389,46 @@ export default {
                     </span>
                   </router-link>
                   <span v-show="range?.price_list?.rate">
+                    <v-btn
+                      v-if="!isInCart(item, range)"
+                      @click="addToCartData(item)"
+                      size="xs"
+                      color="black"
+                      class="text-caption py-1 px-8"
+                      variant="flat"
+                      >Add</v-btn
+                    >
+                    <div
+                      v-else="isInCart(item, range)"
+                      class="d-flex align-center ga-2"
+                    >
                       <v-btn
-                        v-if="!isInCart(item, range)"
-                        @click="addToCart(item)"
                         size="xs"
                         color="black"
-                        class="text-caption py-1 px-8"
+                        class="text-caption pa-1 rounded-0"
                         variant="flat"
-                        >Add</v-btn
+                        icon
+                        @click="updateQuantity(item, 'decrease')"
                       >
-                      <div
-                        v-else="isInCart(item, range)"
-                        class="d-flex align-center ga-2"
+                        <v-icon>mdi-minus</v-icon>
+                      </v-btn>
+
+                      <span>
+                        {{ cartQuantity(item, range) }}
+                      </span>
+
+                      <v-btn
+                        size="xs"
+                        color="black"
+                        class="text-caption pa-1 rounded-0"
+                        variant="flat"
+                        icon
+                        @click="updateQuantity(item, 'increase')"
                       >
-                        <v-btn
-                          size="xs"
-                          color="black"
-                          class="text-caption pa-1 rounded-0"
-                          variant="flat"
-                          icon
-                          @click="updateQuantity(item, 'decrease')"
-                        >
-                          <v-icon>mdi-minus</v-icon>
-                        </v-btn>
-
-                        <span>
-                          {{ cartQuantity(item, range) }}
-                        </span>
-
-                        <v-btn
-                          size="xs"
-                          color="black"
-                          class="text-caption pa-1 rounded-0"
-                          variant="flat"
-                          icon
-                          @click="updateQuantity(item, 'increase')"
-                        >
-                          <v-icon>mdi-plus</v-icon>
-                        </v-btn>
-                      </div>
-                    </span>
+                        <v-icon>mdi-plus</v-icon>
+                      </v-btn>
+                    </div>
+                  </span>
                 </div>
               </div>
             </div>

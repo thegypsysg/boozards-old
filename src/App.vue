@@ -41,6 +41,18 @@
       </RouterView>
       <FooterMobile v-show="!isDesktop"></FooterMobile>
     </div>
+    <v-dialog v-model="isLoggedIn" persistent width="auto">
+      <v-card width="350">
+        <v-card-text class="">
+          <h4 class="mt-4 mb-8 text-center">
+            Please Sign Up or Login to proceed with Adding Items to your Cart
+          </h4>
+          <v-btn class="mb-4 w-100 bg-primary" @click="closeIsLoggedIn">
+            OK
+          </v-btn>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -68,7 +80,7 @@ export default {
       if (this.currentRoute === "/my-profile") {
         title = "My Profile";
       } else if (this.currentRoute === "/checkout") {
-          title = "Checkout";
+        title = "Checkout";
       } else if (this.currentRoute === "/price-list") {
         title = "Price List";
       } else if (this.currentRoute === "/sign-in") {
@@ -194,6 +206,28 @@ export default {
     },
   },
 };
+</script>
+
+<script setup>
+import { ref, watch, computed } from "vue"; // Ensure these are imported
+import { useStore } from "vuex";
+
+const store = useStore();
+
+const isLoggedIn = ref(false);
+
+const isNotLoggedIn = computed(() => store.state.isNotLoggedIn);
+
+const closeIsLoggedIn = () => {
+  isLoggedIn.value = false;
+  store.commit("setIsNotLoggedIn", false);
+};
+
+watch(isNotLoggedIn, (newX) => {
+  if (newX == true) {
+    isLoggedIn.value = true;
+  }
+});
 </script>
 
 <style>

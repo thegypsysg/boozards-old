@@ -79,10 +79,7 @@ export function useCart() {
           Authorization: `Bearer ${authToken}`,
         },
         params: {
-          country_id:
-            parseInt(props.selectedLocation) != null
-              ? parseInt(props.selectedLocation)
-              : data,
+          country_id: data,
         },
       });
       if (response.data.data?.applicable === "Y") {
