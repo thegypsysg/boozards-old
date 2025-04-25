@@ -6,6 +6,11 @@ import { useStore } from "vuex";
 
 const store = useStore();
 
+// Get total quantity of all cart items
+const cartQuantity = computed(() =>
+  store.state.cart.reduce((total, item) => total + item.quantity, 0),
+);
+
 const isLogin = ref(false);
 const screenWidth = ref(window.innerWidth);
 const showScrollButton = ref(false);
@@ -379,7 +384,7 @@ onUnmounted(() => {
           mdi mdi-cart-variant
         </v-icon>
         <div class="cart-title-count d-flex justify-center align-center">
-          <span>0</span>
+          <span>{{ cartQuantity }}</span>
         </div>
         <span class="ml-4">My Cart</span>
       </div>

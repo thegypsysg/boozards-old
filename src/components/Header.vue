@@ -840,12 +840,12 @@ const getDeliveryCharges = () => {
   store.dispatch("getDeliveryCharges", 1);
 };
 
-const addToCartData = (data) => {
+const addToCartData = (data, range) => {
   console.log(token.value);
   if (token.value == "null") {
     store.commit("setIsNotLoggedIn", true);
   } else {
-    addToCart(data);
+    addToCart(data, range);
   }
 };
 

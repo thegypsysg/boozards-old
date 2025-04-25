@@ -167,7 +167,15 @@ const token = computed(() => {
   return localStorage.getItem("token");
 });
 
-const addToCartData = (data) => {
+const addToCartData = (data, range) => {
+  console.log(token.value);
+  if (token.value == "null") {
+    store.commit("setIsNotLoggedIn", true);
+  } else {
+    addToCart(data, range);
+  }
+};
+const addToCartData2 = (data) => {
   console.log(token.value);
   if (token.value == "null") {
     store.commit("setIsNotLoggedIn", true);
@@ -391,7 +399,7 @@ const addToCartData = (data) => {
                   <span v-show="range?.price_list?.rate">
                     <v-btn
                       v-if="!isInCart(item, range)"
-                      @click="addToCartData(item)"
+                      @click="addToCartData2(item)"
                       size="xs"
                       color="black"
                       class="text-caption py-1 px-8"
