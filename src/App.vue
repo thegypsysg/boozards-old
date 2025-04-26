@@ -53,6 +53,18 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="isCartEmpty" persistent width="auto">
+      <v-card width="350">
+        <v-card-text class="">
+          <h4 class="mt-4 mb-8 text-center">
+            Your Cart is Empty . Please add products in your cart first
+          </h4>
+          <v-btn class="mb-4 w-100 bg-primary" @click="closeIsCartEmpty">
+            OK
+          </v-btn>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -215,17 +227,30 @@ import { useStore } from "vuex";
 const store = useStore();
 
 const isLoggedIn = ref(false);
+const isCartEmpty = ref(false);
 
 const isNotLoggedIn = computed(() => store.state.isNotLoggedIn);
+const isCartEmptyStore = computed(() => store.state.isCartEmpty);
 
 const closeIsLoggedIn = () => {
   isLoggedIn.value = false;
   store.commit("setIsNotLoggedIn", false);
 };
 
+const closeIsCartEmpty = () => {
+  isCartEmpty.value = false;
+  store.commit("setIsCartEmpty", false);
+};
+
 watch(isNotLoggedIn, (newX) => {
   if (newX == true) {
     isLoggedIn.value = true;
+  }
+});
+
+watch(isCartEmptyStore, (newX) => {
+  if (newX == true) {
+    isCartEmpty.value = true;
   }
 });
 </script>

@@ -1,19 +1,24 @@
 <template>
-    <div class="fixed-footer">
-        <v-container>
-            <div class="d-flex align-center justify-space-between">
-                <div @click="viewCart = true">
-                    <v-badge :content="cartQuantity" color="red" offset-x="10" offset-y="10">
-                        <v-icon size="45">mdi mdi-cart-variant</v-icon>
-                    </v-badge>
-                </div>
-                <div class="text-h5">
-                   <strong>S{{ cartTotal }}</strong>
-                </div>
-            </div>
-        </v-container>
-        <Cart :viewCart="viewCart" @update:viewCart="viewCart = $event"/>
-    </div>
+  <div class="fixed-footer">
+    <v-container>
+      <div class="d-flex align-center justify-space-between">
+        <div @click="viewCartClick">
+          <v-badge
+            :content="cartQuantity"
+            color="red"
+            offset-x="10"
+            offset-y="10"
+          >
+            <v-icon size="45">mdi mdi-cart-variant</v-icon>
+          </v-badge>
+        </div>
+        <div class="text-h5">
+          <strong>S{{ cartTotal }}</strong>
+        </div>
+      </div>
+    </v-container>
+    <Cart :viewCart="viewCart" @update:viewCart="viewCart = $event" />
+  </div>
 </template>
 
 <style>
@@ -28,7 +33,7 @@
 </style>
 
 <script setup>
-import { ref,computed } from "vue";
+import { ref, computed } from "vue";
 import { useStore } from "vuex";
 import Cart from "@/components/Cart.vue";
 
@@ -40,11 +45,24 @@ const cartQuantity = computed(() => {
   return store.state.cart.reduce((total, item) => total + item.quantity, 0);
 });
 
+const viewCartClick = () => {
+  if (cartQuantity.value > 0) {
+    viewCart.value = true;
+  } else {
+    store.commit("setIsCartEmpty", true);
+  }
+};
+
 // Get total price of all cart items
 const cartTotal = computed(() => {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-      }).format(store.state.cart.reduce((total, item) => total + item.price * item.quantity, 0))
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(
+    store.state.cart.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0,
+    ),
+  );
 });
 </script>

@@ -373,7 +373,15 @@ export default {
       "setFooterData",
       "setCategoryData",
       "setSelectedCountry",
+      "setIsCartEmpty",
     ]),
+    viewCartClick() {
+      if (this.cartTotalQuantity > 0) {
+        this.viewCart = true;
+      } else {
+        this.setIsCartEmpty(true);
+      }
+    },
     async getTaxAmount() {
       let data = null;
 
@@ -1336,7 +1344,7 @@ watch(() => {
     <div>
       <div
         v-if="!isSmall && !isProfile"
-        @click="viewCart = true"
+        @click="viewCartClick"
         class="cart d-flex align-center"
       >
         <div class="cart-line mr-2" />

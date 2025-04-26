@@ -10,7 +10,7 @@ defineProps({
 });
 
 const splideOptions = {
-  perPage: 10,
+  perPage: 9,
   arrows: true,
   pagination: false,
   gap: "2rem",
@@ -135,7 +135,7 @@ onMounted(() => {
 
   <div v-if="desktop" class="explore-section d-none d-md-block">
     <!-- <v-container> -->
-    <div class="position-relative">
+    <div class="position-relative pt-14">
       <!-- <v-btn
         v-if="!isBeginning"
         icon
@@ -145,18 +145,31 @@ onMounted(() => {
         <span class="arrow-icon">←</span>
       </v-btn> -->
 
-      <Splide ref="splideRef" :options="splideOptions">
+      <Splide class="px-16" ref="splideRef" :options="splideOptions">
         <SplideSlide v-for="menu in menuLists" :key="menu.category_id">
           <v-card
             @click="scrollToSection(formatName(menu.category_name), false)"
             class="card-wrapper"
             elevation="3"
           >
-            <v-avatar :size="100">
+            <v-avatar :size="80">
               <v-img aspect-ratio="1" cover :src="fileURL + menu.image"></v-img>
             </v-avatar>
             <div class="card-title">
-              <span class="text-center">{{ menu.category_name }}</span>
+              <!-- <span class="text-center">{{ menu.category_name }}</span> -->
+              <span class="text-center text-body-2 text-no-wrap">{{
+                menu.category_name
+              }}</span>
+            </div>
+            <div
+              class="text-no-wrap d-flex align-center font-weight-bold text-caption mt-n2"
+            >
+              <span class="text-red-darken-1">
+                <!-- {{ menu?.properties_count }} -->
+                12
+              </span>
+              &nbsp;
+              <span> Products</span>
             </div>
           </v-card>
         </SplideSlide>
@@ -170,11 +183,10 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
-.explore-section {
+<!-- .explore-section {
   padding: 2rem;
-}
-
+} -->
+<style scoped>
 .card-wrapper {
   margin: 0.5rem;
   overflow: hidden;

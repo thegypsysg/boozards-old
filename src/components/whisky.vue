@@ -42,10 +42,10 @@ const token = computed(() => {
 
 const splideOptions = computed(() => ({
   type: "slide",
-  perPage: isMobile.value ? 1.5 : 4,
+  perPage: isMobile.value ? 1.3 : 3.5,
   arrows: false,
   pagination: false,
-  gap: isMobile.value ? "1rem" : "2rem",
+  gap: isMobile.value ? "0.6rem" : "0.8rem",
   drag: true,
   snap: true,
   rewind: false,
@@ -71,7 +71,7 @@ const splideOptions = computed(() => ({
       perPage: 2,
     },
     1200: {
-      perPage: 4,
+      perPage: 3.5,
     },
   },
 }));
@@ -282,7 +282,10 @@ onUnmounted(() => {
                 <p class="text-red-darken-4 font-weight-bold text-body-2">
                   {{ menu?.brand_name }}
                 </p>
-                <p class="font-weight-bold text-black text-body-2 mt-1">
+                <p
+                  class="font-weight-bold text-black text-body-2 mt-1"
+                  style="height: 45px"
+                >
                   {{ menu?.product_name }}
                 </p>
               </router-link>
@@ -384,7 +387,7 @@ onUnmounted(() => {
 
 <style scoped>
 .nursing-section {
-  padding: 2rem 0;
+  padding: 1rem 0;
 }
 
 .card-wrapper {
