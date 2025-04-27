@@ -5,7 +5,9 @@
         <p
           class="text-center my-6 text-h5 text-sm-h4 text-lg-h3"
           style="
-            font-family: &quot;DM Serif Display&quot;, system-ui;
+            font-family:
+              DM Serif Display,
+              system-ui;
             font-weight: 400;
           "
         >
@@ -21,7 +23,7 @@
         <v-col cols="6" md="4" class="d-flex flex-column pa-2">
           <Grid
             v-if="imagesDataDesktop[0]?.image"
-            :title="imagesDataDesktop[0]?.brand_name"
+            :title="imagesDataDesktop[0]?.nationality + ' Booze'"
             :image="fileURL + imagesDataDesktop[0]?.image"
             :isSquare="false"
             :show_text="true"
@@ -34,7 +36,7 @@
             <v-col>
               <Grid
                 v-if="imagesDataDesktop[1]?.image"
-                :title="imagesDataDesktop[1]?.brand_name"
+                :title="imagesDataDesktop[1]?.nationality + ' Booze'"
                 :image="fileURL + imagesDataDesktop[1]?.image"
                 :isSquare="true"
                 :show_text="true"
@@ -46,7 +48,7 @@
             <v-col>
               <Grid
                 v-if="imagesDataDesktop[2]?.image"
-                :title="imagesDataDesktop[2]?.brand_name"
+                :title="imagesDataDesktop[2]?.nationality + ' Booze'"
                 :image="fileURL + imagesDataDesktop[2]?.image"
                 :isSquare="true"
                 :show_text="true"
@@ -60,7 +62,7 @@
             <v-col>
               <Grid
                 v-if="imagesDataDesktop[3]?.image"
-                :title="imagesDataDesktop[3]?.brand_name"
+                :title="imagesDataDesktop[3]?.nationality + ' Booze'"
                 :image="fileURL + imagesDataDesktop[3]?.image"
                 :isSquare="true"
                 :show_text="true"
@@ -72,7 +74,7 @@
             <v-col>
               <Grid
                 v-if="imagesDataDesktop[4]?.image"
-                :title="imagesDataDesktop[4]?.brand_name"
+                :title="imagesDataDesktop[4]?.nationality + ' Booze'"
                 :image="fileURL + imagesDataDesktop[4]?.image"
                 :isSquare="true"
                 :show_text="true"
@@ -88,7 +90,7 @@
               <v-col cols="6" md="4" style="height: 100%" class="pa-2">
                 <Grid
                   v-if="imagesDataDesktop[5]?.image"
-                  :title="imagesDataDesktop[5]?.brand_name"
+                  :title="imagesDataDesktop[5]?.nationality + ' Booze'"
                   :image="fileURL + imagesDataDesktop[5]?.image"
                   :isSquare="false"
                   :show_text="true"
@@ -97,8 +99,8 @@
               </v-col>
               <v-col cols="6" md="8" style="height: 100%" class="pa-2">
                 <Grid
-                  v-if="imagesDataDesktop[0]?.image"
-                  :title="imagesDataDesktop[0]?.brand_name"
+                  v-if="imagesDataDesktop[6]?.image"
+                  :title="imagesDataDesktop[6]?.nationality + ' Booze'"
                   :image="fileURL + imagesDataDesktop[0]?.image"
                   :isSquare="false"
                   :show_text="true"
@@ -117,7 +119,7 @@
         <v-col cols="6">
           <Grid
             v-if="image?.image"
-            :title="image?.brand_name"
+            :title="image?.nationality + ' Booze'"
             :image="fileURL + image?.image"
             :isSquare="true"
             :show_text="true"

@@ -25,97 +25,184 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col sm="12" md="4" cols="12">
-        <v-lazy :options="{ threshold: 0.5 }" min-height="200">
-          <v-card class="partners_box" elevation="0">
-            <div class="w-100 d-flex justify-center mb-8 mt-8">
-              <v-img height="40" width="40" src="@/assets/images/partner-1.png">
-                <template #placeholder>
-                  <div class="skeleton" />
-                </template>
-              </v-img>
-            </div>
-            <v-card-title class="text-black text-center">
-              As a Shop Owner
-            </v-card-title>
-            <v-card-text class="text-center">
-              Do you sell Alcohol.? We can help you find Buyers for your stock .
-            </v-card-text>
-            <v-card-actions align="center">
-              <v-btn
-                elevation="0"
-                class="mx-auto bg-info"
-                style="background: #00cdcd !important"
-                :href="`https://api.whatsapp.com/send?phone=${footerData?.whats_app}&text=Hi I am a Shop Owner and would like to register on boozards. Pls send us some details`"
+      <transition-group name="card-transition" mode="out-in">
+        <v-col sm="12" md="4" cols="12">
+          <v-hover v-slot:default="{ isHovering, props }">
+            <v-responsive class="rounded">
+              <v-img
+                :src="partner1"
+                cover
+                style="height: 100%"
+                aspect-ratio="0.75"
               >
-                Partner with us
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-lazy>
-      </v-col>
-      <v-col sm="12" md="4" cols="12">
-        <v-lazy :options="{ threshold: 0.5 }" min-height="200">
-          <v-card class="partners_box" elevation="0">
-            <div class="w-100 d-flex justify-center mb-8 mt-8">
-              <v-img height="40" width="40" src="@/assets/images/partner-2.png">
-                <template #placeholder>
-                  <div class="skeleton" />
-                </template>
+                <div
+                  v-bind="props"
+                  :style="[
+                    isHovering
+                      ? 'background-color: rgba(0, 0, 0, 0.0)'
+                      : 'background-color: rgba(0, 0, 0, 0.3)',
+                    'transition: background-color 0.3s ease',
+                  ]"
+                  class="fill-height py-8 text-white font-weight-light"
+                >
+                  <div
+                    class="d-flex flex-column justify-space-between fill-height"
+                  >
+                    <div
+                      class="font-weight-light text-center text-md-left px-6"
+                    >
+                      <!-- <div>{{ img.properties_count }} Properties</div> -->
+                      <div class="font-weight-bold text-h5 text-white">
+                        As a Delivery Rider
+                      </div>
+                    </div>
+                    <div
+                      class="d-flex flex-column justify-space-between align-center align-md-start ga-3 pl-6 pr-6 pr-md-14"
+                    >
+                      <div
+                        class="d-flex flex-column ga-4 align-center align-md-start"
+                      >
+                        <div class="font-weight-bold">
+                          <span class="text-yellow-lighten-1">Earn More</span
+                          ><span class="text-white">
+                            during your Free Time</span
+                          >
+                        </div>
+                        <v-btn
+                          :href="`https://api.whatsapp.com/send?phone=${footerData?.whats_app}&text=Hi I would like to apply as a Delivery Rider , partner`"
+                          color="blue-lighten-1"
+                          router-link
+                          >Register Now</v-btn
+                        >
+                        <!-- <v-btn color="red-darken-2" :to="img.url" router-link>VIEW</v-btn> -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </v-img>
-            </div>
-            <v-card-title class="text-black text-center">
-              As a Pub / Club Owner
-            </v-card-title>
-            <v-card-text class="text-center">
-              Do you own a Pub or a Club. ? List your promotions and happy hour
-              with us.
-            </v-card-text>
-            <v-card-actions align="center">
-              <v-btn
-                elevation="0"
-                class="mx-auto bg-info"
-                style="background: #84afdc !important"
-                :href="`https://api.whatsapp.com/send?phone=${footerData?.whats_app}&text=Hi I am a Pub / Bar owner and would like to register on boozards. Pls send us some details`"
+            </v-responsive>
+          </v-hover>
+        </v-col>
+        <v-col sm="12" md="4" cols="12">
+          <v-hover v-slot:default="{ isHovering, props }">
+            <v-responsive class="rounded">
+              <v-img
+                :src="partner2"
+                cover
+                style="height: 100%"
+                aspect-ratio="0.75"
               >
-                Enquire Now
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-lazy>
-      </v-col>
-      <v-col sm="12" md="4" cols="12">
-        <v-lazy :options="{ threshold: 0.5 }" min-height="200">
-          <v-card class="partners_box" elevation="0">
-            <div class="w-100 d-flex justify-center mb-8 mt-8">
-              <v-img height="40" width="40" src="@/assets/images/partner-3.png">
-                <template #placeholder>
-                  <div class="skeleton" />
-                </template>
+                <div
+                  v-bind="props"
+                  :style="[
+                    isHovering
+                      ? 'background-color: rgba(0, 0, 0, 0.0)'
+                      : 'background-color: rgba(0, 0, 0, 0.3)',
+                    'transition: background-color 0.3s ease',
+                  ]"
+                  class="fill-height py-8 text-white font-weight-light"
+                >
+                  <div
+                    class="d-flex flex-column justify-space-between fill-height"
+                  >
+                    <div
+                      class="font-weight-light text-center text-md-left px-6"
+                    >
+                      <!-- <div>{{ img.properties_count }} Properties</div> -->
+                      <div class="font-weight-bold text-h5 text-white">
+                        As a Shop / Mart Owner
+                      </div>
+                    </div>
+                    <div
+                      class="d-flex flex-column justify-space-between align-center align-md-start ga-3 pl-6 pr-6 pr-md-14"
+                    >
+                      <div
+                        class="d-flex flex-column ga-4 align-center align-md-start"
+                      >
+                        <div
+                          class="text-white font-weight-bold text-center text-md-left"
+                        >
+                          We will sell your Alcohol for you online.
+                        </div>
+
+                        <v-btn
+                          :href="`https://api.whatsapp.com/send?phone=${footerData?.whats_app}&text=Hi I am a Shop Owner and would like to register on boozards. Pls send us some details`"
+                          color="red-darken-1"
+                          router-link
+                          >Partner with Us</v-btn
+                        >
+                        <!-- <v-btn color="red-darken-2" :to="img.url" router-link>VIEW</v-btn> -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </v-img>
-            </div>
-            <v-card-title class="text-black text-center">
-              As a Delivery Rider
-            </v-card-title>
-            <v-card-text class="text-center">
-              Help us deliver our Alcohol to neighbourhood around you.
-            </v-card-text>
-            <v-card-actions align="center">
-              <v-btn
-                elevation="0"
-                class="mx-auto bg-info"
-                style="background: #808080 !important"
-                :href="`https://api.whatsapp.com/send?phone=${footerData?.whats_app}&text=Hi I would like to apply as a Delivery Rider , partner`"
+            </v-responsive>
+          </v-hover>
+        </v-col>
+        <v-col sm="12" md="4" cols="12">
+          <v-hover v-slot:default="{ isHovering, props }">
+            <v-responsive class="rounded">
+              <v-img
+                :src="partner3"
+                cover
+                style="height: 100%"
+                aspect-ratio="0.75"
               >
-                List Now
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-lazy>
-      </v-col>
+                <div
+                  v-bind="props"
+                  :style="[
+                    isHovering
+                      ? 'background-color: rgba(0, 0, 0, 0.0)'
+                      : 'background-color: rgba(0, 0, 0, 0.3)',
+                    'transition: background-color 0.3s ease',
+                  ]"
+                  class="fill-height py-8 text-white font-weight-light"
+                >
+                  <div
+                    class="d-flex flex-column justify-space-between fill-height"
+                  >
+                    <div
+                      class="font-weight-light text-center text-md-left px-6"
+                    >
+                      <!-- <div>{{ img.properties_count }} Properties</div> -->
+                      <div class="font-weight-bold text-h5 text-white">
+                        As a Pub / Club Owner
+                      </div>
+                    </div>
+                    <div
+                      class="d-flex flex-column justify-space-between align-center align-md-start ga-3 pl-6 pr-6 pr-md-14"
+                    >
+                      <div
+                        class="d-flex flex-column ga-4 align-center align-md-start"
+                      >
+                        <div
+                          class="text-white font-weight-bold text-center text-md-left"
+                        >
+                          List your Happy Hour / Promotions with us.
+                        </div>
+
+                        <v-btn
+                          :href="`https://api.whatsapp.com/send?phone=${footerData?.whats_app}&text=Hi I am a Pub / Bar owner and would like to register on boozards. Pls send us some details`"
+                          color="red-accent-1"
+                          router-link
+                          class="text-white"
+                          >Get in Touch</v-btn
+                        >
+                        <!-- <v-btn color="red-darken-2" :to="img.url" router-link>VIEW</v-btn> -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </v-img>
+            </v-responsive>
+          </v-hover>
+        </v-col>
+      </transition-group>
     </v-row>
   </v-container>
 </template>
+
 <script>
 import { mapState } from "vuex";
 
@@ -145,6 +232,13 @@ export default {
   },
 };
 </script>
+
+<script setup>
+import partner1 from "@/assets/partner-1.jpg";
+import partner2 from "@/assets/partner-2.jpg";
+import partner3 from "@/assets/partner-3.jpg";
+</script>
+
 <style>
 @import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap");
 
@@ -194,5 +288,15 @@ export default {
   100% {
     background-position: -100% 0;
   }
+}
+
+.page-opacity-enter-active,
+.page-opacity-leave-active {
+  transition: 400ms ease all;
+}
+
+.page-opacity-enter-from,
+.page-opacity-leave-to {
+  opacity: 0;
 }
 </style>

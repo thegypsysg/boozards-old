@@ -593,7 +593,7 @@
 
 <style>
 .font-sm {
-  font-size: 12px;
+  font-size: 10px;
 }
 .cart-drawer {
   width: 100%; /* Ensures the parent takes the full width of its container */

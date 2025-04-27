@@ -29,7 +29,7 @@ const getProductDetails = async () => {
     isLoading.value = true;
     const encryptedId = route.params.encryptedId;
     const rangeId = route.query.range_id;
-    const response = await axios.get(`/product/${encryptedId}`);
+    const response = await axios.get(`/product/${encryptedId}/${rangeId}`);
     product.value = response.data.data;
     selectedRange.value = product.value.ranges.find(
       (range) => range.range_id === Number(rangeId),
