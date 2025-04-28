@@ -70,7 +70,7 @@
         />
       </template>
       <SelectCountry />
-      <OurBrands />
+      <!-- <OurBrands /> -->
       <Partners />
     </div>
     <Footer />

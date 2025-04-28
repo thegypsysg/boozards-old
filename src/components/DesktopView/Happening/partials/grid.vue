@@ -33,9 +33,9 @@
           ]"
         >
           <v-btn
-      
             class="ma-2 text-caption"
             :size="$vuetify.display.mdAndUp ? 'large' : 'x-small'"
+            @click="showDialog"
             color="pink darken-1"
             rounded
           >
@@ -109,6 +109,7 @@
           <v-btn
             class="ma-2 text-caption"
             :size="$vuetify.display.mdAndUp ? 'large' : 'x-small'"
+            @click="showDialog"
             color="pink darken-1"
             rounded
           >
@@ -129,18 +130,26 @@
   </v-hover>
 </template>
 
-<script setup lang="ts">
-const props = defineProps<{
-  title: string;
-  image: string;
-  isSquare: boolean;
-  show_text?: boolean;
-  show_option?: boolean;
-  show_title?: boolean;
-}>();
+<script setup>
+import { useStore } from "vuex";
+
+const props = defineProps({
+  title: String,
+  image: String,
+  isSquare: Boolean,
+  show_text: Boolean,
+  show_option: Boolean,
+  show_title: Boolean,
+});
+
+const store = useStore();
 
 // const showOption = ref(false);
 // watchEffect(() => {
 //   showOption.value = props.show_option;
 // })
+
+const showDialog = () => {
+  store.commit("setIsCountryUpdating", true);
+};
 </script>

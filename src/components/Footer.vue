@@ -367,7 +367,7 @@ onUnmounted(() => {
       size="large"
     ></v-btn>
 
-    <div
+    <!-- <div
       v-if="isSmall && isLoggedIn"
       style="
         position: fixed;
@@ -391,7 +391,7 @@ onUnmounted(() => {
       <div class="cart-count d-flex align-center justify-center">
         <span>0000</span>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 

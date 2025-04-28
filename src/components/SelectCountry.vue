@@ -101,7 +101,7 @@
                 <Grid
                   v-if="imagesDataDesktop[6]?.image"
                   :title="imagesDataDesktop[6]?.nationality + ' Booze'"
-                  :image="fileURL + imagesDataDesktop[0]?.image"
+                  :image="fileURL + imagesDataDesktop[6]?.image"
                   :isSquare="false"
                   :show_text="true"
                   :show_option="true"
@@ -136,6 +136,7 @@
         size="large"
         class="text-white px-8"
         rounded="pill"
+        @click="showDialog"
       >
         VIEW ALL COUNTRY SELECTIONS
       </v-btn>
@@ -150,6 +151,9 @@ import Grid from "./DesktopView/Happening/partials/grid.vue";
 import whisky from "@/assets/images/boozards/drink2.jpg";
 import whisky3 from "@/assets/images/boozards/drink3.jpg";
 import drink from "@/assets/images/boozards/drinnk.jpg";
+import { useStore } from "vuex";
+
+const store = useStore();
 
 const imagesDataDesktop = ref([]);
 const imagesDataMobile = ref([]);
@@ -182,6 +186,10 @@ const images = [
     alt: "Guinness",
   },
 ];
+
+const showDialog = () => {
+  store.commit("setIsCountryUpdating", true);
+};
 
 function getImagesDataDesktop() {
   isLoading.value = true;

@@ -1,5 +1,5 @@
 <template>
-  <v-container class="mb-14 mt-md-10 mt-sm-2 wrapper-box">
+  <div class="mb-14 mt-md-10 mt-sm-2">
     <v-row>
       <v-col cols="12">
         <div>
@@ -24,9 +24,9 @@
         </div>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row justify="center">
       <transition-group name="card-transition" mode="out-in">
-        <v-col sm="12" md="4" cols="12">
+        <v-col cols="12" md="4">
           <v-hover v-slot:default="{ isHovering, props }">
             <v-responsive class="rounded">
               <v-img
@@ -83,7 +83,7 @@
             </v-responsive>
           </v-hover>
         </v-col>
-        <v-col sm="12" md="4" cols="12">
+        <v-col cols="12" md="4">
           <v-hover v-slot:default="{ isHovering, props }">
             <v-responsive class="rounded">
               <v-img
@@ -140,7 +140,7 @@
             </v-responsive>
           </v-hover>
         </v-col>
-        <v-col sm="12" md="4" cols="12">
+        <v-col cols="12" md="4">
           <v-hover v-slot:default="{ isHovering, props }">
             <v-responsive class="rounded">
               <v-img
@@ -200,7 +200,7 @@
         </v-col>
       </transition-group>
     </v-row>
-  </v-container>
+  </div>
 </template>
 
 <script>
