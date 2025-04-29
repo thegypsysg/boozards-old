@@ -129,6 +129,16 @@ onMounted(() => {
         <p class="text-no-wrap d-flex align-center mt-2 text-caption">
           {{ menu.category_name }}
         </p>
+        <div
+          class="text-no-wrap d-flex align-center font-weight-bold text-caption"
+        >
+          <span class="text-red-darken-1">
+            <!-- {{ menu?.properties_count }} -->
+            12
+          </span>
+          &nbsp;
+          <span> Products</span>
+        </div>
       </a>
     </div>
   </div>

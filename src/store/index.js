@@ -130,8 +130,9 @@ export default (app) =>
             commit("deliveryCharges", response?.data?.data);
           })
           .catch((error) => {
-            state.errorCart = error?.error;
-            showSnackbar(error?.response?.data?.error, "error");
+            console.log(error);
+            // state.errorCart = error?.error;
+            // showSnackbar(error?.response?.data?.error, "error");
           });
       },
 
@@ -146,8 +147,9 @@ export default (app) =>
             commit("cart", response?.data?.data);
           })
           .catch((error) => {
-            state.errorCart = error?.error;
-            showSnackbar(error?.response?.data?.error, "error");
+            console.log(error);
+            // state.errorCart = error?.error;
+            // showSnackbar(error?.response?.data?.error, "error");
           });
       },
 
@@ -166,8 +168,9 @@ export default (app) =>
             commit("totalCartItems", response?.data.length);
           })
           .catch((error) => {
-            state.errorCart = error?.error;
-            showSnackbar(error?.response?.data?.error, "error");
+            console.log(error);
+            // state.errorCart = error?.error;
+            // showSnackbar(error?.response?.data?.error, "error");
           });
       },
 
@@ -189,8 +192,9 @@ export default (app) =>
             commit("isLoading", false);
           })
           .catch((error) => {
-            state.errorCart = error?.response?.data;
-            showSnackbar(error?.response?.data?.error, "error");
+            console.log(error);
+            // state.errorCart = error?.error;
+            // showSnackbar(error?.response?.data?.error, "error");
             commit("isLoading", false);
           });
       },
@@ -220,9 +224,10 @@ export default (app) =>
                 commit("isLoading", false);
               })
               .catch((error) => {
-                state.errorCart = error;
+                console.log(error);
+                // state.errorCart = error?.error;
+                // showSnackbar(error?.response?.data?.error, "error");
                 commit("isLoading", false);
-                showSnackbar(error?.response?.data?.error, "error");
               });
           })
           .catch((error) => {
@@ -261,9 +266,10 @@ export default (app) =>
                 commit("isLoading", false);
               })
               .catch((error) => {
-                state.errorCart = error;
+                console.log(error);
+                // state.errorCart = error?.error;
+                // showSnackbar(error?.response?.data?.error, "error");
                 commit("isLoading", false);
-                showSnackbar(error?.response?.data?.error, "error");
               });
           })
           .catch((error) => {
