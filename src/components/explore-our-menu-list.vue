@@ -1,9 +1,10 @@
 <script setup>
-import { onMounted, ref, nextTick } from "vue";
+import { onMounted, ref, nextTick, watch, computed } from "vue";
 import axios from "@/util/axios";
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 import { appId, fileURL } from "../main";
+import { useStore } from "vuex";
 
 defineProps({
   desktop: Boolean,
@@ -27,11 +28,15 @@ const splideOptions = {
   },
 };
 
+const store = useStore();
+
 const splideRef = ref(null);
 const isBeginning = ref(true);
 const isEnd = ref(false);
 
 const menuLists = ref([]);
+
+const selectedCountry = computed(() => store.state.selectedCountry);
 
 const formatName = (name) => name.toLowerCase().replace(/\s+/g, "");
 
@@ -79,16 +84,14 @@ const handleSlideMove = () => {
   }
 };
 
-const getMenuListData = () => {
+const getMenuListData = (cityId) => {
   axios
-    .get(`/categories/active-website/app/${appId}`)
+    .get(`/categories-with-products/app/${appId}/${cityId}`)
     .then((response) => {
       const data = response.data.data;
-      menuLists.value = data
-        .sort(function (a, b) {
-          return a.category_id - b.category_id;
-        })
-        .filter((item) => item.active == "Y");
+      menuLists.value = data.sort(function (a, b) {
+        return a.category_id - b.category_id;
+      });
       console.log(menuLists.value);
       // let itemFinal = [];
     })
@@ -98,6 +101,11 @@ const getMenuListData = () => {
       throw error;
     });
 };
+
+watch(selectedCountry, (newX) => {
+  console.log("country is", newX);
+  getMenuListData(newX.city_id);
+});
 
 onMounted(() => {
   nextTick(() => {
@@ -124,7 +132,7 @@ onMounted(() => {
     >
       <a class="d-flex flex-column align-center border-black pa-2 rounded-lg">
         <v-avatar :size="70">
-          <v-img aspect-ratio="1" cover :src="fileURL + menu.image"></v-img>
+          <v-img aspect-ratio="1" cover :src="fileURL + menu?.image"></v-img>
         </v-avatar>
         <p class="text-no-wrap d-flex align-center mt-2 text-caption">
           {{ menu.category_name }}
@@ -133,8 +141,7 @@ onMounted(() => {
           class="text-no-wrap d-flex align-center font-weight-bold text-caption"
         >
           <span class="text-red-darken-1">
-            <!-- {{ menu?.properties_count }} -->
-            12
+            {{ menu?.product_count }}
           </span>
           &nbsp;
           <span> Products</span>
@@ -163,7 +170,11 @@ onMounted(() => {
             elevation="3"
           >
             <v-avatar :size="80">
-              <v-img aspect-ratio="1" cover :src="fileURL + menu.image"></v-img>
+              <v-img
+                aspect-ratio="1"
+                cover
+                :src="fileURL + menu?.image"
+              ></v-img>
             </v-avatar>
             <div class="card-title">
               <!-- <span class="text-center">{{ menu.category_name }}</span> -->
@@ -175,8 +186,7 @@ onMounted(() => {
               class="text-no-wrap d-flex align-center font-weight-bold text-caption mt-n2"
             >
               <span class="text-red-darken-1">
-                <!-- {{ menu?.properties_count }} -->
-                12
+                {{ menu?.product_count }}
               </span>
               &nbsp;
               <span> Products</span>

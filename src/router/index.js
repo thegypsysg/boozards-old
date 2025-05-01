@@ -4,6 +4,7 @@ import MyProfile from "@/views/MyProfileView.vue";
 import PriceList from "@/views/PriceListView.vue";
 import ProductDetail from "@/views/ProductDetailView.vue";
 import PrivacyTerms from "@/views/PrivacyTerms.vue";
+import MyFavorites from "@/views/MyFavoritesView.vue";
 import SignUp from "@/views/SignUpForm.vue";
 import OTPEmailForm from "@/views/OTPEmailForm.vue";
 import CreatePasswordForm from "@/views/CreatePasswordForm.vue";
@@ -56,6 +57,11 @@ const routes = [
     path: "/my-profile",
     name: "My Profile",
     component: MyProfile,
+  },
+  {
+    path: "/my-favorites",
+    name: "My Favorites",
+    component: MyFavorites,
   },
   {
     path: "/privacy-policy",

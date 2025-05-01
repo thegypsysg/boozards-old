@@ -39,7 +39,7 @@
           <component :is="Component" />
         </Transition>
       </RouterView>
-      <FooterMobile v-show="!isDesktop"></FooterMobile>
+      <FooterMobile v-show="!isDesktop && !isProfile"></FooterMobile>
     </div>
     <v-dialog v-model="isLoggedIn" persistent width="auto">
       <v-card width="350">
@@ -103,6 +103,8 @@ export default {
       let title = "";
       if (this.currentRoute === "/my-profile") {
         title = "My Profile";
+      } else if (this.currentRoute === "/my-favorites") {
+        title = "My Favorites";
       } else if (this.currentRoute === "/checkout") {
         title = "Checkout";
       } else if (this.currentRoute === "/price-list") {
@@ -131,6 +133,7 @@ export default {
     isProfile() {
       return (
         this.currentRoute === "/my-profile" ||
+        this.currentRoute === "/my-favorites" ||
         this.currentRoute === "/sign-in" ||
         this.currentRoute === "/social-sign-up" ||
         this.currentRoute === "/price-list"

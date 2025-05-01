@@ -224,6 +224,9 @@ export default {
     isPrivacy() {
       return this.$route.path == "/privacy-policy";
     },
+    isFavorites() {
+      return this.$route.path == "/my-favorites";
+    },
     isTerms() {
       return this.$route.path == "/our-terms";
     },
@@ -1988,9 +1991,11 @@ watch(() => {
           <v-img src="" />
         </div>
 
-        <v-list-item-title style="font-size: 12px">
-          My Favorites
-        </v-list-item-title>
+        <router-link class="text-decoration-none text-black" to="/my-favorites">
+          <v-list-item-title style="font-size: 12px">
+            My Favorites
+          </v-list-item-title>
+        </router-link>
       </li>
       <li v-if="userName != null" class="v-list-item mt-n2">
         <div class="v-list-item__icon">

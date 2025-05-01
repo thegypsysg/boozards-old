@@ -127,7 +127,7 @@
                     @click="loginSocial('twitter')"
                   /> -->
                 </div>
-                <div class="login-footer mt-8">
+                <div class="login-footer mt-8 mb-4">
                   <div class="d-flex justify-center" style="gap: 25px">
                     <div
                       class="login-line"
@@ -144,7 +144,7 @@
                     />
                   </div>
                 </div>
-                <p
+                <!-- <p
                   v-if="!isMobile"
                   class="text-grey mt-4"
                   :class="{ 'mb-4': !isSmall, 'mb-6': isSmall }"
@@ -161,7 +161,7 @@
                     "
                     >Enter Mobile number</span
                   >
-                </p>
+                </p> -->
                 <div
                   v-if="isMobile && !isSendOTP"
                   class="text-grey mt-4"
