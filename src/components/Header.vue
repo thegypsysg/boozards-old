@@ -27,6 +27,7 @@ export default {
       selectedDelivery: null,
       platformFee: null,
       taxAmount: null,
+      isBestViewed: false,
       viewCart: false,
       isApply: false,
       isEmployment: false,
@@ -1066,7 +1067,7 @@ watch(() => {
                     <span v-show="range?.price_list?.rate">
                       <v-btn
                         v-if="!isInCart(item.raw, range)"
-                        @click="addToCartData(item.raw, range)"
+                        @click.stop.prevent="addToCartData(item.raw, range)"
                         size="xs"
                         color="black"
                         class="text-caption py-1 px-8"
@@ -1083,7 +1084,9 @@ watch(() => {
                           class="text-caption pa-1 rounded-0"
                           variant="flat"
                           icon
-                          @click="updateQuantity(item.raw, 'decrease')"
+                          @click.stop.prevent="
+                            updateQuantity(item.raw, 'decrease')
+                          "
                         >
                           <v-icon>mdi-minus</v-icon>
                         </v-btn>
@@ -1098,7 +1101,9 @@ watch(() => {
                           class="text-caption pa-1 rounded-0"
                           variant="flat"
                           icon
-                          @click="updateQuantity(item.raw, 'increase')"
+                          @click.stop.prevent="
+                            updateQuantity(item.raw, 'increase')
+                          "
                         >
                           <v-icon>mdi-plus</v-icon>
                         </v-btn>
@@ -1243,7 +1248,7 @@ watch(() => {
                     <span v-show="range?.price_list?.rate">
                       <v-btn
                         v-if="!isInCart(item.raw, range)"
-                        @click="addToCartData(item.raw, range)"
+                        @click.stop.prevent="addToCartData(item.raw, range)"
                         size="xs"
                         color="black"
                         class="text-caption py-1 px-8"
@@ -1260,7 +1265,9 @@ watch(() => {
                           class="text-caption pa-1 rounded-0"
                           variant="flat"
                           icon
-                          @click="updateQuantity(item.raw, 'decrease')"
+                          @click.stop.prevent="
+                            updateQuantity(item.raw, 'decrease')
+                          "
                         >
                           <v-icon>mdi-minus</v-icon>
                         </v-btn>
@@ -1275,7 +1282,9 @@ watch(() => {
                           class="text-caption pa-1 rounded-0"
                           variant="flat"
                           icon
-                          @click="updateQuantity(item.raw, 'increase')"
+                          @click.stop.prevent="
+                            updateQuantity(item.raw, 'increase')
+                          "
                         >
                           <v-icon>mdi-plus</v-icon>
                         </v-btn>
@@ -1589,7 +1598,7 @@ watch(() => {
                         <span v-show="range?.price_list?.rate">
                           <v-btn
                             v-if="!isInCart(item.raw, range)"
-                            @click="addToCartData(item.raw, range)"
+                            @click.stop.prevent="addToCartData(item.raw, range)"
                             size="xs"
                             color="black"
                             class="text-caption py-1 px-8"
@@ -1606,7 +1615,9 @@ watch(() => {
                               class="text-caption pa-1 rounded-0"
                               variant="flat"
                               icon
-                              @click="updateQuantity(item.raw, 'decrease')"
+                              @click.stop.prevent="
+                                updateQuantity(item.raw, 'decrease')
+                              "
                             >
                               <v-icon>mdi-minus</v-icon>
                             </v-btn>
@@ -1621,7 +1632,9 @@ watch(() => {
                               class="text-caption pa-1 rounded-0"
                               variant="flat"
                               icon
-                              @click="updateQuantity(item.raw, 'increase')"
+                              @click.stop.prevent="
+                                updateQuantity(item.raw, 'increase')
+                              "
                             >
                               <v-icon>mdi-plus</v-icon>
                             </v-btn>
@@ -1745,7 +1758,9 @@ watch(() => {
                           <span v-show="range?.price_list?.rate">
                             <v-btn
                               v-if="!isInCart(item.raw, range)"
-                              @click="addToCartData(item.raw, range)"
+                              @click.stop.prevent="
+                                addToCartData(item.raw, range)
+                              "
                               size="xs"
                               color="black"
                               class="text-caption py-1 px-8"
@@ -1762,7 +1777,9 @@ watch(() => {
                                 class="text-caption pa-1 rounded-0"
                                 variant="flat"
                                 icon
-                                @click="updateQuantity(item.raw, 'decrease')"
+                                @click.stop.prevent="
+                                  updateQuantity(item.raw, 'decrease')
+                                "
                               >
                                 <v-icon>mdi-minus</v-icon>
                               </v-btn>
@@ -1777,7 +1794,9 @@ watch(() => {
                                 class="text-caption pa-1 rounded-0"
                                 variant="flat"
                                 icon
-                                @click="updateQuantity(item.raw, 'increase')"
+                                @click.stop.prevent="
+                                  updateQuantity(item.raw, 'increase')
+                                "
                               >
                                 <v-icon>mdi-plus</v-icon>
                               </v-btn>
@@ -1991,11 +2010,23 @@ watch(() => {
           <v-img src="" />
         </div>
 
-        <router-link class="text-decoration-none text-black" to="/my-favorites">
+        <router-link
+          v-if="isSmall"
+          class="text-decoration-none text-black"
+          to="/my-favorites"
+        >
           <v-list-item-title style="font-size: 12px">
             My Favorites
           </v-list-item-title>
         </router-link>
+        <v-list-item-title
+          v-else
+          @click="isBestViewed = true"
+          class="cursor-pointer"
+          style="font-size: 12px"
+        >
+          My Favorites
+        </v-list-item-title>
       </li>
       <li v-if="userName != null" class="v-list-item mt-n2">
         <div class="v-list-item__icon">
@@ -2120,6 +2151,17 @@ watch(() => {
       </div>
     </div>
   </v-navigation-drawer>
+
+  <v-dialog v-model="isBestViewed" persistent width="auto">
+    <v-card width="350">
+      <v-card-text class="">
+        <h4 class="mt-4 mb-8 text-center">Best Viewed on Mobile</h4>
+        <v-btn class="mb-4 w-100 bg-primary" @click="isBestViewed = false">
+          OK
+        </v-btn>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 
   <v-dialog
     v-model="dialog2"

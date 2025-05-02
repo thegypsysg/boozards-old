@@ -268,7 +268,6 @@ onUnmounted(() => {
               <v-img
                 :src="fileURL + menu?.selectedImage.value"
                 height="200"
-                cover
               ></v-img>
             </router-link>
             <div
