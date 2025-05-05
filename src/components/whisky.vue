@@ -104,9 +104,9 @@ const filteredProducts = computed(() => {
     };
   };
 
-  if (selected.value) {
+  if (selected.value?.country_id) {
     return props.products
-      .filter((product) => product.country_id === selected.value)
+      .filter((product) => product.country_id === selected.value.country_id)
       .map(mapProduct);
   } else {
     return props.products.map(mapProduct);
@@ -218,22 +218,56 @@ onUnmounted(() => {
             { country_name: 'Show All', country_id: 0 },
             ...props.countries,
           ]"
+          item-title="country_name"
           item-value="country_id"
-          :item-title="
-            (item) =>
-              item.country_id == 0
-                ? `${item.country_name}`
-                : `${item.country_name} ( ${item.brand_count} Brands )`
-          "
+          return-object
           placeholder="Country of origin"
         >
-          <template v-slot:selection="{ props, item }">
-            <span v-bind="props">{{ `${item.raw.country_name} ` }}</span>
-            <span v-if="item.raw.country_id != 0" class="font-weight-bold">
-              (
-              <span class="text-red">{{ item.raw.brand_count }}</span> Brands
-              )</span
+          <!-- Tampilan ketika dipilih -->
+          <template #selection="{ props, item }">
+            <div
+              v-bind="props"
+              class="d-flex align-center w-100 text-no-wrap"
+              style="font-size: 14px"
             >
+              <span>{{ item.raw.country_name }}</span>
+              <span
+                v-if="item.raw.country_id != 0"
+                class="font-weight-bold ml-1"
+              >
+                (
+                <span class="text-red">{{ item.raw.brand_count }}</span> Brands
+                |
+                <span class="text-blue-accent-1">{{
+                  item.raw.product_count
+                }}</span>
+                Products )
+              </span>
+            </div>
+          </template>
+
+          <!-- Tampilan item di dropdown -->
+          <template #item="{ props, item }">
+            <div v-bind="props" class="px-2 py-1">
+              <div
+                class="d-flex align-center w-100 text-no-wrap"
+                style="font-size: 14px"
+              >
+                <span>{{ item.raw.country_name }}</span>
+                <span
+                  v-if="item.raw.country_id != 0"
+                  class="font-weight-bold ml-1"
+                >
+                  (
+                  <span class="text-red">{{ item.raw.brand_count }}</span>
+                  Brands |
+                  <span class="text-blue-accent-1">{{
+                    item.raw.product_count
+                  }}</span>
+                  Products )
+                </span>
+              </div>
+            </div>
           </template>
         </v-select>
       </div>
