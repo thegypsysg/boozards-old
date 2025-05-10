@@ -87,10 +87,10 @@
                       <span class="text-blue">{{ product.quantity_name }}</span>
                     </div>
                     <div class="text-body-2 text-end">
-                      <strong
+                      <!-- <strong
                         >{{ selectedCountry?.currency_symbol }}
-                        <!-- S{{ formatCurrency(product.price * product.quantity) }} -->
-                      </strong>
+                      </strong> -->
+                      <!-- S{{ formatCurrency(product.price * product.quantity) }} -->
                     </div>
                   </div>
                   <div class="d-flex align-center justify-space-between">
@@ -203,7 +203,7 @@
                   block
                   >Add New</v-btn
                 >
-                <v-dialog v-model="addressDialog" max-width="600">
+                <v-dialog v-model="addressDialog" max-width="400">
                   <v-card>
                     <div
                       class="d-flex align-center justify-space-between pa-4 border-b"
@@ -219,21 +219,23 @@
                     </div>
                     <div class="pa-5 d-flex flex-column ga-3">
                       <v-row>
-                        <v-col cols="12">
+                        <v-col>
                           <label class="text-grey-darken-1 font-weight-bold"
-                            >Street Address</label
+                            >Name Location as</label
                           >
                           <MazInput
                             class="mt-1"
-                            ref="streetRef"
-                            v-model="addressForm.main_address"
-                            placeholder="Type Your Street Address"
+                            v-model="addressForm.location_name"
+                            placeholder="Name Your Location"
                           />
+                          <small class="text-muted text-caption"
+                            >e.g Home, Office</small
+                          >
                         </v-col>
                       </v-row>
 
-                      <v-row>
-                        <v-col cols="8">
+                      <v-row class="mt-n2">
+                        <v-col>
                           <div>
                             <label class="text-grey-darken-1 font-weight-bold"
                               >Full Address</label
@@ -246,7 +248,11 @@
                             />
                           </div>
                         </v-col>
-                        <v-col cols="4">
+                      </v-row>
+
+                      <!--  -->
+                      <!-- <v-row>
+                        <v-col>
                           <div>
                             <label class="text-grey-darken-1 font-weight-bold"
                               >Unit #</label
@@ -267,6 +273,17 @@
                               placeholder="Postal Code"
                             />
                           </div>
+                        </v-col>
+                        <v-col cols="12">
+                          <label class="text-grey-darken-1 font-weight-bold"
+                            >Street Address</label
+                          >
+                          <MazInput
+                            class="mt-1"
+                            ref="streetRef"
+                            v-model="addressForm.main_address"
+                            placeholder="Type Your Street Address"
+                          />
                         </v-col>
                       </v-row>
 
@@ -333,22 +350,10 @@
                             placeholder="Any Landmarks"
                           />
                         </v-col>
-                      </v-row>
-                      <v-row>
-                        <v-col>
-                          <label class="text-grey-darken-1 font-weight-bold"
-                            >Name Location as</label
-                          >
-                          <MazInput
-                            class="mt-1"
-                            v-model="addressForm.location_name"
-                            placeholder="Name Your Location"
-                          />
-                          <small class="text-muted text-caption"
-                            >e.g Home, Office</small
-                          >
-                        </v-col>
-                      </v-row>
+                      </v-row> -->
+
+                      <!--  -->
+
                       <div>
                         <v-btn
                           @click="saveAddress()"
@@ -368,17 +373,24 @@
 
               <div
                 v-for="(option, index) in addressesOptions"
+                class="border-md bg-white mt-6"
                 :class="{
-                  'mt-2': true,
                   'pa-5': true,
-                  'bg-teal-lighten-2': option.primary_address,
                   'rounded-lg': true,
-                  'border-md': !option.primary_address,
                 }"
               >
+                <!-- 'bg-white': option.primary_address, -->
+                <!-- 'border-md': !option.primary_address, -->
                 <v-row>
-                  <v-col>
+                  <v-col cols="9">
                     <strong>{{ option.location_name }}</strong>
+                  </v-col>
+                  <v-col
+                    v-if="option.primary_address"
+                    col="3"
+                    class="justify-end text-red-darken-1"
+                  >
+                    <strong>Primary</strong>
                   </v-col>
                 </v-row>
                 <v-divider
@@ -391,40 +403,23 @@
                   :thickness="2"
                   class="mt-2 mb-2 border-opacity-15"
                 />
-                <v-row>
+                <v-row class="d-flex align-center">
                   <v-col cols="9">
                     <p>{{ option.full_address }}</p>
                   </v-col>
-                  <v-col
-                    v-if="option.primary_address"
-                    col="3"
-                    class="justify-end"
-                  >
-                    <strong>Primary</strong>
-                  </v-col>
-                </v-row>
-                <v-row class="d-flex">
-                  <v-col cols="9" class="d-flex align-center pa-0 pl-3">
-                    <p
-                      v-if="option.landmark"
-                      class="text-red-darken-4 font-weight-bold"
-                    >
-                      {{ option.landmark }}
-                    </p>
-                  </v-col>
                   <v-col cols="3" class="d-flex align-center pa-0">
-                    <v-btn
-                      class=""
-                      @click="handleOpenDialog(option, index)"
-                      color="red"
-                      icon="mdi-trash-can"
-                      size="small"
-                    ></v-btn>
                     <v-btn
                       class=""
                       @click="handleEditLocation(option.value)"
                       color="lime"
                       icon="mdi-pencil-outline"
+                      size="small"
+                    ></v-btn>
+                    <v-btn
+                      class=""
+                      @click="handleOpenDialog(option, index)"
+                      color="red"
+                      icon="mdi-trash-can"
                       size="small"
                     ></v-btn>
                   </v-col>
@@ -580,13 +575,29 @@
       </div>
     </template>
   </MazDrawer>
-  <v-dialog v-model="openDialog" max-width="400" persistent>
-    <v-card prepend-icon="mdi-trash-can" :text="modalText" :title="modalTitle">
-      <template v-slot:actions>
-        <v-spacer></v-spacer>
-        <v-btn @click="openDialog = false"> Disagree </v-btn>
-        <v-btn @click="handleDeleteAddress()"> Agree </v-btn>
-      </template>
+  <v-dialog v-model="openDialog" persistent width="auto">
+    <v-card width="350">
+      <v-card-text class="">
+        <h4 class="mt-4 mb-8 text-center">Do you wish to Delete . ?</h4>
+        <div class="w-100 d-flex align-center justify-space-around">
+          <v-btn class="mb-4 w-33 bg-primary" @click="handleDeleteAddress()">
+            Yes
+          </v-btn>
+          <v-btn class="mb-4 w-33 bg-primary" @click="openDialog = false">
+            No
+          </v-btn>
+        </div>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+  <v-dialog v-model="isEmptyAddress" persistent width="auto">
+    <v-card width="350">
+      <v-card-text class="">
+        <h4 class="mt-4 mb-8 text-center">Please add at least one address</h4>
+        <v-btn class="mb-4 w-100 bg-primary" @click="isEmptyAddress = false">
+          OK
+        </v-btn>
+      </v-card-text>
     </v-card>
   </v-dialog>
 </template>
@@ -628,6 +639,7 @@ const emit = defineEmits(["update:viewCart"]);
 
 const streetRef = ref(null);
 const openDialog = ref(false);
+const isEmptyAddress = ref(false);
 const addressIndex = ref(null);
 const addressId = ref(null);
 const addressName = ref(null);
@@ -933,17 +945,19 @@ const handleEditLocation = async (address_id) => {
 };
 
 const nextStep = (value) => {
-  /* if(value === 4) {
-    if (isEmptyCart.value) {
-      snackbar.value = true;
-      message.value = {
-        text: "Please add products in your Cart",
-        color: "error",
-      };
+  if (value === 4) {
+    snackbar.value = false;
+    message.value = {
+      text: "",
+      color: "success",
+    };
+
+    if (addresses.value.length == 0) {
+      isEmptyAddress.value = true;
+
       return;
     }
-  } */
-  if (value == 3) {
+  } else if (value == 3) {
     snackbar.value = false;
     message.value = {
       text: "",
@@ -1044,7 +1058,7 @@ const saveAddress = async () => {
         color: "success",
       };
     } else {
-      console.log("isEditAddressForm", addressForm);
+      // console.log("isEditAddressForm", addressForm);
       const response = await axios.put(
         `/update-address/` + addressID.value,
         addressForm,

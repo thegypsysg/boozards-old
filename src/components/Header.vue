@@ -857,7 +857,7 @@ const getDeliveryCharges = () => {
 };
 
 const addToCartData = (data, range) => {
-  console.log(token.value);
+  // console.log(token.value);
   if (token.value == "null") {
     store.commit("setIsNotLoggedIn", true);
   } else {

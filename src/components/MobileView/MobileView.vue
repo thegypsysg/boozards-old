@@ -422,7 +422,7 @@ export default {
         )
         .then((response) => {
           const data = response.data.data;
-          console.log(data);
+          // console.log(data);
           // let itemFinal = [];
           this.activeMallItems = data
             .sort((a, b) => a.distance - b.distance)
