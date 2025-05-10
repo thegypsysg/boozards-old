@@ -572,7 +572,7 @@ export default {
     window.addEventListener("resize", this.handleResize);
   },
   mounted() {
-    console.log(this.appId);
+    // console.log(this.appId);
     this.getAppDetails1();
   },
   unmounted() {
@@ -588,7 +588,7 @@ export default {
         .post(`/send-otp`, payload)
         .then((response) => {
           const data = response.data;
-          console.log(data);
+          // console.log(data);
           this.successMessage = data.message;
           this.isSuccess = true;
           localStorage.setItem("email", data.data.email_id);
@@ -631,13 +631,13 @@ export default {
             app_id: this.appId == "" ? this.$appId : this.appId,
           })
           .then((response) => {
-            console.log(response);
+            // console.log(response);
             if (response) {
               window.location.assign(response.data.target_url);
             } else {
               window.location.href = "/sign-in";
             }
-            console.log(response.data.target_url);
+            // console.log(response.data.target_url);
           })
           .catch((error) => {
             console.log(error);
@@ -652,7 +652,7 @@ export default {
           email_id: this.email,
         })
         .then((response) => {
-          console.log(response);
+          // console.log(response);
           if (response) {
             this.isSuccessForgot = true;
             this.isForgotPassword = true;
@@ -736,7 +736,7 @@ export default {
           .post(`/gypsy/check-info-by-email`, payload)
           .then((response) => {
             const data = response.data.data;
-            console.log(data);
+            // console.log(data);
             if (data == null) {
               localStorage.setItem("email", this.email);
               this.$router.push("/sign-up-email");
@@ -806,7 +806,7 @@ export default {
         .post(`/gypsy/login`, payload)
         .then((response) => {
           const data = response.data;
-          console.log(data);
+          // console.log(data);
           if (this.isForgotPassword) {
             this.isChangePassword = true;
             this.tokenLogin = data.token;
@@ -852,7 +852,7 @@ export default {
     closeChangePassword() {
       this.isChangePassword = false;
       if (this.appIdLogin == "") {
-        console.log("app id, ", this.appIdLogin);
+        // console.log("app id, ", this.appIdLogin);
         localStorage.setItem("social", "Email");
         localStorage.setItem("token", this.tokenLogin);
         app.config.globalProperties.$eventBus.$emit(

@@ -240,7 +240,7 @@ export default {
           })
           .then((response) => {
             const data = response.data;
-            console.log(data);
+            // console.log(data);
             this.successMessage = data.message;
             // localStorage.setItem("name", data.data.name);
             // localStorage.setItem("email", data.data.email_id);

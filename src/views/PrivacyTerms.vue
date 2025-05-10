@@ -75,7 +75,7 @@ export default {
         .get(`/privacy-policy/type/${this.privacyType}`)
         .then((response) => {
           const data = response.data.data;
-          console.log(data);
+          // console.log(data);
           this.privacyData = data;
         })
         .catch((error) => {

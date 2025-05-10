@@ -119,7 +119,7 @@ export function useCart() {
   };
 
   const addToCart = (product, selectedRange = null) => {
-    console.log({ product });
+    // console.log({ product });
     getPlatformFee();
     getTaxAmount();
     if (selectedRange == null) {
@@ -151,7 +151,7 @@ export function useCart() {
           : 0,
     };
 
-    console.log({ cartMasterData });
+    // console.log({ cartMasterData });
     store.dispatch("addToCart", cartMasterData);
   };
 
@@ -176,11 +176,11 @@ export function useCart() {
   };
 
   const updateQuantity = (product, change, selectedRange = null) => {
-    console.log("cartMasterData product", product);
+    // console.log("cartMasterData product", product);
     const cartItems = product.ranges
       ? findSimilarItems(cart.value, product)
       : product;
-    console.log("cartMasterData", cartItems);
+    // console.log("cartMasterData", cartItems);
 
     const cartMasterData = {
       change: change,
@@ -193,7 +193,7 @@ export function useCart() {
       price: Array.isArray(cartItems) ? cartItems[0].price : cartItems.price,
       quantity: 1,
     };
-    console.log("cartMasterData", cartMasterData);
+    // console.log("cartMasterData", cartMasterData);
     store.dispatch("updateCart", cartMasterData);
   };
 

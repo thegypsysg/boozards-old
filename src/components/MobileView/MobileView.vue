@@ -121,7 +121,7 @@ export default {
                 // flag: country.flag,
               };
             });
-          console.log("map country body", defaultCountry);
+          // console.log("map country body", defaultCountry);
           this.setItemSelectedComplete(
             defaultCountry.length > 0 ? defaultCountry[0] : this.country[0],
           );
@@ -476,7 +476,7 @@ export default {
                 subIndustryName: item.sub_industry_name || "",
               };
             });
-          console.log(this.activeMallCards);
+          // console.log(this.activeMallCards);
         })
         .catch((error) => {
           // eslint-disable-next-line

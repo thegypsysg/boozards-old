@@ -676,10 +676,10 @@ export default {
       "changeHeaderWelcome",
       this.socialProvider + " Registration",
     );
-    console.log(this.emailProvider);
-    console.log(this.nameProvider);
-    console.log(this.avatarProvider);
-    console.log(this.appId);
+    // console.log(this.emailProvider);
+    // console.log(this.nameProvider);
+    // console.log(this.avatarProvider);
+    // console.log(this.appId);
   },
   unmounted() {
     window.removeEventListener("resize", this.handleResize);
@@ -775,7 +775,7 @@ export default {
           })
           .then((response) => {
             const data = response.data;
-            console.log(data);
+            // console.log(data);
             this.successMessage = data.message;
             localStorage.setItem("name", data.data.name);
             localStorage.setItem("g_id", data.data.gypsy_ref_no);

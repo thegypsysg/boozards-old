@@ -231,7 +231,7 @@ const getBuyDetail = () => {
     .get(`/get-4walls-property-development-details/${buyId}`)
     .then((response) => {
       const data = response.data.data;
-      console.log(data);
+      // console.log(data);
       detailData.value = data;
       detailDev.value = data;
     })

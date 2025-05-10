@@ -122,7 +122,7 @@ function getConstructionByCity() {
     )
     .then((response) => {
       const data = response.data.data;
-      console.log(data);
+      // console.log(data);
       listData.value = data.map((item) => {
         return {
           img: item?.main_image,
@@ -155,9 +155,9 @@ function getBuildingType() {
 }
 
 function filterList(bt_id) {
-  console.log(bt_id);
+  // console.log(bt_id);
   filteredData.value = listData.value.filter((item) => item.bt_id === bt_id);
-  console.log(filteredData.value);
+  // console.log(filteredData.value);
 }
 
 // var listData = [

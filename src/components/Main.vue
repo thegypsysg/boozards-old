@@ -192,7 +192,7 @@ const getProductCategoryListData = async (cityId) => {
         ),
       }));
 
-    console.log("Transformed Data:", productCategories.value);
+    // console.log("Transformed Data:", productCategories.value);
   } catch (error) {
     console.error("Error fetching product categories:", error);
   } finally {
@@ -201,7 +201,7 @@ const getProductCategoryListData = async (cityId) => {
 };
 
 watch(selectedCountry, (newX) => {
-  console.log("country is", newX);
+  // console.log("country is", newX);
   getProductCategoryListData(newX.city_id);
 });
 

@@ -197,7 +197,7 @@ function getImagesDataDesktop() {
     .get(`/country-selection-brands/7`)
     .then((response) => {
       const data = response.data.data;
-      console.log(data);
+      // console.log(data);
       imagesDataDesktop.value = data;
     })
     .catch((error) => {
@@ -216,7 +216,7 @@ function getImagesDataMobile() {
     .get(`/country-selection-brands/6`)
     .then((response) => {
       const data = response.data.data;
-      console.log(data);
+      // console.log(data);
       imagesDataMobile.value = data;
     })
     .catch((error) => {

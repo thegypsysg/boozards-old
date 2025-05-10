@@ -39,7 +39,7 @@ const getProductDetails = async () => {
         ? "Gift Pack Available"
         : "";
 
-    console.log(selectedRange.value);
+    // console.log(selectedRange.value);
   } catch (err) {
     console.error("Error fetching product:", err);
   } finally {
@@ -53,7 +53,7 @@ const handleResize = () => {
 };
 
 const addToCartData = (data, range) => {
-  console.log(token.value);
+  // console.log(token.value);
   if (token.value == "null") {
     store.commit("setIsNotLoggedIn", true);
   } else {

@@ -115,7 +115,7 @@ export default {
                 // flag: country.flag,
               };
             });
-          console.log("map country body", defaultCountry);
+          // console.log("map country body", defaultCountry);
           this.setItemSelectedComplete(
             defaultCountry.length > 0 ? defaultCountry[0] : this.country[0],
           );
@@ -347,7 +347,7 @@ export default {
       }
     },
     getActiveMallData() {
-      console.log("map country body", this.itemSelectedComplete);
+      // console.log("map country body", this.itemSelectedComplete);
       axios
         .get(
           this.itemSelectedComplete?.id != 1 && this.itemSelected2Complete?.id
@@ -368,7 +368,7 @@ export default {
         )
         .then((response) => {
           const data = response.data.data;
-          console.log(data);
+          // console.log(data);
           // let itemFinal = [];
           this.activeMallItems = data
             .sort((a, b) => a.distance - b.distance)
@@ -422,7 +422,7 @@ export default {
                 subIndustryName: item.sub_industry_name || "",
               };
             });
-          console.log(this.activeMallCards);
+          // console.log(this.activeMallCards);
         })
         .catch((error) => {
           // eslint-disable-next-line

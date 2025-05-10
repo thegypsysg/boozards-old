@@ -25,6 +25,7 @@ export default (app) =>
       appDetails: null,
       categoryData: null,
       cart: [],
+      selectedDelivery: null,
       detailsCart: [],
       isEmptyCart: true,
       totalCartItems: 0,
@@ -33,6 +34,7 @@ export default (app) =>
       isNotLoggedIn: false,
       isCartEmpty: false,
       isCountryUpdating: false,
+      isEmptyDelivery: false,
     },
     mutations: {
       deliveryCharges(state, data) {
@@ -50,8 +52,14 @@ export default (app) =>
       setIsCountryUpdating(state, data) {
         state.isCountryUpdating = data;
       },
+      setIsEmptyDelivery(state, data) {
+        state.isEmptyDelivery = data;
+      },
       cart(state, data) {
         state.cart = data;
+      },
+      selectedDelivery(state, data) {
+        state.selectedDelivery = data;
       },
       isEmptyCart(state, data) {
         state.isEmptyCart = data;
@@ -144,6 +152,8 @@ export default (app) =>
             },
           })
           .then((response) => {
+            localStorage.setItem("selectedDelivery", data?.dc_id);
+            commit("selectedDelivery", data?.dc_id);
             commit("cart", response?.data?.data);
           })
           .catch((error) => {
@@ -183,13 +193,26 @@ export default (app) =>
             },
           })
           .then((response) => {
-            if (response?.data.length > 0) {
-              commit("isEmptyCart", false);
-            }
-            commit("totalCartItems", response?.data.length);
-            console.log("addToCart", data);
-            commit("cart", response?.data);
-            commit("isLoading", false);
+            axios
+              .get(`/get-cart-items`, null, {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              })
+              .then((response) => {
+                if (response?.data.length > 0) {
+                  commit("isEmptyCart", false);
+                }
+                commit("cart", response?.data);
+                commit("totalCartItems", response?.data.length);
+                commit("isLoading", false);
+              })
+              .catch((error) => {
+                console.log(error);
+                // state.errorCart = error?.error;
+                // showSnackbar(error?.response?.data?.error, "error");
+                commit("isLoading", false);
+              });
           })
           .catch((error) => {
             console.log(error);
@@ -201,7 +224,7 @@ export default (app) =>
 
       async updateCart({ commit, state }, product) {
         commit("isLoading", true);
-        console.log("updateCart", product);
+        // console.log("updateCart", product);
         await axios
           .put(`/update-cart`, product, {
             headers: {
@@ -237,7 +260,7 @@ export default (app) =>
 
       async removeFromCart({ commit, state }, product) {
         commit("isLoading", true);
-        console.log("removeFromCart", product);
+        // console.log("removeFromCart", product);
         await axios
           .post(
             `/remove-cart-item`,

@@ -1633,7 +1633,7 @@ export default {
   watch: {
     "input.country": function (newVal, oldVal) {
       const country = this.options.filter((o) => o.value === newVal)[0];
-      console.log(country?.label);
+      // console.log(country?.label);
       this.input.countryName = country?.label;
       this.getCity(country?.label);
     },
@@ -1694,7 +1694,7 @@ export default {
         )
         .then((response) => {
           const data = response.data;
-          console.log(data);
+          // console.log(data);
           this.isEmailOTP = true;
           this.isVerifySent = true;
         })
@@ -1736,7 +1736,7 @@ export default {
         })
         .then((response) => {
           const data = response.data;
-          console.log(data);
+          // console.log(data);
           this.isVerifySuccess = true;
         })
         .catch((error) => {
@@ -1777,14 +1777,14 @@ export default {
       this.resetCropper();
     },
     onInputNationality() {
-      console.log("ok", this.input.nationality);
+      // console.log("ok", this.input.nationality);
     },
     getTown(id) {
       axios
         .get(`/town-list`)
         .then((response) => {
           const data = response.data.data;
-          console.log(id);
+          // console.log(id);
           if (id) {
             this.resource.town = data
               .filter((i) => i.city_id == id)
@@ -1885,7 +1885,7 @@ export default {
         })
         .then((response) => {
           const data = response.data.data;
-          console.log(data);
+          // console.log(data);
           // this.input.nationality = this.resource.nationality.filter(
           //   (i) => i.id == 2
           // )[0];
@@ -1982,7 +1982,7 @@ export default {
         country_current: this.input.nationality.id,
         // image: this.imageSend || null,
       };
-      console.log(payload);
+      // console.log(payload);
       const token = localStorage.getItem("token");
       axios
         .post(`/save-gypsy-user`, payload, {
@@ -1995,7 +1995,7 @@ export default {
         })
         .then((response) => {
           const data = response.data;
-          console.log(data);
+          // console.log(data);
           this.isSuccess = true;
           this.successMessage = data.message;
           // localStorage.setItem("name", data.data.name);
@@ -2044,7 +2044,7 @@ export default {
         nationality: this.input.nationality.id,
         // image: this.imageSend || null,
       };
-      console.log(payload);
+      // console.log(payload);
       const token = localStorage.getItem("token");
       axios
         .post(`/save-gypsy-user`, payload, {
@@ -2057,7 +2057,7 @@ export default {
         })
         .then((response) => {
           const data = response.data;
-          console.log(data);
+          // console.log(data);
           this.isSuccess = true;
           this.successMessage = data.message;
           // localStorage.setItem("name", data.data.name);
@@ -2096,7 +2096,7 @@ export default {
         // email_id: this.input.email,
         date_of_birth: this.input.date,
       };
-      console.log(payload);
+      // console.log(payload);
       const token = localStorage.getItem("token");
       axios
         .post(`/save-gypsy-user`, payload, {
@@ -2109,7 +2109,7 @@ export default {
         })
         .then((response) => {
           const data = response.data;
-          console.log(data);
+          // console.log(data);
           this.isSuccess = true;
           this.successMessage = data.message;
           // localStorage.setItem("name", data.data.name);
@@ -2159,8 +2159,8 @@ export default {
           ? this.input.town.title
           : this.input.town,
       };
-      console.log(payload);
-      console.log(this.phoneEvent);
+      // console.log(payload);
+      // console.log(this.phoneEvent);
       const token = localStorage.getItem("token");
       axios
         .post(`/gypsy/save-current-location`, payload, {
@@ -2172,7 +2172,7 @@ export default {
         })
         .then((response) => {
           const data = response.data;
-          console.log(data);
+          // console.log(data);
           this.isSuccess = true;
           this.successMessage = data.message;
           // localStorage.setItem("name", data.data.name);
@@ -2208,7 +2208,7 @@ export default {
         gypsy_id: this.input.id,
         email_id: this.input.emailNew,
       };
-      console.log(payload);
+      // console.log(payload);
       const token = localStorage.getItem("token");
       axios
         .post(`/save-gypsy-user`, payload, {
@@ -2221,7 +2221,7 @@ export default {
         })
         .then((response) => {
           const data = response.data;
-          console.log(data);
+          // console.log(data);
           this.isSuccess = true;
           this.successMessage = data.message;
           // localStorage.setItem("name", data.data.name);
@@ -2262,7 +2262,7 @@ export default {
         gypsy_id: this.input.id,
         mobile_number: this.input.phoneNew || this.input.phone,
       };
-      console.log(payload);
+      // console.log(payload);
       const token = localStorage.getItem("token");
 
       axios
@@ -2276,7 +2276,7 @@ export default {
         })
         .then((response) => {
           const data = response.data;
-          console.log(data);
+          // console.log(data);
           // this.isSuccess = true;
           this.successMessage = "New Number Updated";
           this.isMobileChanged = true;
@@ -2316,7 +2316,7 @@ export default {
         })
         .then((response) => {
           const data = response.data;
-          console.log(data);
+          // console.log(data);
           this.isSuccess = true;
           this.successMessage = data.message;
           app.config.globalProperties.$eventBus.$emit("getHeaderUserData");
@@ -2355,7 +2355,7 @@ export default {
         gypsy_id: this.input.id,
         image: this.imageSend || null,
       };
-      console.log(payload);
+      // console.log(payload);
       const token = localStorage.getItem("token");
       axios
         .post(`/save-gypsy-user`, payload, {
@@ -2368,7 +2368,7 @@ export default {
         })
         .then((response) => {
           const data = response.data;
-          console.log(data);
+          // console.log(data);
           this.isSuccess = true;
           this.successMessage = data.message;
           app.config.globalProperties.$eventBus.$emit(
@@ -2436,7 +2436,7 @@ export default {
           })
           .then((response) => {
             const data = response.data;
-            console.log(data);
+            // console.log(data);
             // localStorage.setItem("name", data.data.name);
             // localStorage.setItem("email", data.data.email_id);
             // localStorage.setItem("g_id", data.data.gypsy_ref_no);
@@ -2525,7 +2525,7 @@ export default {
       } else {
         this.input.date = formattedDate; // Tidak valid, tetapkan nilai yang sama
       }
-      console.log(this.input.date);
+      // console.log(this.input.date);
     },
   },
 };

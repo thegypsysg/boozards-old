@@ -88,7 +88,7 @@
                     </div>
                     <div class="text-body-2 text-end">
                       <strong
-                        >{{ selectedLocation?.currency_symbol }}
+                        >{{ selectedCountry?.currency_symbol }}
                         <!-- S{{ formatCurrency(product.price * product.quantity) }} -->
                       </strong>
                     </div>
@@ -119,7 +119,7 @@
                     </div>
                     <div class="text-body-2">
                       <strong class="text-red">{{
-                        selectedLocation?.currency_symbol
+                        selectedCountry?.currency_symbol
                       }}</strong>
                       <strong class="text-red">S{{ product.price }}</strong>
                     </div>
@@ -591,90 +591,6 @@
   </v-dialog>
 </template>
 
-<style>
-.font-sm {
-  font-size: 10px;
-}
-.cart-drawer {
-  width: 100%; /* Ensures the parent takes the full width of its container */
-  display: flex; /* Helps manage layout */
-  flex-direction: column; /* Ensures proper stacking of elements */
-  overflow-x: hidden; /* Prevents horizontal scrolling */
-}
-
-.cart-items {
-  width: 100%; /* Makes the child take the full width of the parent */
-  max-width: 100%; /* Ensures it doesn’t exceed parent width */
-  white-space: normal; /* Allows text to wrap instead of overflowing */
-  word-break: break-word; /* Breaks long words if needed */
-  overflow-wrap: break-word; /* Prevents text overflow */
-}
-
-.product-name {
-  width: 17rem; /* Ensures the div takes up to 75% of the space */
-  white-space: normal; /* Allows text to wrap */
-  word-break: break-word; /* Ensures words break if too long */
-  overflow-wrap: break-word; /* Prevents overflow */
-}
-
-.no-header {
-  height: 100dvh !important;
-  min-height: 100dvh !important;
-}
-
-.no-header .m-drawer-content-wrap {
-  min-height: 100dvh !important;
-}
-
-.no-header .m-drawer-header {
-  display: none !important;
-}
-
-.fill-height {
-  height: 100%;
-}
-.cart-items {
-  overflow-y: auto;
-  background: #ffff;
-}
-.checkout-container {
-  position: sticky;
-  bottom: 0;
-  background: #ffff;
-  padding: 20px;
-  z-index: 10; /* Ensures it stays above other content */
-}
-
-.maz-elevation {
-  border: 1px solid #00aaff !important;
-}
-
-.custom-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.custom-table td {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-}
-
-.total-row td {
-  font-weight: bold;
-  padding-top: 10px;
-}
-
-.pac-container {
-  z-index: 99999 !important; /* Ensure autocomplete appears above modal */
-}
-
-@media (max-width: 768px) {
-  .product-name {
-    width: 45vw !important;
-  }
-}
-</style>
-
 <script setup>
 import {
   ref,
@@ -693,43 +609,60 @@ import MazInput from "maz-ui/components/MazInput";
 import MazTextarea from "maz-ui/components/MazTextarea";
 import MazRadioButtons from "maz-ui/components/MazRadioButtons";
 import { Loader } from "@googlemaps/js-api-loader";
-import { number } from "maz-ui";
 import { useCart } from "@/composables/useCart";
 import { useGlobalSnackbar } from "@/composables/useGlobalSnackbar";
 import { fileURL } from "@/main";
 
 const { snackbarVisible, snackbarMessage, snackbarColor } = useGlobalSnackbar();
 const { updateQuantity } = useCart();
+const store = useStore();
 
+let autocomplete;
+const modalTitle = "Are you Sure?";
 const authToken = localStorage.getItem("token");
 
 const props = defineProps({
   viewCart: Boolean,
-  selectedLocation: String,
 });
+const emit = defineEmits(["update:viewCart"]);
 
+const streetRef = ref(null);
 const openDialog = ref(false);
 const addressIndex = ref(null);
 const addressId = ref(null);
 const addressName = ref(null);
-const modalTitle = "Are you Sure?";
 const modalText = ref(null);
-
-watch(props.selectedLocation, async (location, oldLocation) => {
-  await getTaxAmount();
-});
-
-const emit = defineEmits(["update:viewCart"]);
-const store = useStore();
 const isEditAddressForm = ref(false);
 const addressID = ref("");
-
 const step = ref(1);
 const snackbar = ref(false);
 const message = ref({
   text: "",
   color: "success",
 });
+const addressDialog = ref(false);
+const summaryDialog = ref(false);
+const selectedDelivery = ref(
+  // store.state.selectedDelivery ??
+  //   (localStorage.getItem("selectedDelivery") !== null
+  //     ? Number(localStorage.getItem("selectedDelivery"))
+  //     : null),
+  null,
+);
+const selectedPaymentMethod = ref("creditcard");
+const paymentOptions = ref([
+  { label: "Credit Card", value: "creditcard" },
+  { label: "Cash On Deliver (COD)", value: "cod" },
+  { label: "Pay Now", value: "paynow" },
+  { label: "Google Pay", value: "gpay" },
+]);
+const addresses = ref([]);
+const selectedAddress = ref(null);
+const savingAddress = ref(false);
+const addressExpanded = ref({});
+const taxAmount = ref(null);
+const platformFee = ref(null);
+
 const addressForm = reactive({
   main_address: "",
   full_address: "",
@@ -745,13 +678,24 @@ const addressForm = reactive({
   longitude: "",
 });
 
+const addressesOptions = computed(() => {
+  return addresses.value.map((address) => ({
+    value: address.ga_id,
+    full_address: address.full_address,
+    main_address: address.main_address,
+    landmark: address.landmark,
+    location_name: address.location_name,
+    primary_address: address.primary_address,
+  }));
+});
+
+const isLoading = computed(() => {
+  return store.state.isLoading;
+});
+
 const isEmptyCart = computed(() => {
   return store.state.isEmptyCart;
 });
-
-const addressDialog = ref(false);
-const summaryDialog = ref(false);
-const selectedDelivery = ref(null);
 
 const selectedCountry = computed(() => {
   return store.state.selectedCountry;
@@ -760,12 +704,6 @@ const selectedCountry = computed(() => {
 const deliveryOptions = computed(() => {
   return store.state.deliveryCharges;
 });
-const getDeliveryCharges = () => {
-  store.dispatch(
-    "getDeliveryCharges",
-    selectedCountry ? selectedCountry.country_id : 1,
-  );
-};
 
 // const deliveryOptions = ref([
 //   { label: "Standard Delivery Fee", value: "standard", price: 12.0 },
@@ -778,27 +716,48 @@ const selectedDeliveryPrice = computed(() => {
   );
   return option ? option.price : 0;
 });
+
 const selectedDeliveryId = computed(() => {
   const option = deliveryOptions.value.find(
     (opt) => opt.value === selectedDelivery.value,
   );
   return option ? option.id : 0;
 });
-const selectedPaymentMethod = ref("creditcard");
-const paymentOptions = ref([
-  { label: "Credit Card", value: "creditcard" },
-  { label: "Cash On Deliver (COD)", value: "cod" },
-  { label: "Pay Now", value: "paynow" },
-  { label: "Google Pay", value: "gpay" },
-]);
+
+// Get cart items
+const detailsCart = computed(() => {
+  return store.state.detailsCart;
+});
+
+// Get total quantity of all cart items
+const cartQuantity = computed(() =>
+  store.state.cart.reduce((total, item) => total + item.quantity, 0),
+);
+
+const subTotal = computed(() =>
+  store.state.cart.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0,
+  ),
+);
+
+// Get cart items
+const cart = computed(() => {
+  return store.state.cart;
+});
+
+const getDeliveryCharges = () => {
+  store.dispatch(
+    "getDeliveryCharges",
+    selectedCountry.value ? selectedCountry.value.country_id : 1,
+  );
+};
 
 const openAddressDialog = () => {
   resetForm();
   addressDialog.value = true;
 };
 
-let autocomplete;
-const streetRef = ref(null);
 const initAutocomplete = async () => {
   // const googleMapsApiKey = 'AIzaSyDepjJJsj2zb9pi5j-9G0beqBTtTtfYhno';
   const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -892,44 +851,6 @@ const resetForm = () => {
   addressForm.location_name = "";
 };
 
-watch(addressDialog, (isOpen) => {
-  if (isOpen) {
-    initAutocomplete();
-  }
-});
-
-watch(
-  () => props.viewCart, // Watch for changes in viewCart prop
-  (newValue) => {
-    if (newValue) {
-      step.value = 1; // Set step to 1 when viewCart changes
-      selectedDelivery.value = null;
-    }
-  },
-);
-
-// Get cart items
-const cart = computed(() => {
-  return store.state.cart;
-});
-
-// Get cart items
-const detailsCart = computed(() => {
-  return store.state.detailsCart;
-});
-
-// Get total quantity of all cart items
-const cartQuantity = computed(() =>
-  store.state.cart.reduce((total, item) => total + item.quantity, 0),
-);
-
-const subTotal = computed(() =>
-  store.state.cart.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0,
-  ),
-);
-
 /* const formatCurrency = (amount) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -953,7 +874,7 @@ const onSelectDelivery = (selectedId) => {
         delivery_rate: selectedOption.price,
       };
       store.dispatch("updateDeliveryChargesInCart", payload);
-      console.log("Delivery option deliveryOptions:", payload);
+      // console.log("Delivery option deliveryOptions:", payload);
     }
   } catch (error) {
     console.error("Error saving delivery option:", error);
@@ -1030,39 +951,19 @@ const nextStep = (value) => {
     };
 
     if (selectedDelivery.value == null) {
-      snackbar.value = true;
-      message.value = {
-        text: "Please Select Delivery Options",
-        color: "error",
-      };
+      store.commit("setIsEmptyDelivery", true);
       return;
     }
 
     if (authToken == "null") {
-      snackbar.value = true;
-      message.value = {
-        text: "Please Signup or Login to Continue",
-        color: "error",
-      };
+      store.commit("setIsNotLoggedIn", true);
+
       return;
     }
   }
   step.value = value;
 };
 
-const addresses = ref([]);
-const selectedAddress = ref(null);
-const addressesOptions = computed(() => {
-  return addresses.value.map((address) => ({
-    value: address.ga_id,
-    full_address: address.full_address,
-    main_address: address.main_address,
-    landmark: address.landmark,
-    location_name: address.location_name,
-    primary_address: address.primary_address,
-  }));
-});
-const addressExpanded = ref({});
 const toggleAddressDetails = (ga_id) => {
   if (
     Object.keys(addressExpanded.value).find(
@@ -1077,6 +978,7 @@ const toggleAddressDetails = (ga_id) => {
   }
   addressExpanded.value[ga_id] = !addressExpanded.value[ga_id]; // Toggle true/false
 };
+
 const getAddress = async () => {
   try {
     const response = await axios.get(`/get-address`, {
@@ -1117,11 +1019,6 @@ const getAddress = async () => {
   }
 };
 
-const isLoading = computed(() => {
-  return store.state.isLoading;
-});
-
-const savingAddress = ref(false);
 const saveAddress = async () => {
   savingAddress.value = true;
   try {
@@ -1181,27 +1078,23 @@ const saveAddress = async () => {
   }
 };
 
-const taxAmount = ref(null);
 const getTaxAmount = async () => {
-  let data = null;
+  // let data = null;
 
   try {
-    await axios
-      .get(`/gypsy-user`, { headers: { Authorization: `Bearer ${authToken}` } })
-      .then((response) => {
-        data = response.data.data?.country_current;
-      })
-      .catch((_) => {});
+    // await axios
+    //   .get(`/gypsy-user`, { headers: { Authorization: `Bearer ${authToken}` } })
+    //   .then((response) => {
+    //     data = response.data.data?.country_current;
+    //   })
+    //   .catch((_) => {});
 
     const response = await axios.get(`/get-tax-amount`, {
       headers: {
         Authorization: `Bearer ${authToken}`,
       },
       params: {
-        country_id:
-          parseInt(props.selectedLocation) != null
-            ? parseInt(props.selectedLocation)
-            : data,
+        country_id: selectedCountry.value.country_id,
       },
     });
     if (response.data.data?.applicable === "Y") {
@@ -1212,8 +1105,6 @@ const getTaxAmount = async () => {
     console.log(error);
   }
 };
-
-const platformFee = ref(null);
 
 const getCartData = async () => {
   await store.dispatch("getCartItems");
@@ -1263,6 +1154,40 @@ const getPlatformFee = async () => {
   }
 };
 
+watch(selectedCountry, async () => {
+  await getTaxAmount();
+});
+
+watch(addressDialog, (isOpen) => {
+  if (isOpen) {
+    initAutocomplete();
+  }
+});
+
+watch(
+  () => props.viewCart, // Watch for changes in viewCart prop
+  (newValue) => {
+    if (newValue) {
+      // console.log(
+      //   "open cart",
+      //   store.state.selectedDelivery ||
+      //     localStorage.getItem("selectedDelivery"),
+      // );
+      step.value = 1; // Set step to 1 when viewCart changes
+      // selectedDelivery.value = null;
+      if (cart.value[0].delivery_charges != "0.00") {
+        selectedDelivery.value =
+          store.state.selectedDelivery ??
+          (localStorage.getItem("selectedDelivery") !== null
+            ? Number(localStorage.getItem("selectedDelivery"))
+            : null);
+      } else {
+        selectedDelivery.value = null;
+      }
+    }
+  },
+);
+
 onMounted(() => {
   if (
     authToken &&
@@ -1270,7 +1195,7 @@ onMounted(() => {
     authToken != "" &&
     authToken != "null"
   ) {
-    getTaxAmount();
+    // getTaxAmount();
     getAddress();
     getPlatformFee();
     getCartData();
@@ -1278,3 +1203,87 @@ onMounted(() => {
   getDeliveryCharges();
 });
 </script>
+
+<style>
+.font-sm {
+  font-size: 10px;
+}
+.cart-drawer {
+  width: 100%; /* Ensures the parent takes the full width of its container */
+  display: flex; /* Helps manage layout */
+  flex-direction: column; /* Ensures proper stacking of elements */
+  overflow-x: hidden; /* Prevents horizontal scrolling */
+}
+
+.cart-items {
+  width: 100%; /* Makes the child take the full width of the parent */
+  max-width: 100%; /* Ensures it doesn’t exceed parent width */
+  white-space: normal; /* Allows text to wrap instead of overflowing */
+  word-break: break-word; /* Breaks long words if needed */
+  overflow-wrap: break-word; /* Prevents text overflow */
+}
+
+.product-name {
+  width: 17rem; /* Ensures the div takes up to 75% of the space */
+  white-space: normal; /* Allows text to wrap */
+  word-break: break-word; /* Ensures words break if too long */
+  overflow-wrap: break-word; /* Prevents overflow */
+}
+
+.no-header {
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+}
+
+.no-header .m-drawer-content-wrap {
+  min-height: 100dvh !important;
+}
+
+.no-header .m-drawer-header {
+  display: none !important;
+}
+
+.fill-height {
+  height: 100%;
+}
+.cart-items {
+  overflow-y: auto;
+  background: #ffff;
+}
+.checkout-container {
+  position: sticky;
+  bottom: 0;
+  background: #ffff;
+  padding: 20px;
+  z-index: 10; /* Ensures it stays above other content */
+}
+
+.maz-elevation {
+  border: 1px solid #00aaff !important;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.custom-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.total-row td {
+  font-weight: bold;
+  padding-top: 10px;
+}
+
+.pac-container {
+  z-index: 99999 !important; /* Ensure autocomplete appears above modal */
+}
+
+@media (max-width: 768px) {
+  .product-name {
+    width: 45vw !important;
+  }
+}
+</style>

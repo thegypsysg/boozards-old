@@ -92,7 +92,7 @@ const getMenuListData = (cityId) => {
       menuLists.value = data.sort(function (a, b) {
         return a.category_id - b.category_id;
       });
-      console.log(menuLists.value);
+      // console.log(menuLists.value);
       // let itemFinal = [];
     })
     .catch((error) => {
@@ -103,7 +103,7 @@ const getMenuListData = (cityId) => {
 };
 
 watch(selectedCountry, (newX) => {
-  console.log("country is", newX);
+  // console.log("country is", newX);
   getMenuListData(newX.city_id);
 });
 

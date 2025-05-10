@@ -168,7 +168,7 @@ const token = computed(() => {
 });
 
 const addToCartData = (data, range) => {
-  console.log(token.value);
+  // console.log(token.value);
   if (token.value == "null") {
     store.commit("setIsNotLoggedIn", true);
   } else {
@@ -176,7 +176,7 @@ const addToCartData = (data, range) => {
   }
 };
 const addToCartData2 = (data) => {
-  console.log(token.value);
+  // console.log(token.value);
   if (token.value == "null") {
     store.commit("setIsNotLoggedIn", true);
   } else {

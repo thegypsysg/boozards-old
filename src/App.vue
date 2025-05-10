@@ -77,6 +77,16 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="isEmptyDelivery" persistent width="auto">
+      <v-card width="350">
+        <v-card-text class="">
+          <h4 class="mt-4 mb-8 text-center">Please select atleast 1 option</h4>
+          <v-btn class="mb-4 w-100 bg-primary" @click="closeIsEmptyDelivery">
+            OK
+          </v-btn>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -244,10 +254,12 @@ const store = useStore();
 const isLoggedIn = ref(false);
 const isCartEmpty = ref(false);
 const isCountryUpdating = ref(false);
+const isEmptyDelivery = ref(false);
 
 const isNotLoggedIn = computed(() => store.state.isNotLoggedIn);
 const isCartEmptyStore = computed(() => store.state.isCartEmpty);
 const isCountryUpdatingStore = computed(() => store.state.isCountryUpdating);
+const isEmptyDeliveryStore = computed(() => store.state.isEmptyDelivery);
 
 const closeIsLoggedIn = () => {
   isLoggedIn.value = false;
@@ -262,6 +274,11 @@ const closeIsCartEmpty = () => {
 const closeIsCountryUpdating = () => {
   isCountryUpdating.value = false;
   store.commit("setIsCountryUpdating", false);
+};
+
+const closeIsEmptyDelivery = () => {
+  isEmptyDelivery.value = false;
+  store.commit("setIsEmptyDelivery", false);
 };
 
 watch(isNotLoggedIn, (newX) => {
@@ -279,6 +296,12 @@ watch(isCartEmptyStore, (newX) => {
 watch(isCountryUpdatingStore, (newX) => {
   if (newX == true) {
     isCountryUpdating.value = true;
+  }
+});
+
+watch(isEmptyDeliveryStore, (newX) => {
+  if (newX == true) {
+    isEmptyDelivery.value = true;
   }
 });
 </script>

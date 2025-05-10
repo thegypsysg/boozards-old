@@ -23,26 +23,14 @@
   </div>
 </template>
 
-<style>
-.fixed-footer {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: #dbd8d8;
-  z-index: 1000;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-}
-</style>
-
 <script setup>
 import axios from "@/util/axios";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useStore } from "vuex";
 import Cart from "@/components/Cart.vue";
 
 const store = useStore();
 
-const selectedDelivery = ref(null);
 const platformFee = ref(null);
 const taxAmount = ref(null);
 const viewCart = ref(false);
@@ -63,14 +51,15 @@ const subTotal = computed(() => {
   );
 });
 
-const deliveryOptions = computed(() => store.state.deliveryCharges);
 const selectedCountry = computed(() => store.state.selectedCountry);
 
 const selectedDeliveryPrice = computed(() => {
-  const option = deliveryOptions.value.find(
-    (opt) => opt.value === selectedDelivery.value,
-  );
-  return option ? option.price : 0;
+  if (store.state.cart) {
+    // console.log(parseFloat(store.state.cart[0]?.delivery_charges));
+    return parseFloat(store.state.cart[0]?.delivery_charges);
+  } else {
+    return 0;
+  }
 });
 
 const finalCartTotal = computed(() => {
@@ -113,19 +102,19 @@ async function getPlatformFee() {
 }
 
 async function getTaxAmount() {
-  let countryId = null;
+  // let countryId = null;
   try {
-    const userResponse = await axios.get(`/gypsy-user`, {
-      headers: { Authorization: `Bearer ${authToken.value}` },
-    });
-    countryId = userResponse.data.data?.country_current;
+    // const userResponse = await axios.get(`/gypsy-user`, {
+    //   headers: { Authorization: `Bearer ${authToken.value}` },
+    // });
+    // countryId = userResponse.data.data?.country_current;
 
     const taxResponse = await axios.get(`/get-tax-amount`, {
       headers: {
         Authorization: `Bearer ${authToken.value}`,
       },
       params: {
-        country_id: countryId,
+        country_id: selectedCountry.value.country_id,
       },
     });
 
@@ -158,8 +147,23 @@ const viewCartClick = () => {
 //   );
 // });
 
+watch(selectedCountry, async () => {
+  await getTaxAmount();
+});
+
 onMounted(() => {
   getPlatformFee();
-  getTaxAmount();
+  // getTaxAmount();
 });
 </script>
+
+<style>
+.fixed-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #dbd8d8;
+  z-index: 1000;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+</style>

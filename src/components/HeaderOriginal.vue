@@ -44,16 +44,16 @@ export default {
       userLocation: false,
       //Sample
       admins: [
-        ['Management', 'mdi-account-multiple-outline'],
-        ['Settings', 'mdi-cog-outline'],
+        ["Management", "mdi-account-multiple-outline"],
+        ["Settings", "mdi-cog-outline"],
       ],
       cruds: [
-        ['Create', 'mdi-plus-outline'],
-        ['Read', 'mdi-file-outline'],
-        ['Update', 'mdi-update'],
-        ['Delete', 'mdi-delete'],
+        ["Create", "mdi-plus-outline"],
+        ["Read", "mdi-file-outline"],
+        ["Update", "mdi-update"],
+        ["Delete", "mdi-delete"],
       ],
-      open: ['Users'],
+      open: ["Users"],
     };
   },
   computed: {
@@ -192,14 +192,14 @@ export default {
           localStorage.setItem("userName", null);
           localStorage.setItem("g_id", null);
           localStorage.setItem("user_image", null);
-        localStorage.setItem("token", null);
+          localStorage.setItem("token", null);
           app.config.globalProperties.$eventBus.$emit("getUserName");
           this.path = "/";
           window.location.href = "/";
         })
         .catch((error) => {
           // eslint-disable-next-line
-          throw error
+          throw error;
         });
     },
     getHeaderUserData() {
@@ -253,7 +253,7 @@ export default {
         })
         .then((response) => {
           const data = response.data.data;
-          console.log(data);
+          // console.log(data);
 
           this.userName = data.name;
           this.userDated = data.last_login;
@@ -322,7 +322,7 @@ export default {
               };
             });
           this.activeMalls.push(...result);
-          console.log(this.activeMalls);
+          // console.log(this.activeMalls);
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -368,7 +368,7 @@ export default {
           const result = Object.values(uniqueItems);
 
           this.activeMalls.push(...result);
-          console.log(this.activeMalls);
+          // console.log(this.activeMalls);
 
           // this.mallPromotionsItems = data
           //   .filter((item) => item.active === "Y")
@@ -388,7 +388,6 @@ export default {
       if (distance === 0 || distance === null) {
         return "0";
       } else {
-
         return distance.toFixed(1);
       }
     },
@@ -406,18 +405,16 @@ export default {
         });
     },
 
-    setDefaultCountry() {
-
-    },
+    setDefaultCountry() {},
     async getCountryMall() {
-      this.isLoading=true;
+      this.isLoading = true;
 
-      let link = `/app-country-list/${this.$appId}`
+      let link = `/app-country-list/${this.$appId}`;
 
       try {
-        const {data:data} = await axios.get(link)
+        const { data: data } = await axios.get(link);
 
-        let allCountry=data.data.map((country) => {
+        let allCountry = data.data.map((country) => {
           return {
             ...country,
             id: country.country_id,
@@ -427,27 +424,26 @@ export default {
             path: "#",
             flag: country.flag,
             cities: [],
-          }
-        } )
+          };
+        });
 
         const defaultCountry = data
-            .filter((c) => c.country_name == this.countryDevice)
-            .map((country) => {
-              return {
-                id: country.country_id,
-                title: country.country_name,
-                count: country.property_count,
-                oneCity: country.one_city == "Y" ? true : false,
-                path: "#",
-                flag: country.flag,
-                cities: [],
-              };
-            });
+          .filter((c) => c.country_name == this.countryDevice)
+          .map((country) => {
+            return {
+              id: country.country_id,
+              title: country.country_name,
+              count: country.property_count,
+              oneCity: country.one_city == "Y" ? true : false,
+              path: "#",
+              flag: country.flag,
+              cities: [],
+            };
+          });
 
-
-        this.country = allCountry
+        this.country = allCountry;
       } catch (error) {
-        throw error
+        throw error;
       } finally {
         this.isLoading = false;
       }
@@ -509,7 +505,7 @@ export default {
         })
         .catch((error) => {
           // eslint-disable-next-line
-         throw error
+          throw error;
         })
         .finally(() => {
           this.isLoading = false;
@@ -559,7 +555,7 @@ export default {
           if (index !== -1 && this.country[index].oneCity === false) {
             this.country[index].cities = this.city;
           }
-          console.log(this.country);
+          // console.log(this.country);
         })
         .catch((error) => {
           throw error;
@@ -802,25 +798,25 @@ export default {
       <v-icon right dark> mdi-menu-down </v-icon>
     </v-btn> -->
 
-
-    <v-menu
-      v-model="userLocation"
-      :close-on-content-click="false"
-
-    >
+    <v-menu v-model="userLocation" :close-on-content-click="false">
       <template v-slot:activator="{ props }">
-        <v-btn  variant="text" v-bind="props" color="#494949"
+        <v-btn
+          variant="text"
+          v-bind="props"
+          color="#494949"
           append-icon="mdi-chevron-down"
         >
           <template v-slot:prepend>
-            <v-avatar :image="$fileURL + itemSelectedComplete?.flag" size="x-small"></v-avatar>
+            <v-avatar
+              :image="$fileURL + itemSelectedComplete?.flag"
+              size="x-small"
+            ></v-avatar>
           </template>
-          {{selectedPlace}}
+          {{ selectedPlace }}
         </v-btn>
       </template>
 
       <v-card min-width="300">
-
         <v-card-title>
           <div class="d-flex align-center ga-2">
             <v-icon size="small">mdi-map-marker</v-icon>
@@ -828,25 +824,25 @@ export default {
           </div>
         </v-card-title>
 
+        <v-list>
+          <v-list-subheader>
+            <div class="d-flex align-center ga-2">
+              <v-avatar
+                :image="$fileURL + itemSelectedComplete?.flag"
+                size="x-small"
+              ></v-avatar>
+              <p class="text-subtitle-1 font-weight-medium">Singapore</p>
+            </div>
+          </v-list-subheader>
 
-       <v-list>
-        <v-list-subheader>
-          <div class="d-flex align-center ga-2">
-            <v-avatar :image="$fileURL + itemSelectedComplete?.flag" size="x-small"></v-avatar>
-            <p class="text-subtitle-1 font-weight-medium">Singapore</p>
-          </div>
-        </v-list-subheader>
-
-        <v-list-item value="jakarta" variant="plain">
-          <v-list-item-title>
-            <p class="ml-7">Jakarta</p>
-          </v-list-item-title>
-        </v-list-item>
+          <v-list-item value="jakarta" variant="plain">
+            <v-list-item-title>
+              <p class="ml-7">Jakarta</p>
+            </v-list-item-title>
+          </v-list-item>
         </v-list>
       </v-card>
     </v-menu>
-
-
 
     <!-- <v-btn
       v-if="
@@ -1105,7 +1101,7 @@ export default {
                       <div style="width: 100px">
                         <v-img height="40" :src="item?.raw?.mainImage">
                           <template #placeholder>
-                             <v-skeleton-loader type="image"></v-skeleton-loader>
+                            <v-skeleton-loader type="image"></v-skeleton-loader>
                           </template>
                         </v-img>
                       </div>
@@ -1208,7 +1204,7 @@ export default {
             "
           >
             <template #placeholder>
-               <v-skeleton-loader type="image"></v-skeleton-loader>
+              <v-skeleton-loader type="image"></v-skeleton-loader>
             </template>
           </v-img>
         </div>
@@ -1311,7 +1307,9 @@ export default {
         <div class="v-list-item__icon">
           <v-img height="18" width="25" src="@/assets/images/icons/shop.png" />
         </div>
-        <v-list-item-title style="font-size: 12px"> My Cartr </v-list-item-title>
+        <v-list-item-title style="font-size: 12px">
+          My Cartr
+        </v-list-item-title>
       </li>
 
       <li v-if="userName != null" class="v-list-item mt-n2">
@@ -1581,7 +1579,6 @@ export default {
       class="mt-16"
       style="border-top-left-radius: 30px; border-top-right-radius: 30px"
     >
-
       <v-card-title
         class="pt-10 d-flex justify-space-between position-fixed bg-white"
         style="z-index: 1000"
@@ -1632,7 +1629,7 @@ export default {
                   :src="item?.mainImage"
                 >
                   <template #placeholder>
-                     <v-skeleton-loader type="image"></v-skeleton-loader>
+                    <v-skeleton-loader type="image"></v-skeleton-loader>
                   </template>
                 </v-img>
               </div>
@@ -1667,7 +1664,7 @@ export default {
                   :src="item?.image"
                 >
                   <template #placeholder>
-                     <v-skeleton-loader type="image"></v-skeleton-loader>
+                    <v-skeleton-loader type="image"></v-skeleton-loader>
                   </template>
                 </v-img>
               </div>
@@ -1683,7 +1680,6 @@ export default {
     </v-card>
   </v-dialog>
 </template>
-
 
 <style scoped>
 .app-bar-mobile-start {
@@ -1764,7 +1760,6 @@ header.v-sheet.v-app-bar {
   border-radius: 0px;
 }
 
-
 .w15 {
   width: 15%;
 }
@@ -1772,6 +1767,4 @@ header.v-sheet.v-app-bar {
 .w85 {
   width: 85%;
 }
-
-
 </style>

@@ -738,7 +738,7 @@ export default {
             : "",
           flag: `https://flagicons.lipis.dev/flags/4x3/${this.phoneEvent.countryCode.toLowerCase()}.svg`,
         };
-        console.log(payload);
+        // console.log(payload);
 
         // localStorage.setItem("p_email", this.email);
         // localStorage.setItem("p_name", this.name);
@@ -764,7 +764,7 @@ export default {
             })
             .then((response) => {
               const data = response.data;
-              console.log(data);
+              // console.log(data);
               this.successMessage = data.message;
               localStorage.setItem("name", data.data.name);
               localStorage.setItem("email", data.data.email_id);

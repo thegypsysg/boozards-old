@@ -325,7 +325,7 @@ export default {
           .post(`/send-otp`, payload)
           .then((response) => {
             const data = response.data;
-            console.log(data);
+            // console.log(data);
             this.isSuccess = true;
             this.successMessage = "Success verify OTP";
             this.email = "";
@@ -367,7 +367,7 @@ export default {
           .post(`/send-otp`, payload)
           .then((response) => {
             const data = response.data;
-            console.log(data);
+            // console.log(data);
             this.isSuccess = true;
             this.successMessage = "Success send OTP";
             // setTimeout(() => {

@@ -174,7 +174,7 @@ function handleSelectRange(menu, selectedItem) {
 }
 
 const addToCartData = (data) => {
-  console.log(token.value);
+  // console.log(token.value);
   if (token.value == "null") {
     store.commit("setIsNotLoggedIn", true);
   } else {

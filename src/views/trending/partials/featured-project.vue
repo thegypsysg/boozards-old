@@ -175,7 +175,7 @@ function getList() {
     )
     .then((response) => {
       const data = response.data.data;
-      console.log(data);
+      // console.log(data);
       listData.value = data.map((item) => ({
         ...item,
         // img: item.town_image,

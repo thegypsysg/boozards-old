@@ -24,7 +24,6 @@ export default {
   mixins: [cartMixin],
   data() {
     return {
-      selectedDelivery: null,
       platformFee: null,
       taxAmount: null,
       isBestViewed: false,
@@ -149,6 +148,9 @@ export default {
     $route() {
       this.search = null;
     },
+    selectedCountry() {
+      this.getTaxAmount();
+    },
   },
   computed: {
     ...mapState(["deliveryCharges"]),
@@ -198,10 +200,12 @@ export default {
       ).toFixed(2);
     },
     selectedDeliveryPrice() {
-      const option = this.deliveryOptions.find(
-        (opt) => opt.value === this.selectedDelivery,
-      );
-      return option ? option.price : 0;
+      if (this.$store.state.cart) {
+        // console.log(parseFloat(this.$store.state.cart[0].delivery_charges));
+        return parseFloat(this.$store.state.cart[0].delivery_charges);
+      } else {
+        return 0;
+      }
     },
     tokenProvider() {
       // Mendapatkan URL dari browser
@@ -301,7 +305,7 @@ export default {
     }
     this.search = null;
     this.getPlatformFee();
-    this.getTaxAmount();
+    // this.getTaxAmount();
     this.getAppContact();
     this.getTrendingCardData();
     this.getLocationDropDownData();
@@ -387,24 +391,24 @@ export default {
       }
     },
     async getTaxAmount() {
-      let data = null;
+      // let data = null;
 
       try {
-        await axios
-          .get(`/gypsy-user`, {
-            headers: { Authorization: `Bearer ${this.authToken}` },
-          })
-          .then((response) => {
-            data = response.data.data?.country_current;
-          })
-          .catch((_) => {});
+        // await axios
+        //   .get(`/gypsy-user`, {
+        //     headers: { Authorization: `Bearer ${this.authToken}` },
+        //   })
+        //   .then((response) => {
+        //     data = response.data.data?.country_current;
+        //   })
+        //   .catch((_) => {});
 
         const response = await axios.get(`/get-tax-amount`, {
           headers: {
             Authorization: `Bearer ${this.authToken}`,
           },
           params: {
-            country_id: data,
+            country_id: this.selectedCountry.country_id,
           },
         });
         if (response?.data?.data?.applicable === "Y") {
@@ -697,7 +701,7 @@ export default {
               const defaultCountry = this.locationDropdown[0];
               const defaultCity = defaultCountry.cities[0];
               this.selectLocation(defaultCountry, defaultCity);
-              console.log("country: ", this.locationDropdown);
+              // console.log("country: ", this.locationDropdown);
             })
             .catch((error) => {
               // eslint-disable-next-line
@@ -729,7 +733,7 @@ export default {
         "getDeliveryCharges",
         this.selectedLocation.country_id,
       );
-      console.log("selected: ", this.selectedLocation);
+      // console.log("selected: ", this.selectedLocation);
     },
     gotoMallDetail(item) {
       this.dialog2 = false;
@@ -1371,11 +1375,7 @@ watch(() => {
         <span class="ml-2" v-if="subTotal > 0">
           {{ selectedCountry.currency_symbol }} {{ finalCartTotal }}
         </span>
-        <Cart
-          :viewCart="viewCart"
-          :selectedLocation="selectedLocation.country_id.toString()"
-          @update:viewCart="viewCart = $event"
-        />
+        <Cart :viewCart="viewCart" @update:viewCart="viewCart = $event" />
       </div>
     </div>
     <div

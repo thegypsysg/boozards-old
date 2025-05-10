@@ -39,7 +39,7 @@ export default {
               // Mengirim permintaan ke API Geocoding untuk mendapatkan nama negara
               axios
                 .get(
-                  `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${this.latitude}&lon=${this.longitude}`
+                  `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${this.latitude}&lon=${this.longitude}`,
                   // `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${26.907524}&lon=${75.739639}`
                 )
                 .then((response) => {
@@ -49,11 +49,11 @@ export default {
                     response.data.address.country
                   ) {
                     const country = response.data.address.country;
-                    console.log("Country:", country);
+                    // console.log("Country:", country);
                     localStorage.setItem("countryDevice", country);
                   } else {
                     console.log(
-                      "Failed to retrieve country information from the API."
+                      "Failed to retrieve country information from the API.",
                     );
                   }
                 })
@@ -64,7 +64,7 @@ export default {
           },
           (error) => {
             console.log("Error getting location:", error.message);
-          }
+          },
         );
       } else {
         console.log("Geolocation is not supported by this browser.");
