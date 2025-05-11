@@ -31,6 +31,7 @@ export default (app) =>
       totalCartItems: 0,
       isLoading: false,
       deliveryCharges: [],
+      paymentOptions: [],
       isNotLoggedIn: false,
       isCartEmpty: false,
       isCountryUpdating: false,
@@ -39,6 +40,9 @@ export default (app) =>
     mutations: {
       deliveryCharges(state, data) {
         state.deliveryCharges = data;
+      },
+      paymentOptions(state, data) {
+        state.paymentOptions = data;
       },
       isLoading(state, data) {
         state.isLoading = data;

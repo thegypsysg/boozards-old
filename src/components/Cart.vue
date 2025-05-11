@@ -440,17 +440,101 @@
               <MazRadioButtons
                 v-slot="{ option, selected }"
                 v-model="selectedPaymentMethod"
-                :options="paymentOptions"
+                :options="paymentOptions.slice(0, 2)"
+                @update:model-value="onSelectPayment"
                 orientation="col | row"
                 :selector="true"
                 color="info"
                 block
-                class="pt-5"
+                class=""
               >
-                <div class="d-flex justify-space-between ma-2">
-                  <strong>{{ option.label }}</strong>
+                <div class="d-flex align-center justify-start">
+                  <div style="width: 20%">
+                    <v-img height="60" width="60" :src="option.payment_image" />
+                  </div>
+                  <div style="width: 80%">
+                    <p class="font-weight-bold">{{ option.payment_name }}</p>
+                    <p
+                      class="text-caption text-red-darken-1 mt-2 font-weight-bold"
+                    >
+                      {{ option.payment_desc }}
+                    </p>
+                  </div>
                 </div>
               </MazRadioButtons>
+              <p class="text-caption font-weight-bold mb-4 mt-10">
+                More payment options coming soon ...
+              </p>
+              <MazRadioButtons
+                v-slot="{ option, selected }"
+                :options="paymentOptions.slice(2, 5)"
+                orientation="col | row"
+                :selector="true"
+                color="info"
+                block
+                class=""
+              >
+                <div class="d-flex align-center justify-start">
+                  <div style="width: 20%">
+                    <v-img height="60" width="60" :src="option.payment_image" />
+                  </div>
+                  <div style="width: 80%">
+                    <p class="font-weight-bold">{{ option.payment_name }}</p>
+                    <p
+                      class="text-caption text-red-darken-1 mt-2 font-weight-bold"
+                    >
+                      {{ option.payment_desc }}
+                    </p>
+                  </div>
+                </div>
+              </MazRadioButtons>
+            </v-col>
+            <v-col v-if="step == 5" class="pa-5">
+              <div class="my-3 text-h6 d-flex justify-space-between">
+                <span>Pay using PayNow</span>
+                <v-btn
+                  prepend-icon="mdi-arrow-left"
+                  @click="step = 4"
+                  color="grey"
+                  variant="flat"
+                  >Back</v-btn
+                >
+              </div>
+              <v-img :src="qris" height="200" width="200" />
+              <div class="font-weight-bold my-4">
+                <p>Paynow Number</p>
+                <p class="text-grey-darken-1 mt-2">91992000</p>
+              </div>
+              <div class="font-weight-bold mb-4">
+                <p>Paynow Name</p>
+                <p class="text-grey-darken-1 mt-2">
+                  Foxtech 2000 Singapore Pte Ltd
+                </p>
+              </div>
+              <div class="font-weight-bold mb-4">
+                <p>Please Pay Exactly</p>
+                <p class="text-green-darken-1 mt-2">S$ 265.35</p>
+              </div>
+              <div
+                class="d-flex w-100 align-center justify-space-between mt-10"
+              >
+                <v-btn
+                  @click="payLater = true"
+                  variant="outlined"
+                  size="large"
+                  class="rounded-xl"
+                  style="width: 46%"
+                  >I will pay later</v-btn
+                >
+                <v-btn
+                  @click="havePaid = true"
+                  variant="outlined"
+                  size="large"
+                  class="rounded-xl"
+                  style="width: 46%"
+                  >I have Paid</v-btn
+                >
+              </div>
             </v-col>
           </v-row>
         </div>
@@ -484,10 +568,19 @@
             >
             <v-btn
               v-else-if="step == 4"
+              @click="nextStep(5)"
               color="#ff9800"
               variant="flat"
               size="large"
               >Pay Now</v-btn
+            >
+            <v-btn
+              v-else-if="step == 5"
+              @click="confirmOrder = true"
+              color="#1868C1"
+              variant="flat"
+              size="large"
+              >CONFIRM ORDER</v-btn
             >
             <div>
               <v-icon @click="summaryDialog = true" size="40">
@@ -600,6 +693,56 @@
       </v-card-text>
     </v-card>
   </v-dialog>
+  <v-dialog v-model="isEmptyPayment" persistent width="auto">
+    <v-card width="350">
+      <v-card-text class="">
+        <h4 class="mt-4 mb-8 text-center">Please add at least one option</h4>
+        <v-btn class="mb-4 w-100 bg-primary" @click="isEmptyPayment = false">
+          OK
+        </v-btn>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+  <v-dialog v-model="payLater" persistent width="auto">
+    <v-card width="350">
+      <v-card-text class="">
+        <h4 class="mt-4 mb-8 text-center">
+          Once Payment is made pls what's app us to 89102000
+        </h4>
+        <v-btn class="mb-4 w-100 bg-primary" @click="payLater = false">
+          OK
+        </v-btn>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+  <v-dialog v-model="havePaid" persistent width="auto">
+    <v-card width="350">
+      <v-card-text class="">
+        <h4 class="mt-4 mb-8 text-center">
+          Thanks !!! for Payment we will check and update your payment status
+          for your current Order
+        </h4>
+        <v-btn class="mb-4 w-100 bg-primary" @click="havePaid = false">
+          OK
+        </v-btn>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+  <v-dialog v-model="confirmOrder" persistent width="auto">
+    <v-card width="350">
+      <v-card-text class="">
+        <h4 class="mt-4 mb-8 text-center">Confirm this Order . ?</h4>
+        <div class="w-100 d-flex align-center justify-space-around">
+          <v-btn class="mb-4 w-33 bg-primary" @click="handleConfirmOrder()">
+            Yes
+          </v-btn>
+          <v-btn class="mb-4 w-33 bg-primary" @click="confirmOrder = false">
+            No
+          </v-btn>
+        </div>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -623,6 +766,12 @@ import { Loader } from "@googlemaps/js-api-loader";
 import { useCart } from "@/composables/useCart";
 import { useGlobalSnackbar } from "@/composables/useGlobalSnackbar";
 import { fileURL } from "@/main";
+import cash from "@/assets/images/payment/cash.png";
+import paynow from "@/assets/images/payment/paynow.png";
+import credit from "@/assets/images/payment/credit.png";
+import debit from "@/assets/images/payment/debit.png";
+import googleImg from "@/assets/images/payment/google.png";
+import qris from "@/assets/images/payment/qris-example.png";
 
 const { snackbarVisible, snackbarMessage, snackbarColor } = useGlobalSnackbar();
 const { updateQuantity } = useCart();
@@ -639,7 +788,11 @@ const emit = defineEmits(["update:viewCart"]);
 
 const streetRef = ref(null);
 const openDialog = ref(false);
+const payLater = ref(false);
+const havePaid = ref(false);
+const confirmOrder = ref(false);
 const isEmptyAddress = ref(false);
+const isEmptyPayment = ref(false);
 const addressIndex = ref(null);
 const addressId = ref(null);
 const addressName = ref(null);
@@ -661,12 +814,38 @@ const selectedDelivery = ref(
   //     : null),
   null,
 );
-const selectedPaymentMethod = ref("creditcard");
+const selectedPaymentMethod = ref(null);
 const paymentOptions = ref([
-  { label: "Credit Card", value: "creditcard" },
-  { label: "Cash On Deliver (COD)", value: "cod" },
-  { label: "Pay Now", value: "paynow" },
-  { label: "Google Pay", value: "gpay" },
+  {
+    value: 1,
+    payment_name: "Cash",
+    payment_desc: "Cash on Delivery",
+    payment_image: cash,
+  },
+  {
+    value: 2,
+    payment_name: "Paynow",
+    payment_desc: "QR Code Scanner | 91992000",
+    payment_image: paynow,
+  },
+  {
+    value: 3,
+    payment_name: "Credit Card",
+    payment_desc: "Powered by Adyen",
+    payment_image: credit,
+  },
+  {
+    value: 4,
+    payment_name: "Debit Card",
+    payment_desc: "Powered by Stripe",
+    payment_image: debit,
+  },
+  {
+    value: 5,
+    payment_name: "Google Pay",
+    payment_desc: "Powered by Google",
+    payment_image: googleImg,
+  },
 ]);
 const addresses = ref([]);
 const selectedAddress = ref(null);
@@ -893,6 +1072,26 @@ const onSelectDelivery = (selectedId) => {
   }
 };
 
+const onSelectPayment = (selectedId) => {
+  console.log(selectedId);
+  // try {
+  //   const selectedOption = deliveryOptions.value.find(
+  //     (opt) => opt.dc_id === selectedId,
+  //   );
+  //   if (selectedOption) {
+  //     const payload = {
+  //       cart_id: cart.value[0].cart_id,
+  //       dc_id: selectedOption.dc_id,
+  //       delivery_rate: selectedOption.price,
+  //     };
+  //     store.dispatch("updateDeliveryChargesInCart", payload);
+  //     // console.log("Delivery option deliveryOptions:", payload);
+  //   }
+  // } catch (error) {
+  //   console.error("Error saving delivery option:", error);
+  // }
+};
+
 // Open Confirmation Modal
 const handleOpenDialog = (option, index) => {
   addressIndex.value = index;
@@ -917,6 +1116,24 @@ const handleDeleteAddress = async () => {
   };
   addresses.value.splice(addressIndex.value, 1);
   openDialog.value = false;
+};
+
+const handleConfirmOrder = async () => {
+  // const response = await axios.get("/delete-address/" + addressId.value, {
+  //   headers: {
+  //     Authorization: `Bearer ${authToken}`,
+  //   },
+  // });
+
+  // snackbar.value = true;
+  // message.value = {
+  //   text: response.data.message,
+  //   color: "success",
+  // };
+  // addresses.value.splice(addressIndex.value, 1);
+  // openDialog.value = false;
+  emit("update:viewCart", false);
+  confirmOrder.value = false;
 };
 
 // Edit Address
@@ -945,7 +1162,21 @@ const handleEditLocation = async (address_id) => {
 };
 
 const nextStep = (value) => {
-  if (value === 4) {
+  if (value === 5) {
+    snackbar.value = false;
+    message.value = {
+      text: "",
+      color: "success",
+    };
+
+    if (!selectedPaymentMethod.value) {
+      isEmptyPayment.value = true;
+
+      return;
+    } else if (selectedPaymentMethod.value == 1) {
+      return;
+    }
+  } else if (value === 4) {
     snackbar.value = false;
     message.value = {
       text: "",

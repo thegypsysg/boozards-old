@@ -27,6 +27,7 @@ export default {
       platformFee: null,
       taxAmount: null,
       isBestViewed: false,
+      isQRCode: false,
       viewCart: false,
       isApply: false,
       isEmployment: false,
@@ -1865,258 +1866,273 @@ watch(() => {
 
   <!-- v-if="isSmall" -->
   <v-navigation-drawer v-model="drawer" temporary location="right">
-    <div
-      class="drawer__top"
-      :class="{ 'py-6': userName == null, 'py-2': userName != null }"
-    >
-      <div v-if="userName == null" class="btn_sign__up-cont-drawer">
-        <v-btn
-          elevation="0"
-          class="btn_sign__up"
-          @click="$router.push('/sign-in')"
-        >
-          <span> Sign Up / Sign In</span>
-        </v-btn>
-        <div class="btn_sign__up-drawer-hover" />
-      </div>
-      <div v-else class="d-flex align-center">
-        <div style="width: 55px; height: 55px; border-radius: 50%">
-          <v-img
-            cover
-            style="border-radius: 50%; width: 100%; height: 100%"
-            :src="
-              userImage != null
-                ? userImage
-                : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
-            "
-          >
-            <template #placeholder>
-              <v-skeleton-loader type="image"></v-skeleton-loader>
-            </template>
-          </v-img>
-        </div>
-
-        <v-list-item>
-          <v-list-item-title style="font-size: 14px">
-            {{ userName }}
-          </v-list-item-title>
-          <v-list-item-subtitle style="font-size: 10px" class="mt-1">
-            Last Login: {{ userDated }}
-          </v-list-item-subtitle>
-          <div
-            class="text-red mt-1"
-            style="font-size: 12px; cursor: pointer"
-            @click="logout"
-          >
-            Logout
-          </div>
-        </v-list-item>
-      </div>
-    </div>
-    <div class="drawer__heading">
-      <div class="drawer-logo">
-        <v-img
-          height="35"
-          width="80"
-          src="@/assets/images/logo/boozards-logo.png"
-        />
-      </div>
-      <v-menu contained style="z-index: 1000">
-        <template #activator="{ props }">
+    <template v-if="!isQRCode">
+      <div
+        class="drawer__top"
+        :class="{ 'py-6': userName == null, 'py-2': userName != null }"
+      >
+        <div v-if="userName == null" class="btn_sign__up-cont-drawer">
           <v-btn
-            style="background: #f4f5f7; color: black"
-            variant="text"
-            color="black"
-            icon="mdi-share-outline"
-            width="30"
-            height="30"
-            class="mx-4"
-            v-bind="props"
+            elevation="0"
+            class="btn_sign__up"
+            @click="$router.push('/sign-in')"
           >
-            <v-icon color="rgb(38, 38, 38)" size="15">
-              mdi-share-outline
-            </v-icon>
+            <span> Sign Up / Sign In</span>
           </v-btn>
-        </template>
-        <v-list style="z-index: 1000">
-          <v-list-item @click="console.log('share')">
-            <v-list-item-title>
-              <v-icon class="mr-4" color="black" size="18">
-                mdi-email-outline </v-icon
-              >Email
-            </v-list-item-title>
-          </v-list-item>
-          <v-list-item @click="console.log('share')">
-            <v-list-item-title>
-              <v-icon class="mr-4" size="18">
-                <i class="fa-brands fa-facebook-f" /> </v-icon
-              >Facebook
-            </v-list-item-title>
-          </v-list-item>
-          <v-list-item @click="console.log('share')">
-            <v-list-item-title>
-              <v-icon class="mr-4" color="black" size="18"> mdi-twitter </v-icon
-              >Twitter
-            </v-list-item-title>
-          </v-list-item>
-          <v-list-item @click="console.log('share')">
-            <v-list-item-title>
-              <v-icon class="mr-4" size="18">
-                <i class="fa-brands fa-linkedin-in" /> </v-icon
-              >Linkedin
-            </v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-      <div class="text-muted" style="font-size: 10px">Version 1.0</div>
-    </div>
-    <v-divider />
-    <ul class="pt-1" nav dense>
-      <li class="v-list-item">
-        <div class="v-list-item__icon">
-          <v-img height="20" width="30" :src="images.home" />
+          <div class="btn_sign__up-drawer-hover" />
         </div>
-        <v-list-item-title style="font-size: 12px"> Home </v-list-item-title>
-      </li>
+        <div v-else class="d-flex align-center">
+          <div style="width: 55px; height: 55px; border-radius: 50%">
+            <v-img
+              cover
+              style="border-radius: 50%; width: 100%; height: 100%"
+              :src="
+                userImage != null
+                  ? userImage
+                  : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+              "
+            >
+              <template #placeholder>
+                <v-skeleton-loader type="image"></v-skeleton-loader>
+              </template>
+            </v-img>
+          </div>
 
-      <li v-if="userName != null" class="v-list-item mt-n2">
-        <div class="v-list-item__icon">
-          <v-img height="18" width="25" :src="images.shopper" />
+          <v-list-item>
+            <v-list-item-title style="font-size: 14px">
+              {{ userName }}
+            </v-list-item-title>
+            <v-list-item-subtitle style="font-size: 10px" class="mt-1">
+              Last Login: {{ userDated }}
+            </v-list-item-subtitle>
+            <div
+              class="text-red mt-1"
+              style="font-size: 12px; cursor: pointer"
+              @click="logout"
+            >
+              Logout
+            </div>
+          </v-list-item>
         </div>
-        <router-link class="text-decoration-none text-black" to="/my-profile">
+      </div>
+      <div class="drawer__heading">
+        <div class="drawer-logo">
+          <v-img
+            height="35"
+            width="80"
+            src="@/assets/images/logo/boozards-logo.png"
+          />
+        </div>
+        <v-menu contained style="z-index: 1000">
+          <template #activator="{ props }">
+            <v-btn
+              style="background: #f4f5f7; color: black"
+              variant="text"
+              color="black"
+              icon="mdi-share-outline"
+              width="30"
+              height="30"
+              class="mx-4"
+              v-bind="props"
+            >
+              <v-icon color="rgb(38, 38, 38)" size="15">
+                mdi-share-outline
+              </v-icon>
+            </v-btn>
+          </template>
+          <v-list style="z-index: 1000">
+            <v-list-item @click="console.log('share')">
+              <v-list-item-title>
+                <v-icon class="mr-4" color="black" size="18">
+                  mdi-email-outline </v-icon
+                >Email
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="console.log('share')">
+              <v-list-item-title>
+                <v-icon class="mr-4" size="18">
+                  <i class="fa-brands fa-facebook-f" /> </v-icon
+                >Facebook
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="console.log('share')">
+              <v-list-item-title>
+                <v-icon class="mr-4" color="black" size="18">
+                  mdi-twitter </v-icon
+                >Twitter
+              </v-list-item-title>
+            </v-list-item>
+            <v-list-item @click="console.log('share')">
+              <v-list-item-title>
+                <v-icon class="mr-4" size="18">
+                  <i class="fa-brands fa-linkedin-in" /> </v-icon
+                >Linkedin
+              </v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+        <div class="text-muted" style="font-size: 10px">Version 1.0</div>
+      </div>
+      <v-divider />
+      <ul class="pt-1" nav dense>
+        <li class="v-list-item">
+          <div class="v-list-item__icon">
+            <v-img height="20" width="30" :src="images.home" />
+          </div>
+          <v-list-item-title style="font-size: 12px"> Home </v-list-item-title>
+        </li>
+
+        <li v-if="userName != null" class="v-list-item mt-n2">
+          <div class="v-list-item__icon">
+            <v-img height="18" width="25" :src="images.shopper" />
+          </div>
+          <router-link class="text-decoration-none text-black" to="/my-profile">
+            <v-list-item-title style="font-size: 12px">
+              My Profile
+            </v-list-item-title>
+          </router-link>
+        </li>
+
+        <li class="v-list-item mt-n2">
+          <div class="v-list-item__icon">
+            <v-img height="18" width="25" :src="images.shop" />
+          </div>
           <v-list-item-title style="font-size: 12px">
-            My Profile
+            My Cart
           </v-list-item-title>
-        </router-link>
-      </li>
+        </li>
 
-      <li class="v-list-item mt-n2">
-        <div class="v-list-item__icon">
-          <v-img height="18" width="25" :src="images.shop" />
-        </div>
-        <v-list-item-title style="font-size: 12px"> My Cart </v-list-item-title>
-      </li>
-
-      <li v-if="userName != null" class="v-list-item mt-n2">
-        <div class="v-list-item__icon">
-          <v-img src="" />
-        </div>
-        <v-list-item-title style="font-size: 12px">
-          My Vouchers
-        </v-list-item-title>
-      </li>
-      <li v-if="userName != null" class="v-list-item mt-n2">
-        <div class="v-list-item__icon">
-          <v-img src="" />
-        </div>
-
-        <router-link
-          v-if="isSmall"
-          class="text-decoration-none text-black"
-          to="/my-favorites"
-        >
+        <li v-if="userName != null" class="v-list-item mt-n2">
+          <div class="v-list-item__icon">
+            <v-img src="" />
+          </div>
           <v-list-item-title style="font-size: 12px">
+            My Vouchers
+          </v-list-item-title>
+        </li>
+        <li v-if="userName != null" class="v-list-item mt-n2">
+          <div class="v-list-item__icon">
+            <v-img src="" />
+          </div>
+
+          <router-link
+            v-if="isSmall"
+            class="text-decoration-none text-black"
+            to="/my-favorites"
+          >
+            <v-list-item-title style="font-size: 12px">
+              My Favorites
+            </v-list-item-title>
+          </router-link>
+          <v-list-item-title
+            v-else
+            @click="isBestViewed = true"
+            class="cursor-pointer"
+            style="font-size: 12px"
+          >
             My Favorites
           </v-list-item-title>
-        </router-link>
-        <v-list-item-title
-          v-else
-          @click="isBestViewed = true"
-          class="cursor-pointer"
-          style="font-size: 12px"
-        >
-          My Favorites
-        </v-list-item-title>
-      </li>
-      <li v-if="userName != null" class="v-list-item mt-n2">
-        <div class="v-list-item__icon">
-          <v-img src="" />
-        </div>
+        </li>
+        <li v-if="userName != null" class="v-list-item mt-n2">
+          <div class="v-list-item__icon">
+            <v-img src="" />
+          </div>
 
-        <v-list-item-title style="font-size: 12px"> My Apps </v-list-item-title>
-      </li>
-      <li v-if="userName == null" class="v-list-item mt-n2">
-        <div class="v-list-item__icon">
-          <v-img src="" />
-        </div>
-        <router-link
-          class="text-decoration-none text-black"
-          to="/privacy-policy"
-        >
-          <v-list-item-title style="font-size: 12px">
-            Privacy Policy
-          </v-list-item-title>
-        </router-link>
-      </li>
-      <li v-if="userName == null" class="v-list-item mt-n2">
-        <div class="v-list-item__icon">
-          <v-img src="" />
-        </div>
-
-        <router-link class="text-decoration-none text-black" to="/our-terms">
-          <v-list-item-title style="font-size: 12px">
-            Terms & Conditions
-          </v-list-item-title>
-        </router-link>
-      </li>
-    </ul>
-    <div class="drawer__bottom">
-      <div class="text-center" style="width: 100%">
-        <p style="font-size: 13px" class="mb-1">Made in Singapore</p>
-        <h3 style="font-size: 13px">Get connected</h3>
-        <v-row
-          class="d-flex justify-center mt-1"
-          :class="{ 'mb-2': userName == null }"
-        >
-          <v-col cols="3" class="d-flex justify-end">
-            <a :href="contactData?.facebook">
-              <v-img :src="images.facebook" height="40" width="32" />
-            </a>
-          </v-col>
-          <v-col class="d-flex justify-center" cols="3">
-            <a :href="contactData?.instagram">
-              <v-img :src="images.instagram" height="40" width="32" />
-            </a>
-          </v-col>
-          <v-col class="d-flex justify-start" cols="3">
-            <a :href="contactData?.tiktok">
-              <v-img :src="images.tiktok" class="mt-1" height="35" width="35" />
-            </a>
-          </v-col>
-          <v-col
-            class="d-flex justify-center flex-column align-center"
-            cols="12"
+          <v-list-item-title
+            @click="isQRCode = true"
+            class="cursor-pointer"
+            style="font-size: 12px"
           >
-            <p class="text-caption">Wha'ts App Support (24 hrs)</p>
-            <a
-              :href="`https://api.whatsapp.com/send?phone=${footerData?.whats_app}&text=The Gypsy Support here - How may I help you. ?`"
-            >
-              <v-img
-                :src="images.whatsapp"
-                class="mt-1"
-                height="35"
-                width="35"
-              />
-            </a>
-          </v-col>
-        </v-row>
-        <div
-          v-if="userName != null"
-          style="font-size: 12px"
-          class="text-grey my-4"
-        >
+            QR Code - For Payments
+          </v-list-item-title>
+        </li>
+        <li v-if="userName == null" class="v-list-item mt-n2">
+          <div class="v-list-item__icon">
+            <v-img src="" />
+          </div>
           <router-link
-            class="text-decoration-none text-grey"
+            class="text-decoration-none text-black"
             to="/privacy-policy"
           >
-            Privacy
+            <v-list-item-title style="font-size: 12px">
+              Privacy Policy
+            </v-list-item-title>
           </router-link>
-          |
-          <router-link class="text-decoration-none text-grey" to="/our-terms">
-            Terms
+        </li>
+        <li v-if="userName == null" class="v-list-item mt-n2">
+          <div class="v-list-item__icon">
+            <v-img src="" />
+          </div>
+
+          <router-link class="text-decoration-none text-black" to="/our-terms">
+            <v-list-item-title style="font-size: 12px">
+              Terms & Conditions
+            </v-list-item-title>
           </router-link>
-        </div>
-        <!-- <div class="drawer-social d-flex" style="width: 100%">
+        </li>
+      </ul>
+      <div class="drawer__bottom">
+        <div class="text-center" style="width: 100%">
+          <p style="font-size: 13px" class="mb-1">Made in Singapore</p>
+          <h3 style="font-size: 13px">Get connected</h3>
+          <v-row
+            class="d-flex justify-center mt-1"
+            :class="{ 'mb-2': userName == null }"
+          >
+            <v-col cols="3" class="d-flex justify-end">
+              <a :href="contactData?.facebook">
+                <v-img :src="images.facebook" height="40" width="32" />
+              </a>
+            </v-col>
+            <v-col class="d-flex justify-center" cols="3">
+              <a :href="contactData?.instagram">
+                <v-img :src="images.instagram" height="40" width="32" />
+              </a>
+            </v-col>
+            <v-col class="d-flex justify-start" cols="3">
+              <a :href="contactData?.tiktok">
+                <v-img
+                  :src="images.tiktok"
+                  class="mt-1"
+                  height="35"
+                  width="35"
+                />
+              </a>
+            </v-col>
+            <v-col
+              class="d-flex justify-center flex-column align-center"
+              cols="12"
+            >
+              <p class="text-caption">Wha'ts App Support (24 hrs)</p>
+              <a
+                :href="`https://api.whatsapp.com/send?phone=${footerData?.whats_app}&text=The Gypsy Support here - How may I help you. ?`"
+              >
+                <v-img
+                  :src="images.whatsapp"
+                  class="mt-1"
+                  height="35"
+                  width="35"
+                />
+              </a>
+            </v-col>
+          </v-row>
+          <div
+            v-if="userName != null"
+            style="font-size: 12px"
+            class="text-grey my-4"
+          >
+            <router-link
+              class="text-decoration-none text-grey"
+              to="/privacy-policy"
+            >
+              Privacy
+            </router-link>
+            |
+            <router-link class="text-decoration-none text-grey" to="/our-terms">
+              Terms
+            </router-link>
+          </div>
+          <!-- <div class="drawer-social d-flex" style="width: 100%">
           <div>
             <h5>WhatsApp</h5>
             <a
@@ -2135,21 +2151,50 @@ watch(() => {
             >
           </div>
         </div> -->
-        <v-divider class="mt-2 mb-n2" />
-        <v-container class="footer-bottom pb-2 d-flex justify-center">
-          <div class="d-flag d-flex justify-space-between w-100 align-center">
-            <img
-              style="max-width: 40px; border: 1px solid black"
-              src="data:image/png;base64,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"
-              alt="Singapore"
-            />
-            <div id="footerCurrentTime" style="font-size: 0.7rem">
-              {{ currentTime }}
+          <v-divider class="mt-2 mb-n2" />
+          <v-container class="footer-bottom pb-2 d-flex justify-center">
+            <div class="d-flag d-flex justify-space-between w-100 align-center">
+              <img
+                style="max-width: 40px; border: 1px solid black"
+                src="data:image/png;base64,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"
+                alt="Singapore"
+              />
+              <div id="footerCurrentTime" style="font-size: 0.7rem">
+                {{ currentTime }}
+              </div>
             </div>
-          </div>
-        </v-container>
+          </v-container>
+        </div>
       </div>
-    </div>
+    </template>
+    <template v-else>
+      <v-container>
+        <div class="my-3 d-flex justify-space-between">
+          <p class="font-weight-bold">Pay using PayNow</p>
+          <v-btn
+            icon="mdi-arrow-left"
+            @click="isQRCode = false"
+            color="grey"
+            size="sm"
+            variant="flat"
+          ></v-btn>
+        </div>
+        <v-divider></v-divider>
+        <v-img
+          src="@/assets/images/payment/qris-example.png"
+          height="200"
+          width="200"
+        />
+        <div class="font-weight-bold my-4">
+          <p>Paynow Number</p>
+          <p class="text-grey-darken-1 mt-2">91992000</p>
+        </div>
+        <div class="font-weight-bold mb-4">
+          <p>Paynow Name</p>
+          <p class="text-grey-darken-1 mt-2">Foxtech 2000 Singapore Pte Ltd</p>
+        </div>
+      </v-container>
+    </template>
   </v-navigation-drawer>
 
   <v-dialog v-model="isBestViewed" persistent width="auto">
