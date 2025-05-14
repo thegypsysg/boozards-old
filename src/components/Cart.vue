@@ -874,7 +874,7 @@ const addressesOptions = computed(() => {
     value: address.ga_id,
     full_address: address.full_address,
     // main_address: address.main_address,
-    landmark: address.landmark,
+    // landmark: address.landmark,
     location_name: address.location_name,
     primary_address: address.primary_address,
   }));
@@ -977,7 +977,7 @@ const initAutocomplete = async () => {
       autocomplete.addListener("place_changed", () => {
         const place = autocomplete.getPlace();
         if (place.geometry) {
-          var placeName = place.name;
+          // var placeName = place.name;
           var streetName = "";
           var route = "";
           for (let i = 0; i < place.address_components.length; i++) {
@@ -1013,9 +1013,10 @@ const initAutocomplete = async () => {
           //   .filter(Boolean)
           //   .join(" ");
           var fullSingleLine = streetName + " " + route;
-          var fullAddress = [fullSingleLine, wrappedAddress]
-            .filter(Boolean)
-            .join("\n");
+          var fullAddress = fullSingleLine;
+          // var fullAddress = [fullSingleLine]
+          //   .filter(Boolean)
+          //   .join("\n");
 
           // addressForm.main_address = mainAddress;
           addressForm.full_address = fullAddress;
