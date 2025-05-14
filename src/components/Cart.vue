@@ -855,25 +855,25 @@ const taxAmount = ref(null);
 const platformFee = ref(null);
 
 const addressForm = reactive({
-  main_address: "",
+  //main_address: "",
   full_address: "",
-  unit: "",
-  postal_code: "",
-  town: "",
-  city: "",
-  country: "",
-  condo_name: "",
-  landmark: "",
+  //unit: "",
+  //postal_code: "",
+  //town: "",
+  //city: "",
+  //country: "",
+  //condo_name: "",
+  //landmark: "",
   location_name: "",
-  latitude: "",
-  longitude: "",
+  //latitude: "",
+  //longitude: "",
 });
 
 const addressesOptions = computed(() => {
   return addresses.value.map((address) => ({
     value: address.ga_id,
     full_address: address.full_address,
-    main_address: address.main_address,
+    // main_address: address.main_address,
     landmark: address.landmark,
     location_name: address.location_name,
     primary_address: address.primary_address,
@@ -991,36 +991,37 @@ const initAutocomplete = async () => {
               route = component.long_name;
             }
 
-            if (component.types.includes("locality")) {
-              addressForm.city = component.long_name; // City
-            }
-            if (component.types.includes("neighborhood")) {
-              addressForm.town = component.long_name; // Town
-            }
-            if (component.types.includes("country")) {
-              addressForm.country = component.long_name; // Country
-            }
-            if (component.types.includes("postal_code")) {
-              addressForm.postal_code = component.long_name; // Postal Code
-            } else {
-              addressForm.postal_code = "";
-            }
+            // if (component.types.includes("locality")) {
+            //   addressForm.city = component.long_name; // City
+            // }
+            // if (component.types.includes("neighborhood")) {
+            //   addressForm.town = component.long_name; // Town
+            // }
+            // if (component.types.includes("country")) {
+            //   addressForm.country = component.long_name; // Country
+            // }
+            // if (component.types.includes("postal_code")) {
+            //   addressForm.postal_code = component.long_name; // Postal Code
+            // }
+            // else {
+            //   addressForm.postal_code = "";
+            // }
           }
 
-          var wrappedAddress = addressForm.city + " " + addressForm.postal_code;
-          var mainAddress = [placeName, streetName, route]
-            .filter(Boolean)
-            .join(" ");
+          // var wrappedAddress = addressForm.city + " " + addressForm.postal_code;
+          // var mainAddress = [placeName, streetName, route]
+          //   .filter(Boolean)
+          //   .join(" ");
           var fullSingleLine = streetName + " " + route;
           var fullAddress = [fullSingleLine, wrappedAddress]
             .filter(Boolean)
             .join("\n");
 
-          addressForm.main_address = mainAddress;
+          // addressForm.main_address = mainAddress;
           addressForm.full_address = fullAddress;
-          addressForm.condo_name = placeName;
-          addressForm.latitude = place.geometry.location.lat();
-          addressForm.longitude = place.geometry.location.lng();
+          // addressForm.condo_name = placeName;
+          // addressForm.latitude = place.geometry.location.lat();
+          // addressForm.longitude = place.geometry.location.lng();
         }
       });
     } else {
@@ -1030,15 +1031,15 @@ const initAutocomplete = async () => {
 };
 
 const resetForm = () => {
-  addressForm.main_address = "";
+  // addressForm.main_address = "";
   addressForm.full_address = "";
-  addressForm.unit = "";
-  addressForm.postal_code = "";
-  addressForm.town = "";
-  addressForm.city = "";
-  addressForm.country = "";
-  addressForm.condo_name = "";
-  addressForm.landmark = "";
+  // addressForm.unit = "";
+  // addressForm.postal_code = "";
+  // addressForm.town = "";
+  // addressForm.city = "";
+  // addressForm.country = "";
+  // addressForm.condo_name = "";
+  // addressForm.landmark = "";
   addressForm.location_name = "";
 };
 
@@ -1144,15 +1145,15 @@ const handleEditLocation = async (address_id) => {
     .get("/get-address/" + address_id)
     .then((response) => {
       let formData = response.data.data;
-      (addressForm.main_address = formData.address_master?.street_address),
-        (addressForm.full_address = formData.full_address),
-        (addressForm.unit = formData.unit_number),
-        (addressForm.postal_code = formData.address_master?.postal_code),
-        (addressForm.town = formData.address_master?.town.town_name),
-        (addressForm.city = formData.address_master?.city.city_name),
-        (addressForm.country = formData.address_master?.country.country_name),
-        (addressForm.condo_name = formData?.condo_name || ""),
-        (addressForm.landmark = formData.landmark),
+      // (addressForm.main_address = formData.address_master?.street_address),
+      (addressForm.full_address = formData.full_address),
+        // (addressForm.unit = formData.unit_number),
+        // (addressForm.postal_code = formData.address_master?.postal_code),
+        // (addressForm.town = formData.address_master?.town.town_name),
+        // (addressForm.city = formData.address_master?.city.city_name),
+        // (addressForm.country = formData.address_master?.country.country_name),
+        // (addressForm.condo_name = formData?.condo_name || ""),
+        // (addressForm.landmark = formData.landmark),
         (addressForm.location_name = formData.location_name);
       addressDialog.value = true;
     })
