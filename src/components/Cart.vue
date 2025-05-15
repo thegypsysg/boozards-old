@@ -251,6 +251,7 @@
                       </v-row>
 
                       <!--  -->
+
                       <!-- <v-row>
                         <v-col>
                           <div>
@@ -371,12 +372,15 @@
                 </v-dialog>
               </div>
 
+              <!-- class="border-md bg-white mt-6" -->
               <div
                 v-for="(option, index) in addressesOptions"
-                class="border-md bg-white mt-6"
                 :class="{
+                  'mt-6': true,
                   'pa-5': true,
+                  'bg-teal-lighten-2': option.primary_address,
                   'rounded-lg': true,
+                  'border-md': !option.primary_address,
                 }"
               >
                 <!-- 'bg-white': option.primary_address, -->
@@ -425,13 +429,274 @@
                   </v-col>
                 </v-row>
               </div>
+
+              <v-row class="mt-4">
+                <v-col>
+                  <div>
+                    <label class="text-grey-darken-1 font-weight-bold"
+                      >Delivery Instructions</label
+                    >
+                    <MazTextarea
+                      class="mt-1"
+                      rows="4"
+                      placeholder="Your Full Address"
+                      v-model="deliveryInstructions"
+                      @blur="changeDeliveryInstructions"
+                    />
+                  </div>
+                </v-col>
+              </v-row>
             </v-col>
             <v-col v-if="step == 4" class="pa-5">
+              <div class="my-3 text-h6 d-flex justify-space-between">
+                <span>Review Order</span>
+                <v-btn
+                  prepend-icon="mdi-arrow-left"
+                  @click="step = 3"
+                  color="grey"
+                  variant="flat"
+                  >Back</v-btn
+                >
+              </div>
+              <p class="text-red-darken-3 font-weight-black text-caption">
+                (Please press Back button to Edit any changes required)
+              </p>
+              <template v-for="(product, index) in cart" :key="index">
+                <div class="d-flex align-center px-3 py-1">
+                  <div class="flex-grow-0 flex-shrink-0">
+                    <v-img
+                      class="rounded bg-white"
+                      :src="fileURL + product.image"
+                      width="65"
+                      height="65"
+                      cover
+                    >
+                      <template v-slot:placeholder>
+                        <div
+                          class="d-flex align-center justify-center fill-height"
+                        >
+                          <v-progress-circular
+                            color="grey-lighten-4"
+                            indeterminate
+                          ></v-progress-circular>
+                        </div>
+                      </template>
+                    </v-img>
+                  </div>
+                  <div class="flex-grow-1 flex-shrink-0 ml-1 pa-2">
+                    <div class="d-flex align-center justify-space-between">
+                      <div class="text-wrap product-name text-body-2">
+                        {{ product.name }}
+                        <span class="text-blue">{{
+                          product.quantity_name
+                        }}</span>
+                      </div>
+                      <div class="text-body-2 text-end">
+                        <!-- <strong
+                        >{{ selectedCountry?.currency_symbol }}
+                      </strong> -->
+                        <!-- S{{ formatCurrency(product.price * product.quantity) }} -->
+                      </div>
+                    </div>
+                    <div class="d-flex align-center justify-space-between">
+                      <div class="d-flex align-center ga-3 border">
+                        <v-btn
+                          size="xs"
+                          color="black"
+                          class="text-caption pa-1 rounded-0"
+                          variant="flat"
+                          icon
+                          @click="updateQuantity(product, 'decrease')"
+                        >
+                          <v-icon>mdi-minus</v-icon>
+                        </v-btn>
+                        <span class="text-body-2">{{ product.quantity }}</span>
+                        <v-btn
+                          size="xs"
+                          color="black"
+                          class="text-caption pa-1 rounded-0"
+                          variant="flat"
+                          icon
+                          @click="updateQuantity(product, 'increase')"
+                        >
+                          <v-icon>mdi-plus</v-icon>
+                        </v-btn>
+                      </div>
+                      <div class="text-body-2">
+                        <strong class="text-red">{{
+                          selectedCountry?.currency_symbol
+                        }}</strong>
+                        <strong class="text-red">S{{ product.price }}</strong>
+                      </div>
+                      <div>
+                        <v-btn
+                          @click="handleRemoveFromCart(product)"
+                          color="red"
+                          icon="mdi-trash-can"
+                          size="x-small"
+                        ></v-btn>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <v-card elevation="0">
+                <div
+                  class="d-flex align-center justify-space-between pa-4 border-b"
+                >
+                  <div><strong>Billing Summary</strong></div>
+                </div>
+                <v-table density="compact" class="custom-table">
+                  <tbody class="text-caption">
+                    <tr>
+                      <td>Sub Total</td>
+                      <td class="text-end">
+                        {{ selectedCountry.currency_symbol }}
+                      </td>
+                      <td class="text-end">{{ cart[0].amount }}</td>
+                    </tr>
+                    <tr>
+                      <td>Delivery Charges</td>
+                      <td class="text-end">
+                        {{ selectedCountry.currency_symbol }}
+                      </td>
+                      <td class="text-end">
+                        {{ selectedDeliveryPrice.toFixed(2) }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Platform Fee</td>
+                      <td class="text-end">
+                        {{ selectedCountry.currency_symbol }}
+                      </td>
+                      <td class="text-end">{{ platformFee?.toFixed(2) }}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        G.S.T
+                        {{
+                          taxAmount != null
+                            ? "(" + taxAmount + "%)"
+                            : "(Not Applicable)"
+                        }}
+                      </td>
+                      <td class="text-end">
+                        {{ selectedCountry.currency_symbol }}
+                      </td>
+                      <td class="text-end">
+                        {{
+                          taxAmount != null
+                            ? ((subTotal + selectedDeliveryPrice + 0.5) *
+                                taxAmount) /
+                              100
+                            : "0.00"
+                        }}
+                      </td>
+                    </tr>
+                    <tr class="total-row">
+                      <td class="border-none">
+                        <strong>This is what you pay</strong>
+                      </td>
+                      <td class="border-none text-end">
+                        <strong>{{ selectedCountry.currency_symbol }}</strong>
+                      </td>
+                      <td class="text-end border-none">
+                        <strong>{{
+                          (
+                            subTotal +
+                            selectedDeliveryPrice +
+                            platformFee +
+                            ((subTotal + selectedDeliveryPrice + 0.5) *
+                              taxAmount) /
+                              100
+                          ).toFixed(2)
+                        }}</strong>
+                      </td>
+                    </tr>
+                    <!--  -->
+                    <tr class="font-weight-black">
+                      <td class="border-none">Delivery to :</td>
+                      <td class="border-none">Order Instructions</td>
+                      <td class="border-none">Order Status</td>
+                    </tr>
+                    <tr>
+                      <td class="border-none" style="width: 40%">
+                        Lorem ipsum dolor sit amet consectetur, adipisicing
+                        elit. Rerum, tenetur.
+                      </td>
+                      <td class="border-none" style="width: 30%">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      </td>
+                      <td
+                        class="border-none font-weight-black text-blue-darken-3"
+                        style="width: 30%"
+                      >
+                        Static Data
+                      </td>
+                    </tr>
+                    <!--  -->
+                    <!--  -->
+                    <tr class="font-weight-black">
+                      <td class="border-none">Delivery Date</td>
+                      <td class="border-none">Time Slot</td>
+                      <td class="border-none">Delivery Status</td>
+                    </tr>
+                    <tr>
+                      <td
+                        class="border-none font-weight-black text-blue-darken-3"
+                        style="width: 40%"
+                      >
+                        Lorem ipsum dolor sit amet.
+                      </td>
+                      <td
+                        class="border-none font-weight-black text-blue-darken-3"
+                        style="width: 30%"
+                      >
+                        Static data
+                      </td>
+                      <td
+                        class="border-none font-weight-black text-blue-darken-3"
+                        style="width: 30%"
+                      >
+                        Static Data
+                      </td>
+                    </tr>
+                    <!--  -->
+                    <!--  -->
+                    <tr class="font-weight-black">
+                      <td class="border-none">Payment Status</td>
+                      <td class="border-none">Payment By</td>
+                      <td class="border-none"></td>
+                    </tr>
+                    <tr>
+                      <td
+                        class="border-none font-weight-black text-blue-darken-3"
+                        style="width: 40%"
+                      >
+                        Static
+                      </td>
+                      <td
+                        class="border-none font-weight-black text-blue-darken-3"
+                        style="width: 30%"
+                      >
+                        Static
+                      </td>
+                      <td
+                        class="border-none font-weight-black text-blue-darken-3"
+                        style="width: 30%"
+                      ></td>
+                    </tr>
+                    <!--  -->
+                  </tbody>
+                </v-table>
+              </v-card>
+            </v-col>
+            <v-col v-if="step == 5" class="pa-5">
               <div class="my-3 text-h6 d-flex justify-space-between">
                 <span>Payment Options</span>
                 <v-btn
                   prepend-icon="mdi-arrow-left"
-                  @click="step = 3"
+                  @click="step = 4"
                   color="grey"
                   variant="flat"
                   >Back</v-btn
@@ -489,12 +754,12 @@
                 </div>
               </MazRadioButtons>
             </v-col>
-            <v-col v-if="step == 5" class="pa-5">
+            <v-col v-if="step == 6" class="pa-5">
               <div class="my-3 text-h6 d-flex justify-space-between">
                 <span>Pay using PayNow</span>
                 <v-btn
                   prepend-icon="mdi-arrow-left"
-                  @click="step = 4"
+                  @click="step = 5"
                   color="grey"
                   variant="flat"
                   >Back</v-btn
@@ -564,7 +829,7 @@
               color="#ff9800"
               variant="flat"
               size="large"
-              >Proceed to Pay</v-btn
+              >Review Order</v-btn
             >
             <v-btn
               v-else-if="step == 4"
@@ -572,10 +837,18 @@
               color="#ff9800"
               variant="flat"
               size="large"
-              >Pay Now</v-btn
+              >Confirm Order</v-btn
             >
             <v-btn
               v-else-if="step == 5"
+              @click="nextStep(6)"
+              color="#ff9800"
+              variant="flat"
+              size="large"
+              >Pay Now</v-btn
+            >
+            <v-btn
+              v-else-if="step == 6"
               @click="confirmOrder = true"
               color="#1868C1"
               variant="flat"
@@ -618,7 +891,7 @@
                       <tr>
                         <td>Platform Fee</td>
                         <td>{{ selectedCountry.currency_symbol }}</td>
-                        <td class="text-end">{{ platformFee.toFixed(2) }}</td>
+                        <td class="text-end">{{ platformFee?.toFixed(2) }}</td>
                       </tr>
                       <tr>
                         <td>
@@ -868,6 +1141,7 @@ const addressForm = reactive({
   //latitude: "",
   //longitude: "",
 });
+const deliveryInstructions = ref("");
 
 const addressesOptions = computed(() => {
   return addresses.value.map((address) => ({
@@ -1105,7 +1379,7 @@ const handleOpenDialog = (option, index) => {
 
 // Delete address from the DB & the list
 const handleDeleteAddress = async () => {
-  const response = await axios.get("/delete-address/" + addressId.value, {
+  const response = await axios.delete("/delete-address/" + addressId.value, {
     headers: {
       Authorization: `Bearer ${authToken}`,
     },
@@ -1164,7 +1438,7 @@ const handleEditLocation = async (address_id) => {
 };
 
 const nextStep = (value) => {
-  if (value === 5) {
+  if (value === 6) {
     snackbar.value = false;
     message.value = {
       text: "",
@@ -1323,6 +1597,10 @@ const saveAddress = async () => {
   } finally {
     savingAddress.value = false;
   }
+};
+
+const changeDeliveryInstructions = () => {
+  console.log(deliveryInstructions.value);
 };
 
 const getTaxAmount = async () => {
@@ -1515,7 +1793,6 @@ onMounted(() => {
 }
 
 .custom-table td {
-  padding: 10px;
   border-bottom: 1px solid #ddd;
 }
 
