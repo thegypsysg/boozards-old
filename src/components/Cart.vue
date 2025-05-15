@@ -833,7 +833,7 @@
             >
             <v-btn
               v-else-if="step == 4"
-              @click="nextStep(5)"
+              @click="confirmOrder2 = true"
               color="#ff9800"
               variant="flat"
               size="large"
@@ -1001,6 +1001,21 @@
       </v-card-text>
     </v-card>
   </v-dialog>
+  <v-dialog v-model="confirmOrder2" persistent width="auto">
+    <v-card width="350">
+      <v-card-text class="">
+        <h4 class="mt-4 mb-8 text-center">Confirm this Order . ?</h4>
+        <div class="w-100 d-flex align-center justify-space-around">
+          <v-btn class="mb-4 w-33 bg-primary" @click="handleConfirmOrder2()">
+            Yes
+          </v-btn>
+          <v-btn class="mb-4 w-33 bg-primary" @click="confirmOrder2 = false">
+            No
+          </v-btn>
+        </div>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
   <v-dialog v-model="confirmOrder" persistent width="auto">
     <v-card width="350">
       <v-card-text class="">
@@ -1064,6 +1079,7 @@ const openDialog = ref(false);
 const payLater = ref(false);
 const havePaid = ref(false);
 const confirmOrder = ref(false);
+const confirmOrder2 = ref(false);
 const isEmptyAddress = ref(false);
 const isEmptyPayment = ref(false);
 const addressIndex = ref(null);
@@ -1410,6 +1426,23 @@ const handleConfirmOrder = async () => {
   // openDialog.value = false;
   emit("update:viewCart", false);
   confirmOrder.value = false;
+};
+const handleConfirmOrder2 = async () => {
+  // const response = await axios.get("/delete-address/" + addressId.value, {
+  //   headers: {
+  //     Authorization: `Bearer ${authToken}`,
+  //   },
+  // });
+
+  // snackbar.value = true;
+  // message.value = {
+  //   text: response.data.message,
+  //   color: "success",
+  // };
+  // addresses.value.splice(addressIndex.value, 1);
+  // openDialog.value = false;
+  nextStep(5);
+  confirmOrder2.value = false;
 };
 
 // Edit Address
