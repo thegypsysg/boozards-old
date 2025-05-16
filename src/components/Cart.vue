@@ -409,7 +409,10 @@
                 />
                 <v-row class="d-flex align-center">
                   <v-col cols="9">
-                    <p>{{ option.full_address }}</p>
+                    <p
+                      v-if="option?.full_address"
+                      v-html="formatInfo(option.full_address)"
+                    />
                   </v-col>
                   <v-col cols="3" class="d-flex align-center pa-0">
                     <v-btn
@@ -615,21 +618,33 @@
                     </tr>
                     <!--  -->
                     <tr class="font-weight-black">
-                      <td class="border-none">Delivery to :</td>
-                      <td class="border-none">Order Instructions</td>
-                      <td class="border-none">Order Status</td>
+                      <td class="border-none" style="vertical-align: top">
+                        Delivery to :
+                      </td>
+                      <td class="border-none" style="vertical-align: top">
+                        Order Instructions
+                      </td>
+                      <td class="border-none" style="vertical-align: top">
+                        Order Status
+                      </td>
                     </tr>
                     <tr>
-                      <td class="border-none" style="width: 40%">
+                      <td
+                        class="border-none"
+                        style="width: 40%; vertical-align: top"
+                      >
                         Lorem ipsum dolor sit amet consectetur, adipisicing
                         elit. Rerum, tenetur.
                       </td>
-                      <td class="border-none" style="width: 30%">
+                      <td
+                        class="border-none"
+                        style="width: 30%; vertical-align: top"
+                      >
                         Lorem ipsum dolor sit amet consectetur adipisicing elit.
                       </td>
                       <td
                         class="border-none font-weight-black text-blue-darken-3"
-                        style="width: 30%"
+                        style="width: 30%; vertical-align: top"
                       >
                         Static Data
                       </td>
@@ -637,26 +652,32 @@
                     <!--  -->
                     <!--  -->
                     <tr class="font-weight-black">
-                      <td class="border-none">Delivery Date</td>
-                      <td class="border-none">Time Slot</td>
-                      <td class="border-none">Delivery Status</td>
+                      <td class="border-none" style="vertical-align: top">
+                        Delivery Date
+                      </td>
+                      <td class="border-none" style="vertical-align: top">
+                        Time Slot
+                      </td>
+                      <td class="border-none" style="vertical-align: top">
+                        Delivery Status
+                      </td>
                     </tr>
                     <tr>
                       <td
                         class="border-none font-weight-black text-blue-darken-3"
-                        style="width: 40%"
+                        style="width: 40%; vertical-align: top"
                       >
                         Lorem ipsum dolor sit amet.
                       </td>
                       <td
                         class="border-none font-weight-black text-blue-darken-3"
-                        style="width: 30%"
+                        style="width: 30%; vertical-align: top"
                       >
                         Static data
                       </td>
                       <td
                         class="border-none font-weight-black text-blue-darken-3"
-                        style="width: 30%"
+                        style="width: 30%; vertical-align: top"
                       >
                         Static Data
                       </td>
@@ -664,26 +685,30 @@
                     <!--  -->
                     <!--  -->
                     <tr class="font-weight-black">
-                      <td class="border-none">Payment Status</td>
-                      <td class="border-none">Payment By</td>
+                      <td class="border-none" style="vertical-align: top">
+                        Payment Status
+                      </td>
+                      <td class="border-none" style="vertical-align: top">
+                        Payment By
+                      </td>
                       <td class="border-none"></td>
                     </tr>
                     <tr>
                       <td
                         class="border-none font-weight-black text-blue-darken-3"
-                        style="width: 40%"
+                        style="width: 40%; vertical-align: top"
                       >
                         Static
                       </td>
                       <td
                         class="border-none font-weight-black text-blue-darken-3"
-                        style="width: 30%"
+                        style="width: 30%; vertical-align: top"
                       >
                         Static
                       </td>
                       <td
                         class="border-none font-weight-black text-blue-darken-3"
-                        style="width: 30%"
+                        style="width: 30%; vertical-align: top"
                       ></td>
                     </tr>
                     <!--  -->
@@ -1227,6 +1252,10 @@ const cart = computed(() => {
   return store.state.cart;
 });
 
+const formatInfo = (info) => {
+  return info.replace(/\n/g, "<br>");
+};
+
 const getDeliveryCharges = () => {
   store.dispatch(
     "getDeliveryCharges",
@@ -1539,34 +1568,28 @@ const getAddress = async () => {
       headers: { Authorization: `Bearer ${authToken}` },
     });
 
-    // Pastikan `data` adalah array sebelum menggunakannya
+    // Ambil data dari response dan pastikan array
     const data = response.data?.data;
     addresses.value = Array.isArray(data) ? data : [];
 
     // Cari alamat utama (primary address)
-    // const primaryAddressIndex = addresses.value.findIndex(
-    //   (address) => address.primary_address,
-    // );
-    // const primaryAddress = addresses.value.find(
-    //   (address) => address.primary_address,
-    // );
+    const primaryAddressIndex = addresses.value.findIndex(
+      (address) => address.primary_address === true,
+    );
 
-    /* if (primaryAddress) {
-      // Hanya memindahkan alamat utama ke urutan pertama jika ditemukan
-      addresses.value.splice(primaryAddressIndex, 1);
-      addresses.value.unshift(primaryAddress);
+    if (primaryAddressIndex !== -1) {
+      const [primaryAddress] = addresses.value.splice(primaryAddressIndex, 1);
+      addresses.value.unshift(primaryAddress); // Pindahkan ke paling atas
 
-      // Set `selectedAddress` dengan `ga_id` dari alamat utama
+      // Set selectedAddress dengan ga_id
       selectedAddress.value = primaryAddress.ga_id ?? null;
 
-      // Pastikan `primaryAddress.ga_id` ada sebelum mengaksesnya
       if (primaryAddress.ga_id) {
         addressExpanded.value[primaryAddress.ga_id] = true;
       }
     } else {
-      selectedAddress.value = null; // Jika tidak ada primary address, set null
-    } */
-    selectedAddress.value = null;
+      selectedAddress.value = null;
+    }
   } catch (error) {
     console.error("Error fetching addresses:", error);
     // alert(error.response?.data?.message || "Something went wrong!");
