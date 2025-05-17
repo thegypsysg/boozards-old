@@ -375,17 +375,18 @@
               <!-- class="border-md bg-white mt-6" -->
               <div
                 v-for="(option, index) in addressesOptions"
+                class="cursor-pointer"
                 :class="{
                   'mt-6': true,
                   'pa-5': true,
-                  'bg-teal-lighten-2': option.primary_address,
+                  'bg-teal-lighten-2': option.value == selectedAddress,
                   'rounded-lg': true,
-                  'border-md': !option.primary_address,
+                  'border-md': option.value != selectedAddress,
                 }"
               >
                 <!-- 'bg-white': option.primary_address, -->
                 <!-- 'border-md': !option.primary_address, -->
-                <v-row>
+                <v-row @click="selectAddress(option)">
                   <v-col cols="9">
                     <strong>{{ option.location_name }}</strong>
                   </v-col>
@@ -408,7 +409,7 @@
                   class="mt-2 mb-2 border-opacity-15"
                 />
                 <v-row class="d-flex align-center">
-                  <v-col cols="9">
+                  <v-col @click="selectAddress(option)" cols="9">
                     <p
                       v-if="option?.full_address"
                       v-html="formatInfo(option.full_address)"
@@ -1429,7 +1430,7 @@ const handleDeleteAddress = async () => {
       Authorization: `Bearer ${authToken}`,
     },
   });
-
+  getAddress();
   snackbar.value = true;
   message.value = {
     text: response.data.message,
@@ -1582,14 +1583,15 @@ const getAddress = async () => {
       addresses.value.unshift(primaryAddress); // Pindahkan ke paling atas
 
       // Set selectedAddress dengan ga_id
-      selectedAddress.value = primaryAddress.ga_id ?? null;
+      // selectedAddress.value = primaryAddress.ga_id ?? null;
 
       if (primaryAddress.ga_id) {
         addressExpanded.value[primaryAddress.ga_id] = true;
       }
-    } else {
-      selectedAddress.value = null;
     }
+    // else {
+    //   selectedAddress.value = null;
+    // }
   } catch (error) {
     console.error("Error fetching addresses:", error);
     // alert(error.response?.data?.message || "Something went wrong!");
@@ -1608,13 +1610,13 @@ const saveAddress = async () => {
       // ✅ Push the new address into `addresses.value`
       addresses.value.unshift(response.data.data); // Ensure `addresses` is a reactive array
       // const primaryAddressIndex = addresses.value.findIndex(address => address.primary_address)
-      selectedAddress.value = response.data.data.ga_id;
+      // selectedAddress.value = response.data.data.ga_id;
       toggleAddressDetails(response.data.data.ga_id);
       addresses.value = addresses.value.map((address) => ({
         ...address,
         // primary_address: address.ga_id === selectedAddress.value,
       }));
-
+      getAddress();
       snackbar.value = true;
       message.value = {
         text: response.data.message,
@@ -1653,6 +1655,47 @@ const saveAddress = async () => {
   } finally {
     savingAddress.value = false;
   }
+};
+
+const selectAddress = async (item) => {
+  // console.log(cart.value[0].cart_id);
+  // console.log(item);
+  // return false;
+  // savingAddress.value = true;
+  try {
+    const response = await axios.put(
+      `/update-cart-address`,
+      {
+        cart_id: cart.value[0].cart_id,
+        ga_id: item.value,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      },
+    );
+    getAddress();
+    const data = response.data.data;
+    selectedAddress.value = data.ga_id;
+    console.log(selectedAddress.value);
+    snackbar.value = true;
+    message.value = {
+      text: response.data.message,
+      color: "success",
+    };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || "Something went wrong!";
+    snackbar.value = true;
+    message.value = {
+      text: errorMessage,
+      color: "error",
+    };
+  }
+  // finally {
+  //   savingAddress.value = false;
+  // }
 };
 
 const changeDeliveryInstructions = () => {
@@ -1743,6 +1786,14 @@ watch(addressDialog, (isOpen) => {
   if (isOpen) {
     initAutocomplete();
   }
+});
+
+watch(cart, async (newCart) => {
+  // console.log(newCart);
+  if (newCart.length > 0) {
+    selectedAddress.value = newCart[0]?.ga_id;
+  }
+  console.log(selectedAddress.value);
 });
 
 watch(
