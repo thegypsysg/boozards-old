@@ -170,8 +170,93 @@
                   }}</strong>
                 </div>
               </MazRadioButtons>
+              <div class="w-75 mx-auto mt-4" v-if="selectedDelivery == 5">
+                <v-autocomplete
+                  clearable
+                  density="compact"
+                  placeholder="Select Advance Delivery"
+                  :items="[]"
+                  class="border-sm text-blue-darken-2 mb-4"
+                  variant="outlined"
+                ></v-autocomplete>
+                <v-autocomplete
+                  clearable
+                  density="compact"
+                  placeholder="Select Time Slot"
+                  :items="[]"
+                  class="border-sm text-blue-darken-2"
+                  variant="outlined"
+                ></v-autocomplete>
+              </div>
             </v-col>
             <v-col v-if="step == 3" class="pa-5">
+              <div class="my-3 text-h6 d-flex justify-space-between">
+                <span class="font-weight-bold text-blue-darken-2"
+                  >Delivery Schedule</span
+                >
+                <v-btn
+                  prepend-icon="mdi-arrow-left"
+                  @click="step = 2"
+                  color="grey"
+                  variant="flat"
+                  >Back</v-btn
+                >
+              </div>
+              <p class="font-weight-bold text-red-darken-4 mb-6">
+                You Selected
+              </p>
+              <div class="d-flex justify-space-between ma-2">
+                <strong>{{ selectedDeliveryObject?.label }}</strong>
+                <span class="price"
+                  >{{ selectedCountry.currency_symbol }}
+                  {{ selectedDeliveryObject?.price }}</span
+                >
+              </div>
+              <div class="d-flex justify-space-between ma-2">
+                <strong class="text-red font-bold font-sm">{{
+                  selectedDeliveryObject?.description_2
+                }}</strong>
+              </div>
+              <p class="font-weight-bold text-red-darken-4 mt-10 mb-6">
+                This is your Delivery Schedule
+              </p>
+              <div class="d-flex justify-start align-center ga-8">
+                <div>
+                  <label class="font-weight-bold text-caption"
+                    >Today
+                    <span class="text-blue-darken-2"
+                      >({{ deliveryScheduleDay }})</span
+                    ></label
+                  >
+                  <MazInput
+                    class="mt-1 text-blue-darken-2 font-weight-bold"
+                    v-model="deliveryScheduleToday"
+                    readonly
+                  />
+                </div>
+                <div>
+                  <label class="font-weight-bold text-caption"
+                    >Approx Delivery Time</label
+                  >
+                  <MazInput
+                    class="mt-1 text-blue-darken-2 font-weight-bold"
+                    v-model="deliveryScheduleApprox"
+                    readonly
+                  />
+                </div>
+              </div>
+              <div class="mt-12">
+                <label class="text-red-darken-4 font-weight-bold"
+                  >Delivery Order Instructions</label
+                >
+                <MazTextarea
+                  class="mt-1"
+                  rows="4"
+                  v-model="deliveryScheduleInstruction"
+                />
+              </div>
+            </v-col>
+            <v-col v-if="step == 4" class="pa-5">
               <div class="my-3 text-h6 d-flex justify-space-between">
                 <div class="d-flex flex-column">
                   <span>Where To Deliver . ?</span>
@@ -179,7 +264,7 @@
                 </div>
                 <v-btn
                   prepend-icon="mdi-arrow-left"
-                  @click="step = 2"
+                  @click="step = 3"
                   color="grey"
                   variant="flat"
                   >Back</v-btn
@@ -451,12 +536,12 @@
                 </v-col>
               </v-row>
             </v-col>
-            <v-col v-if="step == 4" class="pa-5">
+            <v-col v-if="step == 5" class="pa-5">
               <div class="my-3 text-h6 d-flex justify-space-between">
                 <span>Review Order</span>
                 <v-btn
                   prepend-icon="mdi-arrow-left"
-                  @click="step = 3"
+                  @click="step = 4"
                   color="grey"
                   variant="flat"
                   >Back</v-btn
@@ -717,12 +802,12 @@
                 </v-table>
               </v-card>
             </v-col>
-            <v-col v-if="step == 5" class="pa-5">
+            <v-col v-if="step == 6" class="pa-5">
               <div class="my-3 text-h6 d-flex justify-space-between">
                 <span>Payment Options</span>
                 <v-btn
                   prepend-icon="mdi-arrow-left"
-                  @click="step = 4"
+                  @click="step = 5"
                   color="grey"
                   variant="flat"
                   >Back</v-btn
@@ -731,7 +816,7 @@
               <MazRadioButtons
                 v-slot="{ option, selected }"
                 v-model="selectedPaymentMethod"
-                :options="paymentOptions.slice(0, 2)"
+                :options="paymentOptions"
                 @update:model-value="onSelectPayment"
                 orientation="col | row"
                 :selector="true"
@@ -753,12 +838,15 @@
                   </div>
                 </div>
               </MazRadioButtons>
-              <p class="text-caption font-weight-bold mb-4 mt-10">
+              <p
+                v-if="paymentOptions2.length > 0"
+                class="text-caption font-weight-bold mb-4 mt-10"
+              >
                 More payment options coming soon ...
               </p>
               <MazRadioButtons
                 v-slot="{ option, selected }"
-                :options="paymentOptions.slice(2, 5)"
+                :options="paymentOptions2"
                 orientation="col | row"
                 :selector="true"
                 color="info"
@@ -780,12 +868,12 @@
                 </div>
               </MazRadioButtons>
             </v-col>
-            <v-col v-if="step == 6" class="pa-5">
+            <v-col v-if="step == 7" class="pa-5">
               <div class="my-3 text-h6 d-flex justify-space-between">
                 <span>Pay using PayNow</span>
                 <v-btn
                   prepend-icon="mdi-arrow-left"
-                  @click="step = 5"
+                  @click="step = 6"
                   color="grey"
                   variant="flat"
                   >Back</v-btn
@@ -847,7 +935,7 @@
               color="#ff9800"
               variant="flat"
               size="large"
-              >Where to Deliver?</v-btn
+              >Delivery Schedule</v-btn
             >
             <v-btn
               v-else-if="step == 3"
@@ -855,10 +943,18 @@
               color="#ff9800"
               variant="flat"
               size="large"
-              >Review Order</v-btn
+              >Where to Deliver?</v-btn
             >
             <v-btn
               v-else-if="step == 4"
+              @click="nextStep(5)"
+              color="#ff9800"
+              variant="flat"
+              size="large"
+              >Review Order</v-btn
+            >
+            <v-btn
+              v-else-if="step == 5"
               @click="confirmOrder2 = true"
               color="#ff9800"
               variant="flat"
@@ -866,15 +962,15 @@
               >Confirm Order</v-btn
             >
             <v-btn
-              v-else-if="step == 5"
-              @click="nextStep(6)"
+              v-else-if="step == 6"
+              @click="nextStep(7)"
               color="#ff9800"
               variant="flat"
               size="large"
               >Pay Now</v-btn
             >
             <v-btn
-              v-else-if="step == 6"
+              v-else-if="step == 8"
               @click="confirmOrder = true"
               color="#1868C1"
               variant="flat"
@@ -1131,36 +1227,20 @@ const selectedDelivery = ref(
 );
 const selectedPaymentMethod = ref(null);
 const paymentOptions = ref([
-  {
-    value: 1,
-    payment_name: "Cash",
-    payment_desc: "Cash on Delivery",
-    payment_image: cash,
-  },
-  {
-    value: 2,
-    payment_name: "Paynow",
-    payment_desc: "QR Code Scanner | 91992000",
-    payment_image: paynow,
-  },
-  {
-    value: 3,
-    payment_name: "Credit Card",
-    payment_desc: "Powered by Adyen",
-    payment_image: credit,
-  },
-  {
-    value: 4,
-    payment_name: "Debit Card",
-    payment_desc: "Powered by Stripe",
-    payment_image: debit,
-  },
-  {
-    value: 5,
-    payment_name: "Google Pay",
-    payment_desc: "Powered by Google",
-    payment_image: googleImg,
-  },
+  // {
+  //   value: 1,
+  //   payment_name: "Cash",
+  //   payment_desc: "Cash on Delivery",
+  //   payment_image: cash,
+  // },
+]);
+const paymentOptions2 = ref([
+  // {
+  //   value: 1,
+  //   payment_name: "Cash",
+  //   payment_desc: "Cash on Delivery",
+  //   payment_image: cash,
+  // },
 ]);
 const addresses = ref([]);
 const selectedAddress = ref(null);
@@ -1184,6 +1264,10 @@ const addressForm = reactive({
   //longitude: "",
 });
 const deliveryInstructions = ref("");
+const deliveryScheduleDay = ref("Sunday");
+const deliveryScheduleToday = ref("18/05/2025");
+const deliveryScheduleApprox = ref("3 pm to 4 pm");
+const deliveryScheduleInstruction = ref("");
 
 const addressesOptions = computed(() => {
   return addresses.value.map((address) => ({
@@ -1229,6 +1313,13 @@ const selectedDeliveryId = computed(() => {
     (opt) => opt.value === selectedDelivery.value,
   );
   return option ? option.id : 0;
+});
+
+const selectedDeliveryObject = computed(() => {
+  const option = deliveryOptions.value.find(
+    (opt) => opt.value === selectedDelivery.value,
+  );
+  return option;
 });
 
 // Get cart items
@@ -1471,7 +1562,7 @@ const handleConfirmOrder2 = async () => {
   // };
   // addresses.value.splice(addressIndex.value, 1);
   // openDialog.value = false;
-  nextStep(5);
+  nextStep(6);
   confirmOrder2.value = false;
 };
 
@@ -1501,7 +1592,7 @@ const handleEditLocation = async (address_id) => {
 };
 
 const nextStep = (value) => {
-  if (value === 6) {
+  if (value === 7) {
     snackbar.value = false;
     message.value = {
       text: "",
@@ -1515,7 +1606,7 @@ const nextStep = (value) => {
     } else if (selectedPaymentMethod.value == 1) {
       return;
     }
-  } else if (value === 4) {
+  } else if (value === 5) {
     snackbar.value = false;
     message.value = {
       text: "",
@@ -1678,7 +1769,7 @@ const selectAddress = async (item) => {
     getAddress();
     const data = response.data.data;
     selectedAddress.value = data.ga_id;
-    console.log(selectedAddress.value);
+    // console.log(selectedAddress.value);
     snackbar.value = true;
     message.value = {
       text: response.data.message,
@@ -1778,8 +1869,50 @@ const getPlatformFee = async () => {
   }
 };
 
+const getPaymentTypes = async () => {
+  try {
+    const response = await axios.get(`/payment-type-list`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+
+    // Ambil data dari response dan pastikan array
+    const data = response.data?.data;
+    const result = Array.isArray(data)
+      ? data.filter(
+          (item) => item.country_id == selectedCountry.value.country_id,
+        )
+      : [];
+    paymentOptions.value = result
+      .filter((item) => item.active == "Y")
+      .map((pay) => {
+        return {
+          ...pay,
+          value: pay?.payment_type_id || 0,
+          payment_name: pay?.payment_name || "",
+          payment_desc: pay?.description || "",
+          payment_image: pay?.image ? fileURL + pay.image : "",
+        };
+      });
+    paymentOptions2.value = result
+      .filter((item) => item.active != "Y")
+      .map((pay) => {
+        return {
+          ...pay,
+          value: pay?.payment_type_id || 0,
+          payment_name: pay?.payment_name || "",
+          payment_desc: pay?.description || "",
+          payment_image: pay?.image ? fileURL + pay.image : "",
+        };
+      });
+  } catch (error) {
+    console.error("Error fetching addresses:", error);
+    // alert(error.response?.data?.message || "Something went wrong!");
+  }
+};
+
 watch(selectedCountry, async () => {
   await getTaxAmount();
+  await getPaymentTypes();
 });
 
 watch(addressDialog, (isOpen) => {
@@ -1793,7 +1926,7 @@ watch(cart, async (newCart) => {
   if (newCart.length > 0) {
     selectedAddress.value = newCart[0]?.ga_id;
   }
-  console.log(selectedAddress.value);
+  // console.log(selectedAddress.value);
 });
 
 watch(
@@ -1829,6 +1962,7 @@ onMounted(() => {
   ) {
     // getTaxAmount();
     getAddress();
+    // getPaymentTypes();
     getPlatformFee();
     getCartData();
   }
