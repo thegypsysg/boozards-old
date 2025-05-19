@@ -149,7 +149,11 @@
               <MazRadioButtons
                 v-slot="{ option, selected }"
                 v-model="selectedDelivery"
-                :options="deliveryOptions"
+                :options="
+                  deliveryOptions.filter(
+                    (item) => !item.label.toLowerCase().includes('advance'),
+                  )
+                "
                 orientation="col | row"
                 :selector="true"
                 color="info"
@@ -170,24 +174,37 @@
                   }}</strong>
                 </div>
               </MazRadioButtons>
-              <div class="w-75 mx-auto mt-4" v-if="selectedDelivery == 5">
-                <v-autocomplete
-                  clearable
-                  density="compact"
-                  placeholder="Select Advance Delivery"
-                  :items="[]"
-                  class="border-sm text-blue-darken-2 mb-4"
-                  variant="outlined"
-                ></v-autocomplete>
-                <v-autocomplete
-                  clearable
-                  density="compact"
-                  placeholder="Select Time Slot"
-                  :items="[]"
-                  class="border-sm text-blue-darken-2"
-                  variant="outlined"
-                ></v-autocomplete>
-              </div>
+              <p class="font-weight-black mb-2 mt-6 text-center">
+                === Advance Delivery Options ===
+              </p>
+              <MazRadioButtons
+                v-slot="{ option, selected }"
+                v-model="selectedDelivery"
+                :options="
+                  deliveryOptions.filter((item) =>
+                    item.label.toLowerCase().includes('advance'),
+                  )
+                "
+                orientation="col | row"
+                :selector="true"
+                color="info"
+                block
+                class="pt-5"
+                @update:model-value="onSelectDelivery"
+              >
+                <div class="d-flex justify-space-between ma-2">
+                  <strong>{{ option.label }}</strong>
+                  <span class="price"
+                    >{{ selectedCountry.currency_symbol }}
+                    {{ option.price }}</span
+                  >
+                </div>
+                <div class="d-flex justify-space-between ma-2">
+                  <strong class="text-red font-bold font-sm">{{
+                    option.description_2
+                  }}</strong>
+                </div>
+              </MazRadioButtons>
             </v-col>
             <v-col v-if="step == 3" class="pa-5">
               <div class="my-3 text-h6 d-flex justify-space-between">
@@ -217,34 +234,57 @@
                   selectedDeliveryObject?.description_2
                 }}</strong>
               </div>
-              <p class="font-weight-bold text-red-darken-4 mt-10 mb-6">
-                This is your Delivery Schedule
-              </p>
-              <div class="d-flex justify-start align-center ga-8">
-                <div>
-                  <label class="font-weight-bold text-caption"
-                    >Today
-                    <span class="text-blue-darken-2"
-                      >({{ deliveryScheduleDay }})</span
-                    ></label
-                  >
-                  <MazInput
-                    class="mt-1 text-blue-darken-2 font-weight-bold"
-                    v-model="deliveryScheduleToday"
-                    readonly
-                  />
-                </div>
-                <div>
-                  <label class="font-weight-bold text-caption"
-                    >Approx Delivery Time</label
-                  >
-                  <MazInput
-                    class="mt-1 text-blue-darken-2 font-weight-bold"
-                    v-model="deliveryScheduleApprox"
-                    readonly
-                  />
-                </div>
+              <div
+                class="w-75 mt-4"
+                v-if="selectedDelivery == 5 || selectedDelivery == 6"
+              >
+                <v-autocomplete
+                  clearable
+                  density="compact"
+                  placeholder="Select Advance Delivery"
+                  :items="[]"
+                  class="border-sm text-blue-darken-2 mb-4"
+                  variant="outlined"
+                ></v-autocomplete>
+                <v-autocomplete
+                  clearable
+                  density="compact"
+                  placeholder="Select Time Slot"
+                  :items="[]"
+                  class="border-sm text-blue-darken-2"
+                  variant="outlined"
+                ></v-autocomplete>
               </div>
+              <template v-else>
+                <p class="font-weight-bold text-red-darken-4 mt-10 mb-6">
+                  This is your Delivery Schedule
+                </p>
+                <div class="d-flex justify-start align-center ga-8">
+                  <div>
+                    <label class="font-weight-bold text-caption"
+                      >Today
+                      <span class="text-blue-darken-2"
+                        >({{ deliveryScheduleDay }})</span
+                      ></label
+                    >
+                    <MazInput
+                      class="mt-1 text-blue-darken-2 font-weight-bold"
+                      v-model="deliveryScheduleToday"
+                      readonly
+                    />
+                  </div>
+                  <div>
+                    <label class="font-weight-bold text-caption"
+                      >Approx Delivery Time</label
+                    >
+                    <MazInput
+                      class="mt-1 text-blue-darken-2 font-weight-bold"
+                      v-model="deliveryScheduleApprox"
+                      readonly
+                    />
+                  </div>
+                </div>
+              </template>
               <div class="mt-12">
                 <label class="text-red-darken-4 font-weight-bold"
                   >Delivery Order Instructions</label
@@ -519,7 +559,7 @@
                 </v-row>
               </div>
 
-              <v-row class="mt-4">
+              <!-- <v-row class="mt-4">
                 <v-col>
                   <div>
                     <label class="text-grey-darken-1 font-weight-bold"
@@ -534,7 +574,7 @@
                     />
                   </div>
                 </v-col>
-              </v-row>
+              </v-row> -->
             </v-col>
             <v-col v-if="step == 5" class="pa-5">
               <div class="my-3 text-h6 d-flex justify-space-between">
@@ -1468,7 +1508,7 @@ const onSelectDelivery = (selectedId) => {
     );
     if (selectedOption) {
       const payload = {
-        cart_id: cart.value[0].cart_id,
+        cart_id: cart.value[0]?.cart_id,
         dc_id: selectedOption.dc_id,
         delivery_rate: selectedOption.price,
       };
@@ -1927,6 +1967,7 @@ const getPaymentTypes = async () => {
 watch(selectedCountry, async () => {
   await getTaxAmount();
   await getPaymentTypes();
+  getDeliveryCharges();
 });
 
 watch(addressDialog, (isOpen) => {
@@ -1955,7 +1996,7 @@ watch(
       // );
       step.value = 1; // Set step to 1 when viewCart changes
       // selectedDelivery.value = null;
-      if (cart.value[0].delivery_charges != "0.00") {
+      if (cart.value[0]?.delivery_charges != "0.00") {
         selectedDelivery.value =
           store.state.selectedDelivery ??
           (localStorage.getItem("selectedDelivery") !== null
@@ -1981,7 +2022,6 @@ onMounted(() => {
     getPlatformFee();
     getCartData();
   }
-  getDeliveryCharges();
 });
 </script>
 

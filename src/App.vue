@@ -203,7 +203,8 @@ export default {
               data.basic_steps == "C" &&
               this.currentRoute == "/"
             ) {
-              this.$router.push(`/${data.slug}`);
+              // this.$router.push(`/${data.slug}`);
+              this.$router.push(`/`);
               app.config.globalProperties.$eventBus.$emit(
                 "getTrendingCardData2",
               );
@@ -215,11 +216,16 @@ export default {
             }
 
             if (data?.slug) {
-              this.path = `/${data.slug}`;
+              // this.path = `/${data.slug}`;
+              this.path = `/`;
               app.config.globalProperties.$eventBus.$emit(
                 "changeHeaderPath",
-                `/${data.slug}`,
+                `/`,
               );
+              // app.config.globalProperties.$eventBus.$emit(
+              //   "changeHeaderPath",
+              //   `/${data.slug}`,
+              // );
             } else {
               this.path = "/";
               app.config.globalProperties.$eventBus.$emit(
