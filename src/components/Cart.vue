@@ -1176,11 +1176,6 @@ import { Loader } from "@googlemaps/js-api-loader";
 import { useCart } from "@/composables/useCart";
 import { useGlobalSnackbar } from "@/composables/useGlobalSnackbar";
 import { fileURL } from "@/main";
-import cash from "@/assets/images/payment/cash.png";
-import paynow from "@/assets/images/payment/paynow.png";
-import credit from "@/assets/images/payment/credit.png";
-import debit from "@/assets/images/payment/debit.png";
-import googleImg from "@/assets/images/payment/google.png";
 import qris from "@/assets/images/payment/qris-example.png";
 
 const { snackbarVisible, snackbarMessage, snackbarColor } = useGlobalSnackbar();
@@ -1485,23 +1480,42 @@ const onSelectDelivery = (selectedId) => {
   }
 };
 
-const onSelectPayment = (selectedId) => {
-  console.log(selectedId);
-  // try {
-  //   const selectedOption = deliveryOptions.value.find(
-  //     (opt) => opt.dc_id === selectedId,
-  //   );
-  //   if (selectedOption) {
-  //     const payload = {
-  //       cart_id: cart.value[0].cart_id,
-  //       dc_id: selectedOption.dc_id,
-  //       delivery_rate: selectedOption.price,
-  //     };
-  //     store.dispatch("updateDeliveryChargesInCart", payload);
-  //     // console.log("Delivery option deliveryOptions:", payload);
-  //   }
-  // } catch (error) {
-  //   console.error("Error saving delivery option:", error);
+const onSelectPayment = async (selectedId) => {
+  // console.log(selectedId);
+  try {
+    const response = await axios.put(
+      `/update-cart-payment-type`,
+      {
+        cart_id: cart.value[0].cart_id,
+        payment_type_id: selectedId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      },
+    );
+    // getAddress();
+    const data = response.data.data;
+    // console.log(data);
+    selectedPaymentMethod.value = data.payment_type_id;
+    // console.log(selectedAddress.value);
+    snackbar.value = true;
+    message.value = {
+      text: response.data.message,
+      color: "success",
+    };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || "Something went wrong!";
+    snackbar.value = true;
+    message.value = {
+      text: errorMessage,
+      color: "error",
+    };
+  }
+  // finally {
+  //   savingAddress.value = false;
   // }
 };
 
@@ -1925,6 +1939,7 @@ watch(cart, async (newCart) => {
   // console.log(newCart);
   if (newCart.length > 0) {
     selectedAddress.value = newCart[0]?.ga_id;
+    selectedPaymentMethod.value = newCart[0]?.payment_type_id;
   }
   // console.log(selectedAddress.value);
 });
