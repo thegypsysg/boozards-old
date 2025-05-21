@@ -146,13 +146,14 @@
                   >Back</v-btn
                 >
               </div>
+              <p class="text-red-darken-4 font-weight-bold">
+                {{ currentTime }}
+              </p>
               <MazRadioButtons
                 v-slot="{ option, selected }"
                 v-model="selectedDelivery"
                 :options="
-                  deliveryOptions.filter(
-                    (item) => !item.label.toLowerCase().includes('advance'),
-                  )
+                  deliveryOptions.filter((item) => item.same_day == 'Y')
                 "
                 orientation="col | row"
                 :selector="true"
@@ -169,9 +170,11 @@
                   >
                 </div>
                 <div class="d-flex justify-space-between ma-2">
-                  <strong class="text-red font-bold font-sm">{{
-                    option.description_2
-                  }}</strong>
+                  <strong
+                    v-if="option.cut_off"
+                    class="text-red font-bold font-sm"
+                    >Cut off Time ({{ option.cut_off }})</strong
+                  >
                 </div>
               </MazRadioButtons>
               <p class="font-weight-black mb-2 mt-6 text-center">
@@ -181,9 +184,7 @@
                 v-slot="{ option, selected }"
                 v-model="selectedDelivery"
                 :options="
-                  deliveryOptions.filter((item) =>
-                    item.label.toLowerCase().includes('advance'),
-                  )
+                  deliveryOptions.filter((item) => item.same_day == 'A')
                 "
                 orientation="col | row"
                 :selector="true"
@@ -230,7 +231,12 @@
                 >
               </div>
               <div class="d-flex justify-space-between ma-2">
-                <strong class="text-red font-bold font-sm">{{
+                <strong
+                  v-if="selectedDeliveryObject?.same_day == 'Y'"
+                  class="text-red font-bold font-sm"
+                  >Cut off Time ({{ selectedDeliveryObject?.cut_off }})</strong
+                >
+                <strong v-else class="text-red font-bold font-sm">{{
                   selectedDeliveryObject?.description_2
                 }}</strong>
               </div>
@@ -1206,6 +1212,7 @@ import {
   onMounted,
   nextTick,
 } from "vue";
+import moment from "moment-timezone";
 import axios from "@/util/axios";
 import { useStore } from "vuex";
 import MazDrawer from "maz-ui/components/MazDrawer";
@@ -1231,6 +1238,7 @@ const props = defineProps({
 });
 const emit = defineEmits(["update:viewCart"]);
 
+const currentTime = ref("");
 const streetRef = ref(null);
 const openDialog = ref(false);
 const payLater = ref(false);
@@ -2009,6 +2017,16 @@ watch(
   },
 );
 
+const updateTime = () => {
+  const singaporeTime = moment().tz("Asia/Singapore");
+
+  const day = singaporeTime.format("dddd"); // e.g., Wednesday
+  const date = singaporeTime.format("DD/MM/YYYY"); // e.g., 21/05/2025
+  const time = singaporeTime.format("HH:mm"); // e.g., 16:49
+
+  currentTime.value = `${day} (Today) | ${date} | ${time}`;
+};
+
 onMounted(() => {
   if (
     authToken &&
@@ -2022,6 +2040,9 @@ onMounted(() => {
     getPlatformFee();
     getCartData();
   }
+
+  updateTime();
+  setInterval(updateTime, 1000);
 });
 </script>
 
