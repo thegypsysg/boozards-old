@@ -278,12 +278,12 @@
                     <label class="font-weight-bold text-caption"
                       >Today
                       <span class="text-blue-darken-2"
-                        >({{ deliveryScheduleDay }})</span
+                        >({{ selectedDeliveryObject?.today_day }})</span
                       ></label
                     >
                     <MazInput
                       class="mt-1 text-blue-darken-2 font-weight-bold"
-                      v-model="deliveryScheduleToday"
+                      v-model="selectedDeliveryObject.today_date"
                       readonly
                     />
                   </div>
@@ -293,7 +293,7 @@
                     >
                     <MazInput
                       class="mt-1 text-blue-darken-2 font-weight-bold"
-                      v-model="deliveryScheduleApprox"
+                      v-model="selectedDeliveryObject.time_slot"
                       readonly
                     />
                   </div>
