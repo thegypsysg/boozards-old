@@ -153,7 +153,7 @@
                 v-slot="{ option, selected }"
                 v-model="selectedDelivery"
                 :options="
-                  deliveryOptions.filter((item) => item.same_day == 'Y')
+                  deliveryOptions.filter((item) => item.same_day == 'S')
                 "
                 orientation="col | row"
                 :selector="true"
@@ -166,7 +166,7 @@
                   <strong>{{ option.label }}</strong>
                   <span class="price"
                     >{{ selectedCountry.currency_symbol }}
-                    {{ option.price }}</span
+                    {{ option?.price ? option.price.toFixed(2) : "" }}</span
                   >
                 </div>
                 <div class="d-flex justify-space-between ma-2">
@@ -197,7 +197,7 @@
                   <strong>{{ option.label }}</strong>
                   <span class="price"
                     >{{ selectedCountry.currency_symbol }}
-                    {{ option.price }}</span
+                    {{ option?.price ? option.price.toFixed(2) : "" }}</span
                   >
                 </div>
                 <div class="d-flex justify-space-between ma-2">
@@ -220,25 +220,33 @@
                   >Back</v-btn
                 >
               </div>
-              <p class="font-weight-bold text-red-darken-4 mb-6">
-                You Selected
+              <p class="text-red-darken-4 font-weight-bold mt-2">
+                {{ currentTime }}
               </p>
-              <div class="d-flex justify-space-between ma-2">
-                <strong>{{ selectedDeliveryObject?.label }}</strong>
-                <span class="price"
-                  >{{ selectedCountry.currency_symbol }}
-                  {{ selectedDeliveryObject?.price }}</span
-                >
-              </div>
-              <div class="d-flex justify-space-between ma-2">
-                <strong
-                  v-if="selectedDeliveryObject?.same_day == 'Y'"
-                  class="text-red font-bold font-sm"
-                  >Cut off Time ({{ selectedDeliveryObject?.cut_off }})</strong
-                >
-                <strong v-else class="text-red font-bold font-sm">{{
-                  selectedDeliveryObject?.description_2
-                }}</strong>
+              <!-- <p class="font-weight-bold text-red-darken-4 mb-6">
+                You Selected
+              </p> -->
+              <div style="border: 1.5px solid #daf4fd" class="px-4 py-3 my-4">
+                <div class="d-flex justify-space-between mb-3">
+                  <strong>{{ selectedDeliveryObject?.label }}</strong>
+                  <span class="price"
+                    >{{ selectedCountry.currency_symbol }}
+                    {{ selectedDeliveryObject?.price }}</span
+                  >
+                </div>
+
+                <div class="d-flex justify-space-between">
+                  <strong
+                    v-if="selectedDeliveryObject?.same_day == 'Y'"
+                    class="text-red font-bold font-sm"
+                    >Cut off Time ({{
+                      selectedDeliveryObject?.cut_off
+                    }})</strong
+                  >
+                  <strong v-else class="text-red font-bold font-sm">{{
+                    selectedDeliveryObject?.description_2
+                  }}</strong>
+                </div>
               </div>
               <div
                 class="w-75 mt-4"
@@ -262,9 +270,9 @@
                 ></v-autocomplete>
               </div>
               <template v-else>
-                <p class="font-weight-bold text-red-darken-4 mt-10 mb-6">
+                <!-- <p class="font-weight-bold text-red-darken-4 mt-10 mb-6">
                   This is your Delivery Schedule
-                </p>
+                </p> -->
                 <div class="d-flex justify-start align-center ga-8">
                   <div>
                     <label class="font-weight-bold text-caption"
@@ -2022,7 +2030,7 @@ const updateTime = () => {
 
   const day = singaporeTime.format("dddd"); // e.g., Wednesday
   const date = singaporeTime.format("DD/MM/YYYY"); // e.g., 21/05/2025
-  const time = singaporeTime.format("HH:mm"); // e.g., 16:49
+  const time = singaporeTime.format("HH:mm:ss"); // e.g., 16:49
 
   currentTime.value = `${day} (Today) | ${date} | ${time}`;
 };
