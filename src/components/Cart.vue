@@ -993,7 +993,7 @@
             >
             <v-btn
               v-else-if="step == 3"
-              @click="nextStep(4)"
+              @click="whereToDeliver()"
               color="#ff9800"
               variant="flat"
               size="large"
@@ -1315,9 +1315,6 @@ const addressForm = reactive({
   //longitude: "",
 });
 const deliveryInstructions = ref("");
-const deliveryScheduleDay = ref("Sunday");
-const deliveryScheduleToday = ref("18/05/2025");
-const deliveryScheduleApprox = ref("3 pm to 4 pm");
 const deliveryScheduleInstruction = ref("");
 
 const addressesOptions = computed(() => {
@@ -1661,6 +1658,44 @@ const handleEditLocation = async (address_id) => {
     });
 };
 
+const whereToDeliver = async () => {
+  console.log(selectedDeliveryObject.value);
+  try {
+    const response = await axios.put(
+      `/update-delivery-schedule-in-cart`,
+      {
+        cart_id: cart.value[0].cart_id,
+        dc_id: selectedDeliveryObject.value.dc_id,
+        delivery_date: selectedDeliveryObject.value.today_date,
+        delivery_day: selectedDeliveryObject.value.today_day,
+        same_day: selectedDeliveryObject.value.same_day,
+        time_slot: selectedDeliveryObject.value.time_slot,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      },
+    );
+    // const data = response.data.data;
+    // console.log(data);
+    nextStep(4);
+    snackbar.value = true;
+    message.value = {
+      text: response.data.message,
+      color: "success",
+    };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || "Something went wrong!";
+    snackbar.value = true;
+    message.value = {
+      text: errorMessage,
+      color: "error",
+    };
+  }
+};
+
 const nextStep = (value) => {
   if (value === 7) {
     snackbar.value = false;
@@ -1997,6 +2032,7 @@ watch(cart, async (newCart) => {
   if (newCart.length > 0) {
     selectedAddress.value = newCart[0]?.ga_id;
     selectedPaymentMethod.value = newCart[0]?.payment_type_id;
+    deliveryScheduleInstruction.value = newCart[0]?.order_instructions;
   }
   // console.log(selectedAddress.value);
 });
