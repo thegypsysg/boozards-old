@@ -730,6 +730,14 @@
                       </td>
                     </tr>
                     <tr>
+                      <td>Service Fee (0.25%)</td>
+                      <td></td>
+                      <td class="text-end">
+                        <!-- {{ selectedDeliveryPrice.toFixed(2) }} -->
+                        Static
+                      </td>
+                    </tr>
+                    <tr>
                       <td>Platform Fee</td>
                       <td class="text-end">
                         {{ selectedCountry.currency_symbol }}
@@ -751,9 +759,11 @@
                       <td class="text-end">
                         {{
                           taxAmount != null
-                            ? ((subTotal + selectedDeliveryPrice + 0.5) *
-                                taxAmount) /
-                              100
+                            ? (
+                                ((subTotal + selectedDeliveryPrice + 0.5) *
+                                  taxAmount) /
+                                100
+                              ).toFixed(2)
                             : "0.00"
                         }}
                       </td>
@@ -1087,6 +1097,14 @@
                         </td>
                       </tr>
                       <tr>
+                        <td>Service Fee (0.25%)</td>
+                        <td></td>
+                        <td class="text-end">
+                          <!-- {{ selectedDeliveryPrice.toFixed(2) }} -->
+                          Static
+                        </td>
+                      </tr>
+                      <tr>
                         <td>Platform Fee</td>
                         <td>{{ selectedCountry.currency_symbol }}</td>
                         <td class="text-end">{{ platformFee?.toFixed(2) }}</td>
@@ -1104,9 +1122,11 @@
                         <td class="text-end">
                           {{
                             taxAmount != null
-                              ? ((subTotal + selectedDeliveryPrice + 0.5) *
-                                  taxAmount) /
-                                100
+                              ? (
+                                  ((subTotal + selectedDeliveryPrice + 0.5) *
+                                    taxAmount) /
+                                  100
+                                ).toFixed(2)
                               : "0.00"
                           }}
                         </td>
