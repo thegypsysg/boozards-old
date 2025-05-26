@@ -252,19 +252,41 @@
                 class="w-75 mt-4"
                 v-if="selectedDelivery == 5 || selectedDelivery == 6"
               >
-                <v-autocomplete
+                <!-- <v-autocomplete
                   clearable
                   density="compact"
                   placeholder="Select Advance Delivery"
-                  :items="[]"
+                  :items="selectedDeliveryObject?.allowedDays"
+                  item-title="label"
+                  item-value="value"
                   class="border-sm text-blue-darken-2 mb-4"
                   variant="outlined"
-                ></v-autocomplete>
+                ></v-autocomplete> -->
+                <VueDatePicker
+                  style="font-size: 12px !important"
+                  class="text-caption mb-4"
+                  :disabled-week-days="selectedDeliveryObject?.allowedDays"
+                  v-model="selectedDate"
+                  :format="format"
+                >
+                  <!-- @update:model-value="onDateSelected" -->
+                  <!-- <template #input-icon>
+                <Icon
+                  style="font-size: 20px"
+                  class="mt-1 text-black"
+                  icon="solar:calendar-outline"
+                />
+              </template>
+              <template #clear-icon>
+                <Icon style="font-size: 18px" class="text-black" icon="mdi:chevron-down" />
+              </template> -->
+                </VueDatePicker>
                 <v-autocomplete
                   clearable
                   density="compact"
                   placeholder="Select Time Slot"
-                  :items="[]"
+                  v-model="selectedTimeSlot"
+                  :items="timeSlots"
                   class="border-sm text-blue-darken-2"
                   variant="outlined"
                 ></v-autocomplete>
@@ -1238,7 +1260,7 @@ const { updateQuantity } = useCart();
 const store = useStore();
 
 let autocomplete;
-const modalTitle = "Are you Sure?";
+const allDays = [0, 1, 2, 3, 4, 5, 6];
 const authToken = localStorage.getItem("token");
 
 const props = defineProps({
@@ -1277,6 +1299,8 @@ const selectedDelivery = ref(
   null,
 );
 const selectedPaymentMethod = ref(null);
+const selectedDate = ref(null);
+const selectedTimeSlot = ref(null);
 const paymentOptions = ref([
   // {
   //   value: 1,
@@ -1299,6 +1323,7 @@ const savingAddress = ref(false);
 const addressExpanded = ref({});
 const taxAmount = ref(null);
 const platformFee = ref(null);
+const timeSlots = ref([]);
 
 const addressForm = reactive({
   //main_address: "",
@@ -1341,7 +1366,12 @@ const selectedCountry = computed(() => {
 });
 
 const deliveryOptions = computed(() => {
-  return store.state.deliveryCharges;
+  return store.state.deliveryCharges.map((item) => {
+    return {
+      ...item,
+      allowedDays: allDays.filter((day) => !item.allowed_days.includes(day)),
+    };
+  });
 });
 
 // const deliveryOptions = ref([
@@ -1391,6 +1421,28 @@ const subTotal = computed(() =>
 const cart = computed(() => {
   return store.state.cart;
 });
+
+const format = (date) => {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+};
+
+const parse = (dateStr) => {
+  const [day, month, year] = dateStr.split("/").map(Number);
+  return new Date(year, month - 1, day); // month is 0-based
+};
+
+// const onDateSelected = (newDate) => {
+//   const day = newDate.getDate();
+//   const month = newDate.getMonth() + 1;
+//   const year = newDate.getFullYear();
+
+//   selectedDate.value = `${day}/${month}/${year}`;
+//   // console.log(`${day}/${month}/${year}`);
+// };
 
 const formatInfo = (info) => {
   return info.replace(/\n/g, "<br>");
@@ -1659,17 +1711,17 @@ const handleEditLocation = async (address_id) => {
 };
 
 const whereToDeliver = async () => {
-  console.log(selectedDeliveryObject.value);
   try {
     const response = await axios.put(
       `/update-delivery-schedule-in-cart`,
       {
         cart_id: cart.value[0].cart_id,
         dc_id: selectedDeliveryObject.value.dc_id,
-        delivery_date: selectedDeliveryObject.value.today_date,
-        delivery_day: selectedDeliveryObject.value.today_day,
+        delivery_date: format(selectedDate.value),
+        // delivery_day: selectedDeliveryObject.value.today_day,
         same_day: selectedDeliveryObject.value.same_day,
-        time_slot: selectedDeliveryObject.value.time_slot,
+        time_slot: selectedTimeSlot.value,
+        order_instructions: deliveryScheduleInstruction.value,
       },
       {
         headers: {
@@ -1680,6 +1732,7 @@ const whereToDeliver = async () => {
     // const data = response.data.data;
     // console.log(data);
     nextStep(4);
+    getCartData();
     snackbar.value = true;
     message.value = {
       text: response.data.message,
@@ -1974,6 +2027,21 @@ const getPlatformFee = async () => {
   }
 };
 
+const getTimeSlots = async () => {
+  try {
+    const response = await axios.get(`/list-time-slots`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    });
+
+    // Ambil data dari response dan pastikan array
+    const data = response.data?.data;
+    timeSlots.value = Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error("Error fetching addresses:", error);
+    // alert(error.response?.data?.message || "Something went wrong!");
+  }
+};
+
 const getPaymentTypes = async () => {
   try {
     const response = await axios.get(`/payment-type-list`, {
@@ -2033,6 +2101,10 @@ watch(cart, async (newCart) => {
     selectedAddress.value = newCart[0]?.ga_id;
     selectedPaymentMethod.value = newCart[0]?.payment_type_id;
     deliveryScheduleInstruction.value = newCart[0]?.order_instructions;
+    selectedDate.value = newCart[0]?.delivery_date
+      ? parse(newCart[0]?.delivery_date)
+      : null;
+    selectedTimeSlot.value = newCart[0]?.time_slot;
   }
   // console.log(selectedAddress.value);
 });
@@ -2081,10 +2153,11 @@ onMounted(() => {
     // getTaxAmount();
     getAddress();
     // getPaymentTypes();
+    getTimeSlots();
     getPlatformFee();
     getCartData();
   }
-
+  // selectedDate.value = null;
   updateTime();
   setInterval(updateTime, 1000);
 });

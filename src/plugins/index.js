@@ -5,8 +5,9 @@
  */
 
 // Plugins
-import vuetify from './vuetify'
+import vuetify from "./vuetify";
+import VueDatePicker from "@vuepic/vue-datepicker";
 
-export function registerPlugins (app) {
-  app.use(vuetify)
+export function registerPlugins(app) {
+  app.component("VueDatePicker", VueDatePicker).use(vuetify);
 }

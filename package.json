@@ -11,6 +11,7 @@
     "@googlemaps/js-api-loader": "^1.16.8",
     "@mdi/font": "7.0.96",
     "@splidejs/vue-splide": "^0.6.12",
+    "@vuepic/vue-datepicker": "^9.0.3",
     "aos": "^2.3.4",
     "axios": "^1.6.8",
     "libphonenumber-js": "^1.10.41",
