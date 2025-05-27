@@ -714,38 +714,40 @@
                 <v-table density="compact" class="custom-table">
                   <tbody class="text-caption">
                     <tr>
-                      <td>Sub Total</td>
-                      <td class="text-end">
+                      <td colspan="2">Sub Total</td>
+                      <td colspan="2" class="text-end">
                         {{ selectedCountry.currency_symbol }}
                       </td>
-                      <td class="text-end">{{ cart[0].amount }}</td>
+                      <td colspan="2" class="text-end">{{ cart[0].amount }}</td>
                     </tr>
                     <tr>
-                      <td>Delivery Charges</td>
-                      <td class="text-end">
+                      <td colspan="2">Delivery Charges</td>
+                      <td colspan="2" class="text-end">
                         {{ selectedCountry.currency_symbol }}
                       </td>
-                      <td class="text-end">
+                      <td colspan="2" class="text-end">
                         {{ selectedDeliveryPrice.toFixed(2) }}
                       </td>
                     </tr>
                     <tr>
-                      <td>Service Fee (0.25%)</td>
-                      <td></td>
-                      <td class="text-end">
+                      <td colspan="2">Service Fee (0.25%)</td>
+                      <td colspan="2"></td>
+                      <td colspan="2" class="text-end">
                         <!-- {{ selectedDeliveryPrice.toFixed(2) }} -->
                         Static
                       </td>
                     </tr>
                     <tr>
-                      <td>Platform Fee</td>
-                      <td class="text-end">
+                      <td colspan="2">Platform Fee</td>
+                      <td colspan="2" class="text-end">
                         {{ selectedCountry.currency_symbol }}
                       </td>
-                      <td class="text-end">{{ platformFee?.toFixed(2) }}</td>
+                      <td colspan="2" class="text-end">
+                        {{ platformFee?.toFixed(2) }}
+                      </td>
                     </tr>
                     <tr>
-                      <td>
+                      <td colspan="2">
                         G.S.T
                         {{
                           taxAmount != null
@@ -753,10 +755,10 @@
                             : "(Not Applicable)"
                         }}
                       </td>
-                      <td class="text-end">
+                      <td colspan="2" class="text-end">
                         {{ selectedCountry.currency_symbol }}
                       </td>
-                      <td class="text-end">
+                      <td colspan="2" class="text-end">
                         {{
                           taxAmount != null
                             ? (
@@ -769,13 +771,13 @@
                       </td>
                     </tr>
                     <tr class="total-row">
-                      <td class="border-none">
+                      <td colspan="2" class="border-none">
                         <strong>This is what you pay</strong>
                       </td>
-                      <td class="border-none text-end">
+                      <td colspan="2" class="border-none text-end">
                         <strong>{{ selectedCountry.currency_symbol }}</strong>
                       </td>
-                      <td class="text-end border-none">
+                      <td colspan="2" class="text-end border-none">
                         <strong>{{
                           (
                             subTotal +
@@ -788,104 +790,57 @@
                         }}</strong>
                       </td>
                     </tr>
-                    <!--  -->
-                    <tr class="font-weight-black">
-                      <td class="border-none" style="vertical-align: top">
-                        Delivery to :
-                      </td>
-                      <td class="border-none" style="vertical-align: top">
-                        Order Instructions
-                      </td>
-                      <td class="border-none" style="vertical-align: top">
-                        Order Status
-                      </td>
-                    </tr>
-                    <tr>
-                      <td
-                        class="border-none"
-                        style="width: 40%; vertical-align: top"
-                      >
-                        Lorem ipsum dolor sit amet consectetur, adipisicing
-                        elit. Rerum, tenetur.
-                      </td>
-                      <td
-                        class="border-none"
-                        style="width: 30%; vertical-align: top"
-                      >
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                      </td>
-                      <td
-                        class="border-none font-weight-black text-blue-darken-3"
-                        style="width: 30%; vertical-align: top"
-                      >
-                        Static Data
-                      </td>
-                    </tr>
-                    <!--  -->
-                    <!--  -->
-                    <tr class="font-weight-black">
-                      <td class="border-none" style="vertical-align: top">
-                        Delivery Date
-                      </td>
-                      <td class="border-none" style="vertical-align: top">
-                        Time Slot
-                      </td>
-                      <td class="border-none" style="vertical-align: top">
-                        Delivery Status
-                      </td>
-                    </tr>
-                    <tr>
-                      <td
-                        class="border-none font-weight-black text-blue-darken-3"
-                        style="width: 40%; vertical-align: top"
-                      >
-                        Lorem ipsum dolor sit amet.
-                      </td>
-                      <td
-                        class="border-none font-weight-black text-blue-darken-3"
-                        style="width: 30%; vertical-align: top"
-                      >
-                        Static data
-                      </td>
-                      <td
-                        class="border-none font-weight-black text-blue-darken-3"
-                        style="width: 30%; vertical-align: top"
-                      >
-                        Static Data
-                      </td>
-                    </tr>
-                    <!--  -->
-                    <!--  -->
-                    <tr class="font-weight-black">
-                      <td class="border-none" style="vertical-align: top">
-                        Payment Status
-                      </td>
-                      <td class="border-none" style="vertical-align: top">
-                        Payment By
-                      </td>
-                      <td class="border-none"></td>
-                    </tr>
-                    <tr>
-                      <td
-                        class="border-none font-weight-black text-blue-darken-3"
-                        style="width: 40%; vertical-align: top"
-                      >
-                        Static
-                      </td>
-                      <td
-                        class="border-none font-weight-black text-blue-darken-3"
-                        style="width: 30%; vertical-align: top"
-                      >
-                        Static
-                      </td>
-                      <td
-                        class="border-none font-weight-black text-blue-darken-3"
-                        style="width: 30%; vertical-align: top"
-                      ></td>
-                    </tr>
-                    <!--  -->
                   </tbody>
                 </v-table>
+                <div class="px-4 text-caption">
+                  <v-row no-gutters class="font-weight-black mt-6">
+                    <v-col cols="6"> Delivery to : </v-col>
+                    <v-col cols="6"> Order Instructions </v-col>
+                  </v-row>
+                  <v-row no-gutters class="mt-2 font-weight-bold">
+                    <v-col cols="6">
+                      Lorem ipsum dolor sit amet consectetur, adipisicing elit.
+                      Rerum, tenetur.
+                    </v-col>
+                    <v-col cols="6">
+                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    </v-col>
+                  </v-row>
+                  <v-row no-gutters class="font-weight-black mt-6">
+                    <v-col cols="6"> Order Status </v-col>
+                    <v-col cols="6"> Delivery Status </v-col>
+                  </v-row>
+                  <v-row
+                    no-gutters
+                    class="mt-2 text-blue-darken-4 font-weight-bold"
+                  >
+                    <v-col cols="6"> Lorem ipsum dolor sit amet. </v-col>
+                    <v-col cols="6"> Static data </v-col>
+                  </v-row>
+                  <v-row no-gutters class="font-weight-black mt-6">
+                    <v-col cols="6"> Delivery Date </v-col>
+                    <v-col cols="6"> Time Slot </v-col>
+                  </v-row>
+                  <v-row
+                    no-gutters
+                    class="mt-2 text-blue-darken-4 font-weight-bold"
+                  >
+                    <v-col cols="6"> Static </v-col>
+                    <v-col cols="6"> Static </v-col>
+                  </v-row>
+                  <v-row no-gutters class="font-weight-black mt-6">
+                    <v-col cols="6"> Payment Status </v-col>
+                    <v-col cols="6"> Payment By </v-col>
+                  </v-row>
+                  <v-row no-gutters class="mt-2">
+                    <v-col cols="6" class="text-blue-darken-4 font-weight-bold">
+                      Static
+                    </v-col>
+                    <v-col cols="6" class="text-red-darken-1 font-weight-bold">
+                      Static
+                    </v-col>
+                  </v-row>
+                </div>
               </v-card>
             </v-col>
             <v-col v-if="step == 6" class="pa-5">
@@ -1200,7 +1155,7 @@
         <h4 class="mt-4 mb-8 text-center">
           Once Payment is made pls what's app us to 89102000
         </h4>
-        <v-btn class="mb-4 w-100 bg-primary" @click="payLater = false">
+        <v-btn class="mb-4 w-100 bg-primary" @click="handlePayLater">
           OK
         </v-btn>
       </v-card-text>
@@ -1213,7 +1168,32 @@
           Thanks !!! for Payment we will check and update your payment status
           for your current Order
         </h4>
-        <v-btn class="mb-4 w-100 bg-primary" @click="havePaid = false">
+        <v-btn class="mb-4 w-100 bg-primary" @click="handleHavePaid">
+          OK
+        </v-btn>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+  <v-dialog v-model="acceptCash" persistent width="auto">
+    <v-card width="350">
+      <v-card-text class="">
+        <h4 class="mt-4 mb-8 text-center">
+          We will accept Cash Option for the 1st Delivery
+        </h4>
+        <v-btn class="mb-4 w-100 bg-primary" @click="handleAcceptCash()">
+          OK
+        </v-btn>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+  <v-dialog v-model="orderConfirmed" persistent width="auto">
+    <v-card width="350">
+      <v-card-text class="">
+        <h4 class="mt-4 mb-8 text-center">
+          Your Order has been confirmed . someone will get in touch with you
+          very shortly.
+        </h4>
+        <v-btn class="mb-4 w-100 bg-primary" @click="handleOrderConfirmed()">
           OK
         </v-btn>
       </v-card-text>
@@ -1224,7 +1204,7 @@
       <v-card-text class="">
         <h4 class="mt-4 mb-8 text-center">Confirm this Order . ?</h4>
         <div class="w-100 d-flex align-center justify-space-around">
-          <v-btn class="mb-4 w-33 bg-primary" @click="handleConfirmOrder2()">
+          <v-btn class="mb-4 w-33 bg-primary" @click="updateCartOrderStatus()">
             Yes
           </v-btn>
           <v-btn class="mb-4 w-33 bg-primary" @click="confirmOrder2 = false">
@@ -1234,7 +1214,7 @@
       </v-card-text>
     </v-card>
   </v-dialog>
-  <v-dialog v-model="confirmOrder" persistent width="auto">
+  <!-- <v-dialog v-model="confirmOrder" persistent width="auto">
     <v-card width="350">
       <v-card-text class="">
         <h4 class="mt-4 mb-8 text-center">Confirm this Order . ?</h4>
@@ -1248,7 +1228,7 @@
         </div>
       </v-card-text>
     </v-card>
-  </v-dialog>
+  </v-dialog> -->
 </template>
 
 <script setup>
@@ -1297,6 +1277,8 @@ const confirmOrder = ref(false);
 const confirmOrder2 = ref(false);
 const isEmptyAddress = ref(false);
 const isEmptyPayment = ref(false);
+const acceptCash = ref(false);
+const orderConfirmed = ref(false);
 const addressIndex = ref(null);
 const addressId = ref(null);
 const addressName = ref(null);
@@ -1624,6 +1606,9 @@ const onSelectPayment = async (selectedId) => {
     const data = response.data.data;
     // console.log(data);
     selectedPaymentMethod.value = data.payment_type_id;
+    if (data.payment_type_id == 1) {
+      acceptCash.value = true;
+    }
     // console.log(selectedAddress.value);
     snackbar.value = true;
     message.value = {
@@ -1670,7 +1655,7 @@ const handleDeleteAddress = async () => {
   openDialog.value = false;
 };
 
-const handleConfirmOrder = async () => {
+const handlePayLater = async () => {
   // const response = await axios.get("/delete-address/" + addressId.value, {
   //   headers: {
   //     Authorization: `Bearer ${authToken}`,
@@ -1685,9 +1670,9 @@ const handleConfirmOrder = async () => {
   // addresses.value.splice(addressIndex.value, 1);
   // openDialog.value = false;
   emit("update:viewCart", false);
-  confirmOrder.value = false;
+  payLater.value = false;
 };
-const handleConfirmOrder2 = async () => {
+const handleHavePaid = async () => {
   // const response = await axios.get("/delete-address/" + addressId.value, {
   //   headers: {
   //     Authorization: `Bearer ${authToken}`,
@@ -1701,8 +1686,17 @@ const handleConfirmOrder2 = async () => {
   // };
   // addresses.value.splice(addressIndex.value, 1);
   // openDialog.value = false;
-  nextStep(6);
-  confirmOrder2.value = false;
+  emit("update:viewCart", false);
+  havePaid.value = false;
+};
+
+const handleAcceptCash = async () => {
+  acceptCash.value = false;
+  orderConfirmed.value = true;
+};
+const handleOrderConfirmed = () => {
+  orderConfirmed.value = false;
+  emit("update:viewCart", false);
 };
 
 // Edit Address
@@ -1769,6 +1763,41 @@ const whereToDeliver = async () => {
   }
 };
 
+const updateCartOrderStatus = async () => {
+  try {
+    const response = await axios.put(
+      `/update-cart-order-status`,
+      {
+        cart_id: cart.value[0].cart_id,
+        order_status: "C",
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      },
+    );
+    // const data = response.data.data;
+    // console.log(data);
+    confirmOrder2.value = false;
+    nextStep(6);
+    getCartData();
+    snackbar.value = true;
+    message.value = {
+      text: response.data.message,
+      color: "success",
+    };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || "Something went wrong!";
+    snackbar.value = true;
+    message.value = {
+      text: errorMessage,
+      color: "error",
+    };
+  }
+};
+
 const nextStep = (value) => {
   if (value === 7) {
     snackbar.value = false;
@@ -1790,6 +1819,15 @@ const nextStep = (value) => {
       text: "",
       color: "success",
     };
+
+    if (!selectedAddress.value) {
+      snackbar.value = true;
+      message.value = {
+        text: "You must select address",
+        color: "error",
+      };
+      return;
+    }
 
     if (addresses.value.length == 0) {
       isEmptyAddress.value = true;
