@@ -229,9 +229,9 @@
               <div style="border: 1.5px solid #daf4fd" class="px-4 py-3 my-4">
                 <div class="d-flex justify-space-between mb-3">
                   <strong>{{ selectedDeliveryObject?.label }}</strong>
-                  <span class="price"
+                  <span v-if="selectedDeliveryObject?.price" class="price"
                     >{{ selectedCountry.currency_symbol }}
-                    {{ selectedDeliveryObject?.price }}</span
+                    {{ selectedDeliveryObject?.price.toFixed(2) }}</span
                   >
                 </div>
 
@@ -268,6 +268,8 @@
                   :disabled-week-days="selectedDeliveryObject?.allowedDays"
                   v-model="selectedDate"
                   :format="format"
+                  :min-date="new Date()"
+                  placeholder="Select Advance Delivery"
                 >
                   <!-- @update:model-value="onDateSelected" -->
                   <!-- <template #input-icon>
@@ -718,7 +720,9 @@
                       <td colspan="2" class="text-end">
                         {{ selectedCountry.currency_symbol }}
                       </td>
-                      <td colspan="2" class="text-end">{{ cart[0].amount }}</td>
+                      <td colspan="2" class="text-end">
+                        {{ cart[0]?.amount }}
+                      </td>
                     </tr>
                     <tr>
                       <td colspan="2">Delivery Charges</td>
@@ -731,10 +735,11 @@
                     </tr>
                     <tr>
                       <td colspan="2">Service Fee (0.25%)</td>
-                      <td colspan="2"></td>
                       <td colspan="2" class="text-end">
-                        <!-- {{ selectedDeliveryPrice.toFixed(2) }} -->
-                        Static
+                        {{ selectedCountry.currency_symbol }}
+                      </td>
+                      <td colspan="2" class="text-end">
+                        {{ cart[0]?.service_fee }}
                       </td>
                     </tr>
                     <tr>
@@ -783,6 +788,7 @@
                             subTotal +
                             selectedDeliveryPrice +
                             platformFee +
+                            parseFloat(cart[0]?.service_fee) +
                             ((subTotal + selectedDeliveryPrice + 0.5) *
                               taxAmount) /
                               100
@@ -803,7 +809,10 @@
                       Rerum, tenetur.
                     </v-col>
                     <v-col cols="6">
-                      Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                      <p
+                        v-if="cart[0]?.order_instructions"
+                        v-html="formatInfo(cart[0]?.order_instructions)"
+                      />
                     </v-col>
                   </v-row>
                   <v-row no-gutters class="font-weight-black mt-6">
@@ -825,8 +834,8 @@
                     no-gutters
                     class="mt-2 text-blue-darken-4 font-weight-bold"
                   >
-                    <v-col cols="6"> Static </v-col>
-                    <v-col cols="6"> Static </v-col>
+                    <v-col cols="6"> {{ cart[0]?.delivery_date }} </v-col>
+                    <v-col cols="6"> {{ cart[0]?.time_slot }} </v-col>
                   </v-row>
                   <v-row no-gutters class="font-weight-black mt-6">
                     <v-col cols="6"> Payment Status </v-col>
@@ -837,7 +846,7 @@
                       Static
                     </v-col>
                     <v-col cols="6" class="text-red-darken-1 font-weight-bold">
-                      Static
+                      {{ cart[0]?.payment_type_id }}
                     </v-col>
                   </v-row>
                 </div>
@@ -1042,7 +1051,7 @@
                       <tr>
                         <td>Sub Total</td>
                         <td>{{ selectedCountry.currency_symbol }}</td>
-                        <td class="text-end">{{ cart[0].amount }}</td>
+                        <td class="text-end">{{ cart[0]?.amount }}</td>
                       </tr>
                       <tr>
                         <td>Delivery Charges</td>
@@ -1053,10 +1062,9 @@
                       </tr>
                       <tr>
                         <td>Service Fee (0.25%)</td>
-                        <td></td>
+                        <td>{{ selectedCountry.currency_symbol }}</td>
                         <td class="text-end">
-                          <!-- {{ selectedDeliveryPrice.toFixed(2) }} -->
-                          Static
+                          {{ cart[0]?.service_fee }}
                         </td>
                       </tr>
                       <tr>
@@ -1097,6 +1105,7 @@
                               subTotal +
                               selectedDeliveryPrice +
                               platformFee +
+                              parseFloat(cart[0]?.service_fee) +
                               ((subTotal + selectedDeliveryPrice + 0.5) *
                                 taxAmount) /
                                 100
@@ -1656,47 +1665,114 @@ const handleDeleteAddress = async () => {
 };
 
 const handlePayLater = async () => {
-  // const response = await axios.get("/delete-address/" + addressId.value, {
-  //   headers: {
-  //     Authorization: `Bearer ${authToken}`,
-  //   },
-  // });
-
-  // snackbar.value = true;
-  // message.value = {
-  //   text: response.data.message,
-  //   color: "success",
-  // };
-  // addresses.value.splice(addressIndex.value, 1);
-  // openDialog.value = false;
-  emit("update:viewCart", false);
-  payLater.value = false;
+  try {
+    const response = await axios.put(
+      `/update-cart-status`,
+      {
+        cart_id: cart.value[0].cart_id,
+        order_status: "CPP",
+        payment_status: "PP",
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      },
+    );
+    // const data = response.data.data;
+    // console.log(data);
+    payLater.value = false;
+    emit("update:viewCart", false);
+    getCartData();
+    snackbar.value = true;
+    message.value = {
+      text: response.data.message,
+      color: "success",
+    };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || "Something went wrong!";
+    snackbar.value = true;
+    message.value = {
+      text: errorMessage,
+      color: "error",
+    };
+  }
 };
 const handleHavePaid = async () => {
-  // const response = await axios.get("/delete-address/" + addressId.value, {
-  //   headers: {
-  //     Authorization: `Bearer ${authToken}`,
-  //   },
-  // });
-
-  // snackbar.value = true;
-  // message.value = {
-  //   text: response.data.message,
-  //   color: "success",
-  // };
-  // addresses.value.splice(addressIndex.value, 1);
-  // openDialog.value = false;
-  emit("update:viewCart", false);
-  havePaid.value = false;
+  try {
+    const response = await axios.put(
+      `/update-cart-status`,
+      {
+        cart_id: cart.value[0].cart_id,
+        order_status: "CPP",
+        payment_status: "PP",
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      },
+    );
+    // const data = response.data.data;
+    // console.log(data);
+    havePaid.value = false;
+    emit("update:viewCart", false);
+    getCartData();
+    snackbar.value = true;
+    message.value = {
+      text: response.data.message,
+      color: "success",
+    };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || "Something went wrong!";
+    snackbar.value = true;
+    message.value = {
+      text: errorMessage,
+      color: "error",
+    };
+  }
 };
 
 const handleAcceptCash = async () => {
   acceptCash.value = false;
   orderConfirmed.value = true;
 };
-const handleOrderConfirmed = () => {
-  orderConfirmed.value = false;
-  emit("update:viewCart", false);
+const handleOrderConfirmed = async () => {
+  try {
+    const response = await axios.put(
+      `/update-cart-status`,
+      {
+        cart_id: cart.value[0].cart_id,
+        order_status: "CPP",
+        payment_status: "PP",
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      },
+    );
+    // const data = response.data.data;
+    // console.log(data);
+    orderConfirmed.value = false;
+    emit("update:viewCart", false);
+    getCartData();
+    snackbar.value = true;
+    message.value = {
+      text: response.data.message,
+      color: "success",
+    };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || "Something went wrong!";
+    snackbar.value = true;
+    message.value = {
+      text: errorMessage,
+      color: "error",
+    };
+  }
 };
 
 // Edit Address
@@ -1840,6 +1916,8 @@ const nextStep = (value) => {
       text: "",
       color: "success",
     };
+    selectedDate.value = null;
+    selectedTimeSlot.value = null;
 
     if (selectedDelivery.value == null) {
       store.commit("setIsEmptyDelivery", true);
@@ -2215,7 +2293,7 @@ onMounted(() => {
     getPlatformFee();
     getCartData();
   }
-  // selectedDate.value = null;
+
   updateTime();
   setInterval(updateTime, 1000);
 });

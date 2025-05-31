@@ -8,6 +8,9 @@ const authToken = localStorage.getItem("token");
 export function useCart() {
   const store = useStore();
   const cart = computed(() => store.state.cart);
+  const selectedCountry = computed(() => {
+    return store.state.selectedCountry;
+  });
 
   const getSelectedRange = (product) => {
     return product.rangeItems
@@ -129,6 +132,7 @@ export function useCart() {
 
     const cartMasterData = {
       app_id: 3,
+      country_id: selectedCountry.value ? selectedCountry.value.country_id : 1,
       platform_fee: platformFee.value,
       gst: taxAmount.value,
       order_status: "PP",
