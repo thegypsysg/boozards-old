@@ -252,46 +252,64 @@
                 class="w-75 mt-4"
                 v-if="selectedDelivery == 5 || selectedDelivery == 6"
               >
-                <!-- <v-autocomplete
-                  clearable
-                  density="compact"
-                  placeholder="Select Advance Delivery"
-                  :items="selectedDeliveryObject?.allowedDays"
-                  item-title="label"
-                  item-value="value"
-                  class="border-sm text-blue-darken-2 mb-4"
-                  variant="outlined"
-                ></v-autocomplete> -->
-                <VueDatePicker
+                <!-- <VueDatePicker
                   style="font-size: 12px !important"
                   class="text-caption mb-4"
                   :disabled-week-days="selectedDeliveryObject?.allowedDays"
                   v-model="selectedDate"
                   :format="format"
-                  :min-date="new Date()"
+                  :min-date="
+                    new Date(new Date().setDate(new Date().getDate() + 1))
+                  "
                   placeholder="Select Advance Delivery"
-                >
-                  <!-- @update:model-value="onDateSelected" -->
-                  <!-- <template #input-icon>
-                <Icon
-                  style="font-size: 20px"
-                  class="mt-1 text-black"
-                  icon="solar:calendar-outline"
-                />
-              </template>
-              <template #clear-icon>
-                <Icon style="font-size: 18px" class="text-black" icon="mdi:chevron-down" />
-              </template> -->
-                </VueDatePicker>
-                <v-autocomplete
+                /> -->
+                <v-dialog v-model="dialog" width="300">
+                  <template #activator="{ props }">
+                    <v-btn
+                      class="w-100 text-left text-blue-darken-2"
+                      variant="outlined"
+                      color="primary"
+                      v-bind="props"
+                    >
+                      <span v-if="!selectedDate">
+                        Select Advance Delivery
+                      </span>
+                      <span v-else>{{ format(selectedDate) }}</span>
+                    </v-btn>
+                  </template>
+
+                  <v-card height="550">
+                    <v-card-title>Select a Date</v-card-title>
+                    <v-card-text>
+                      <VueDatePicker
+                        v-model="selectedDate"
+                        :format="format"
+                        :min-date="tomorrow"
+                        placeholder="Select Advance Delivery"
+                        style="font-size: 12px !important"
+                        class="text-caption mb-4"
+                        :disabled-week-days="
+                          selectedDeliveryObject?.allowedDays
+                        "
+                        :enable-time-picker="false"
+                      />
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-spacer />
+                      <v-btn text @click="cancelDate">Cancel</v-btn>
+                      <v-btn text @click="confirmDate">OK</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+                <v-select
                   clearable
                   density="compact"
                   placeholder="Select Time Slot"
                   v-model="selectedTimeSlot"
                   :items="timeSlots"
-                  class="border-sm text-blue-darken-2"
+                  class="border-sm text-blue-darken-2 mt-4"
                   variant="outlined"
-                ></v-autocomplete>
+                ></v-select>
               </div>
               <template v-else>
                 <!-- <p class="font-weight-bold text-red-darken-4 mt-10 mb-6">
@@ -550,12 +568,12 @@
                 <!-- 'bg-white': option.primary_address, -->
                 <!-- 'border-md': !option.primary_address, -->
                 <v-row @click="selectAddress(option)">
-                  <v-col cols="9">
+                  <v-col cols="8">
                     <strong>{{ option.location_name }}</strong>
                   </v-col>
                   <v-col
                     v-if="option.primary_address"
-                    col="3"
+                    col="4"
                     class="justify-end text-red-darken-1"
                   >
                     <strong>Primary</strong>
@@ -805,8 +823,10 @@
                   </v-row>
                   <v-row no-gutters class="mt-2 font-weight-bold">
                     <v-col cols="6">
-                      Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                      Rerum, tenetur.
+                      <p
+                        v-if="cart[0]?.delivery_address"
+                        v-html="formatInfo(cart[0]?.delivery_address)"
+                      />
                     </v-col>
                     <v-col cols="6">
                       <p
@@ -823,8 +843,8 @@
                     no-gutters
                     class="mt-2 text-blue-darken-4 font-weight-bold"
                   >
-                    <v-col cols="6"> Lorem ipsum dolor sit amet. </v-col>
-                    <v-col cols="6"> Static data </v-col>
+                    <v-col cols="6"> {{ cart[0]?.order_status_name }} </v-col>
+                    <v-col cols="6"> {{ cart[0]?.delivery_status }} </v-col>
                   </v-row>
                   <v-row no-gutters class="font-weight-black mt-6">
                     <v-col cols="6"> Delivery Date </v-col>
@@ -834,7 +854,11 @@
                     no-gutters
                     class="mt-2 text-blue-darken-4 font-weight-bold"
                   >
-                    <v-col cols="6"> {{ cart[0]?.delivery_date }} </v-col>
+                    <v-col cols="6">
+                      {{
+                        `${cart[0]?.delivery_day}, ${cart[0]?.delivery_date}`
+                      }}
+                    </v-col>
                     <v-col cols="6"> {{ cart[0]?.time_slot }} </v-col>
                   </v-row>
                   <v-row no-gutters class="font-weight-black mt-6">
@@ -843,10 +867,10 @@
                   </v-row>
                   <v-row no-gutters class="mt-2">
                     <v-col cols="6" class="text-blue-darken-4 font-weight-bold">
-                      Static
+                      {{ cart[0]?.payment_status_name }}
                     </v-col>
                     <v-col cols="6" class="text-red-darken-1 font-weight-bold">
-                      {{ cart[0]?.payment_type_id }}
+                      {{ cart[0]?.payment_type }}
                     </v-col>
                   </v-row>
                 </div>
@@ -1310,6 +1334,7 @@ const selectedDelivery = ref(
   null,
 );
 const selectedPaymentMethod = ref(null);
+const dialog = ref(false);
 const selectedDate = ref(null);
 const selectedTimeSlot = ref(null);
 const paymentOptions = ref([
@@ -1441,9 +1466,24 @@ const format = (date) => {
   return `${day}/${month}/${year}`;
 };
 
+const tomorrow = computed(() => {
+  const date = new Date();
+  date.setDate(date.getDate() + 1);
+  return date;
+});
+
 const parse = (dateStr) => {
   const [day, month, year] = dateStr.split("/").map(Number);
   return new Date(year, month - 1, day); // month is 0-based
+};
+
+const cancelDate = () => {
+  selectedDate.value = null;
+  dialog.value = false;
+};
+
+const confirmDate = () => {
+  dialog.value = false;
 };
 
 // const onDateSelected = (newDate) => {
@@ -2061,6 +2101,7 @@ const selectAddress = async (item) => {
       },
     );
     getAddress();
+    getCartData();
     const data = response.data.data;
     selectedAddress.value = data.ga_id;
     // console.log(selectedAddress.value);

@@ -12,10 +12,13 @@
             <v-icon size="45">mdi mdi-cart-variant</v-icon>
           </v-badge>
         </div>
-        <div class="text-h5">
+        <div v-if="store.state.cart.length > 0" class="text-h5">
           <strong
             >{{ selectedCountry.currency_symbol }}{{ finalCartTotal }}</strong
           >
+        </div>
+        <div v-else class="text-h5">
+          <strong>{{ selectedCountry.currency_symbol }} 0</strong>
         </div>
       </div>
     </v-container>
