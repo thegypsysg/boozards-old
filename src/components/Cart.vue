@@ -1847,10 +1847,16 @@ const whereToDeliver = async () => {
       {
         cart_id: cart.value[0].cart_id,
         dc_id: selectedDeliveryObject.value.dc_id,
-        delivery_date: format(selectedDate.value),
+        delivery_date:
+          selectedDeliveryObject.value.same_day == "A"
+            ? format(selectedDate.value)
+            : selectedDeliveryObject.value.today_date,
         // delivery_day: selectedDeliveryObject.value.today_day,
         same_day: selectedDeliveryObject.value.same_day,
-        time_slot: selectedTimeSlot.value,
+        time_slot:
+          selectedDeliveryObject.value.same_day == "A"
+            ? selectedTimeSlot.value
+            : selectedDeliveryObject.value.time_slot,
         order_instructions: deliveryScheduleInstruction.value,
       },
       {
@@ -1869,6 +1875,7 @@ const whereToDeliver = async () => {
       color: "success",
     };
   } catch (error) {
+    console.log(error);
     const errorMessage =
       error.response?.data?.message || "Something went wrong!";
     snackbar.value = true;
