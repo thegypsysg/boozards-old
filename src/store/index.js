@@ -158,7 +158,7 @@ export default (app) =>
           .then((response) => {
             localStorage.setItem("selectedDelivery", data?.dc_id);
             commit("selectedDelivery", data?.dc_id);
-            commit("cart", response?.data?.data);
+            // commit("cart", response?.data?.data);
           })
           .catch((error) => {
             console.log(error);

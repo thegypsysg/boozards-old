@@ -835,7 +835,7 @@
                       />
                     </v-col>
                   </v-row>
-                  <v-row no-gutters class="font-weight-black mt-6">
+                  <!-- <v-row no-gutters class="font-weight-black mt-6">
                     <v-col cols="6"> Order Status </v-col>
                     <v-col cols="6"> Delivery Status </v-col>
                   </v-row>
@@ -845,7 +845,7 @@
                   >
                     <v-col cols="6"> {{ cart[0]?.order_status_name }} </v-col>
                     <v-col cols="6"> {{ cart[0]?.delivery_status }} </v-col>
-                  </v-row>
+                  </v-row> -->
                   <v-row no-gutters class="font-weight-black mt-6">
                     <v-col cols="6"> Delivery Date </v-col>
                     <v-col cols="6"> Time Slot </v-col>
@@ -861,7 +861,7 @@
                     </v-col>
                     <v-col cols="6"> {{ cart[0]?.time_slot }} </v-col>
                   </v-row>
-                  <v-row no-gutters class="font-weight-black mt-6">
+                  <!-- <v-row no-gutters class="font-weight-black mt-6">
                     <v-col cols="6"> Payment Status </v-col>
                     <v-col cols="6"> Payment By </v-col>
                   </v-row>
@@ -872,7 +872,7 @@
                     <v-col cols="6" class="text-red-darken-1 font-weight-bold">
                       {{ cart[0]?.payment_type }}
                     </v-col>
-                  </v-row>
+                  </v-row> -->
                 </div>
               </v-card>
             </v-col>
@@ -1211,7 +1211,7 @@
     <v-card width="350">
       <v-card-text class="">
         <h4 class="mt-4 mb-8 text-center">
-          We will accept Cash Option for the 1st Delivery
+          We will accept cash option once you address is Verified
         </h4>
         <v-btn class="mb-4 w-100 bg-primary" @click="handleAcceptCash()">
           OK
@@ -1335,8 +1335,7 @@ const selectedDelivery = ref(
 );
 const selectedPaymentMethod = ref(null);
 const dialog = ref(false);
-const selectedDate = ref(null);
-const selectedTimeSlot = ref(null);
+
 const paymentOptions = ref([
   // {
   //   value: 1,
@@ -1375,8 +1374,9 @@ const addressForm = reactive({
   //latitude: "",
   //longitude: "",
 });
-const deliveryInstructions = ref("");
-const deliveryScheduleInstruction = ref("");
+const selectedDate = ref(null);
+const selectedTimeSlot = ref(null);
+const deliveryScheduleInstruction = ref(null);
 
 const addressesOptions = computed(() => {
   return addresses.value.map((address) => ({
@@ -1395,6 +1395,10 @@ const isLoading = computed(() => {
 
 const isEmptyCart = computed(() => {
   return store.state.isEmptyCart;
+});
+
+const isSameDelivery = computed(() => {
+  return localStorage.getItem("isSameDelivery");
 });
 
 const selectedCountry = computed(() => {
@@ -1627,6 +1631,7 @@ const onSelectDelivery = (selectedId) => {
         cart_id: cart.value[0]?.cart_id,
         dc_id: selectedOption.dc_id,
         delivery_rate: selectedOption.price,
+        same_day: selectedOption.same_day,
       };
       store.dispatch("updateDeliveryChargesInCart", payload);
       // console.log("Delivery option deliveryOptions:", payload);
@@ -1638,11 +1643,12 @@ const onSelectDelivery = (selectedId) => {
 
 const onSelectPayment = async (selectedId) => {
   // console.log(selectedId);
+  console.log(cart.value);
   try {
     const response = await axios.put(
       `/update-cart-payment-type`,
       {
-        cart_id: cart.value[0].cart_id,
+        cart_id: cart.value[0]?.cart_id,
         payment_type_id: selectedId,
       },
       {
@@ -1665,6 +1671,7 @@ const onSelectPayment = async (selectedId) => {
       color: "success",
     };
   } catch (error) {
+    console.log(error);
     const errorMessage =
       error.response?.data?.message || "Something went wrong!";
     snackbar.value = true;
@@ -1785,7 +1792,7 @@ const handleOrderConfirmed = async () => {
       `/update-cart-status`,
       {
         cart_id: cart.value[0].cart_id,
-        order_status: "CPP",
+        order_status: "C",
         payment_status: "PP",
       },
       {
@@ -1963,8 +1970,13 @@ const nextStep = (value) => {
       text: "",
       color: "success",
     };
-    selectedDate.value = null;
-    selectedTimeSlot.value = null;
+    console.log(localStorage.getItem("selectedDelivery"), cart.value[0]?.dc_id);
+    if (localStorage.getItem("selectedDelivery") != cart.value[0]?.dc_id) {
+      console.log("execute");
+      selectedDate.value = null;
+      selectedTimeSlot.value = null;
+      deliveryScheduleInstruction.value = null;
+    }
 
     if (selectedDelivery.value == null) {
       store.commit("setIsEmptyDelivery", true);
@@ -2129,10 +2141,6 @@ const selectAddress = async (item) => {
   // finally {
   //   savingAddress.value = false;
   // }
-};
-
-const changeDeliveryInstructions = () => {
-  console.log(deliveryInstructions.value);
 };
 
 const getTaxAmount = async () => {
@@ -2304,6 +2312,11 @@ watch(
       // );
       step.value = 1; // Set step to 1 when viewCart changes
       // selectedDelivery.value = null;
+      selectedDate.value = cart.value[0]?.delivery_date
+        ? parse(cart.value[0]?.delivery_date)
+        : null;
+      selectedTimeSlot.value = cart.value[0]?.time_slot;
+      deliveryScheduleInstruction.value = cart.value[0]?.order_instructions;
       if (cart.value[0]?.delivery_charges != "0.00") {
         selectedDelivery.value =
           store.state.selectedDelivery ??
