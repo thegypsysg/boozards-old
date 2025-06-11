@@ -123,6 +123,8 @@ export default {
         title = "Sign-Up / Sign-in";
       } else if (this.currentRoute === "/social-sign-up") {
         title = "Social Registration";
+      } else if (this.currentRoute === "/sign-up-email") {
+        title = "Email Registration";
       } else if (this.currentRoute === "/discount-types") {
         title = "Promotions by Discount";
       } else if (this.currentRoute === "/category") {
@@ -146,6 +148,7 @@ export default {
         this.currentRoute === "/my-favorites" ||
         this.currentRoute === "/sign-in" ||
         this.currentRoute === "/social-sign-up" ||
+        this.currentRoute === "/sign-up-email" ||
         this.currentRoute === "/price-list"
       );
     },
@@ -155,6 +158,7 @@ export default {
     isSignIn() {
       return (
         this.currentRoute === "/sign-in" ||
+        this.currentRoute === "/sign-up-email" ||
         this.currentRoute === "/social-sign-up"
       );
     },

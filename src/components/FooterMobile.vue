@@ -1,7 +1,10 @@
 <template>
   <div class="fixed-footer">
     <v-container>
-      <div class="d-flex align-center justify-space-between">
+      <div
+        v-if="store.state.cart.length > 0"
+        class="d-flex align-center justify-space-between"
+      >
         <div @click="viewCartClick">
           <v-badge
             :content="cartQuantity"
@@ -21,6 +24,14 @@
           <strong>{{ selectedCountry.currency_symbol }} 0</strong>
         </div>
       </div>
+      <v-btn
+        v-else
+        elevation="0"
+        class="btn_sign__up"
+        @click="$router.push('/sign-in')"
+      >
+        <span> Sign Up / Sign In</span>
+      </v-btn>
     </v-container>
     <Cart :viewCart="viewCart" @update:viewCart="viewCart = $event" />
   </div>

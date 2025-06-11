@@ -36,6 +36,7 @@
                           subTotal +
                           selectedDeliveryPrice +
                           platformFee +
+                          parseFloat(cart[0]?.service_fee) +
                           ((subTotal + selectedDeliveryPrice + 0.5) *
                             taxAmount) /
                             100
@@ -87,10 +88,12 @@
                       <span class="text-blue">{{ product.quantity_name }}</span>
                     </div>
                     <div class="text-body-2 text-end">
-                      <!-- <strong
+                      <strong
                         >{{ selectedCountry?.currency_symbol }}
-                      </strong> -->
-                      <!-- S{{ formatCurrency(product.price * product.quantity) }} -->
+                        {{
+                          (product.price * product.quantity).toFixed(2)
+                        }}</strong
+                      >
                     </div>
                   </div>
                   <div class="d-flex align-center justify-space-between">
@@ -121,7 +124,7 @@
                       <strong class="text-red">{{
                         selectedCountry?.currency_symbol
                       }}</strong>
-                      <strong class="text-red">S{{ product.price }}</strong>
+                      <strong class="text-red">{{ product.price }}</strong>
                     </div>
                     <div>
                       <v-btn
@@ -1610,11 +1613,11 @@ const resetForm = () => {
   addressForm.location_name = "";
 };
 
-/* const formatCurrency = (amount) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(amount); */
+// const formatCurrency = (amount) =>
+//   new Intl.NumberFormat("en-US", {
+//     style: "currency",
+//     currency: "USD",
+//   }).format(amount);
 
 // Remove item from cart
 const handleRemoveFromCart = (product) => {
@@ -1792,7 +1795,7 @@ const handleOrderConfirmed = async () => {
       `/update-cart-status`,
       {
         cart_id: cart.value[0].cart_id,
-        order_status: "C",
+        order_status: "CPP",
         payment_status: "PP",
       },
       {

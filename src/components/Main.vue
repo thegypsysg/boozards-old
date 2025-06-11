@@ -59,6 +59,7 @@
 
   <div class="main-content">
     <ExploreOurMenu class="d-none d-md-block" />
+    <YourOrder />
     <div v-if="!isLoading" id="ourBooze" class="mx-auto px-2 px-md-10">
       <!-- style="max-width: 1200px" -->
       <template v-for="item in productCategories" :key="item?.category_id">
