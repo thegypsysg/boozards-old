@@ -755,7 +755,9 @@
                       </td>
                     </tr>
                     <tr>
-                      <td colspan="2">Service Fee (0.25%)</td>
+                      <td colspan="2">
+                        Service Fee ({{ cart[0]?.service_fee }}%)
+                      </td>
                       <td colspan="2" class="text-end">
                         {{ selectedCountry.currency_symbol }}
                       </td>
@@ -1088,7 +1090,7 @@
                         </td>
                       </tr>
                       <tr>
-                        <td>Service Fee (0.25%)</td>
+                        <td>Service Fee ({{ cart[0]?.service_fee }}%)</td>
                         <td>{{ selectedCountry.currency_symbol }}</td>
                         <td class="text-end">
                           {{ cart[0]?.service_fee }}
