@@ -59,7 +59,7 @@
 
   <div class="main-content">
     <ExploreOurMenu class="d-none d-md-block" />
-    <YourOrder />
+    <YourOrder v-if="cart.length > 0" class="mb-4" />
     <div v-if="!isLoading" id="ourBooze" class="mx-auto px-2 px-md-10">
       <!-- style="max-width: 1200px" -->
       <template v-for="item in productCategories" :key="item?.category_id">
@@ -109,6 +109,7 @@ function scrollToSection() {
 }
 
 const selectedCountry = computed(() => store.state.selectedCountry);
+const cart = computed(() => store.state.cart);
 
 const handleIntersection = (entries, observer) => {
   entries.forEach((entry) => {

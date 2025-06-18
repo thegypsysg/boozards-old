@@ -383,6 +383,7 @@ export default {
       "setCategoryData",
       "setSelectedCountry",
       "setIsCartEmpty",
+      "setUserName",
     ]),
     viewCartClick() {
       if (this.cartTotalQuantity > 0) {
@@ -523,6 +524,7 @@ export default {
           // console.log("user data: ", data);
 
           this.userName = data.name;
+          this.setUserName(data.name);
           localStorage.setItem("userName", data.name);
           this.userDated = data.last_login;
           this.userImage =
@@ -560,6 +562,7 @@ export default {
           //console.log(data);
 
           this.userName = data.name;
+          this.setUserName(data.name);
           this.userDated = data.last_login;
           this.userImage =
             data.image != null ? this.$fileURL + data.image : null;

@@ -36,6 +36,7 @@ export default (app) =>
       isCartEmpty: false,
       isCountryUpdating: false,
       isEmptyDelivery: false,
+      userName: localStorage.getItem("username"),
     },
     mutations: {
       deliveryCharges(state, data) {
@@ -121,6 +122,9 @@ export default (app) =>
       clearCart(state) {
         state.cart = [];
         localStorage.removeItem("cart");
+      },
+      setUserName(state, data) {
+        state.userName = data;
       },
     },
     actions: {
