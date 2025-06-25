@@ -1,5 +1,9 @@
 <template>
-  <div class="hero-container" :class="{ 'hero-container-mobile': isSmall }">
+  <div
+    v-if="!userName"
+    class="hero-container"
+    :class="{ 'hero-container-mobile': isSmall }"
+  >
     <!-- Background image -->
     <v-img
       :src="boozardsBackground"
@@ -57,7 +61,10 @@
     </v-container>
   </div>
 
-  <div class="main-content">
+  <div
+    class="main-content"
+    :class="userName ? 'main-content-user' : 'main-content-guest'"
+  >
     <ExploreOurMenu class="d-none d-md-block" />
     <YourOrder v-if="userName" class="mb-4" />
     <div v-if="!isLoading" id="ourBooze" class="mx-auto px-2 px-md-10">
@@ -283,6 +290,13 @@ onMounted(() => {
   line-height: 1.2;
 }
 
+.main-content-user {
+  margin-top: 100px !important;
+}
+.main-content-guest {
+  margin-top: 100vh !important;
+}
+
 @media (max-width: 599px) {
   .hero-container {
     top: 30vh !important;
@@ -297,13 +311,12 @@ onMounted(() => {
     font-size: 28px;
     line-height: 1.3;
   }
-
-  .main-content {
-    margin-top: 0;
-  }
   .hero-text-container {
     margin-top: 5rem !important;
     height: auto;
+  }
+  .main-content-user {
+    margin-top: 30vh !important;
   }
 }
 
@@ -311,7 +324,6 @@ onMounted(() => {
   position: relative;
   z-index: 2;
   background-color: #fff;
-  margin-top: 100vh;
 }
 
 .zoom-effect {
