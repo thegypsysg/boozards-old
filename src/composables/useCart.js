@@ -133,6 +133,7 @@ export function useCart() {
     const cartMasterData = {
       app_id: 3,
       country_id: selectedCountry.value ? selectedCountry.value.country_id : 1,
+      city_id: selectedCountry.value ? selectedCountry.value.city_id : 1,
       platform_fee: platformFee.value,
       gst: taxAmount.value,
       order_status: "PP",
@@ -154,6 +155,7 @@ export function useCart() {
           ? selectedRange?.price_list?.rate
           : 0,
     };
+    console.log(selectedCountry.value);
 
     // console.log({ cartMasterData });
     store.dispatch("addToCart", cartMasterData);

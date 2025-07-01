@@ -250,17 +250,8 @@
                       </td>
                     </tr>
                     <tr>
-                      <td colspan="2">Delivery Charges</td>
-                      <td colspan="2" class="text-end">
-                        {{ selectedCountry.currency_symbol }}
-                      </td>
-                      <td colspan="2" class="text-end">
-                        {{ orderDetail?.delivery_charges }}
-                      </td>
-                    </tr>
-                    <tr>
                       <td colspan="2">
-                        Service Fee ({{ orderDetail?.service_fee }}%)
+                        Service Fee ({{ orderDetail?.service_percentage }}%)
                       </td>
                       <td colspan="2" class="text-end">
                         {{ selectedCountry.currency_symbol }}
@@ -278,6 +269,16 @@
                         {{ orderDetail?.platform_fee }}
                       </td>
                     </tr>
+                    <tr>
+                      <td colspan="2">Delivery Charges</td>
+                      <td colspan="2" class="text-end">
+                        {{ selectedCountry.currency_symbol }}
+                      </td>
+                      <td colspan="2" class="text-end">
+                        {{ orderDetail?.delivery_charges }}
+                      </td>
+                    </tr>
+
                     <!-- <tr>
                       <td colspan="2">
                         G.S.T

@@ -746,17 +746,8 @@
                       </td>
                     </tr>
                     <tr>
-                      <td colspan="2">Delivery Charges</td>
-                      <td colspan="2" class="text-end">
-                        {{ selectedCountry.currency_symbol }}
-                      </td>
-                      <td colspan="2" class="text-end">
-                        {{ selectedDeliveryPrice.toFixed(2) }}
-                      </td>
-                    </tr>
-                    <tr>
                       <td colspan="2">
-                        Service Fee ({{ cart[0]?.service_fee }}%)
+                        Service Fee ({{ cart[0]?.service_percentage }}%)
                       </td>
                       <td colspan="2" class="text-end">
                         {{ selectedCountry.currency_symbol }}
@@ -774,6 +765,16 @@
                         {{ platformFee?.toFixed(2) }}
                       </td>
                     </tr>
+                    <tr>
+                      <td colspan="2">Delivery Charges</td>
+                      <td colspan="2" class="text-end">
+                        {{ selectedCountry.currency_symbol }}
+                      </td>
+                      <td colspan="2" class="text-end">
+                        {{ selectedDeliveryPrice.toFixed(2) }}
+                      </td>
+                    </tr>
+
                     <tr>
                       <td colspan="2">
                         G.S.T
@@ -1083,14 +1084,9 @@
                         <td class="text-end">{{ cart[0]?.amount }}</td>
                       </tr>
                       <tr>
-                        <td>Delivery Charges</td>
-                        <td>{{ selectedCountry.currency_symbol }}</td>
-                        <td class="text-end">
-                          {{ selectedDeliveryPrice.toFixed(2) }}
+                        <td>
+                          Service Fee ({{ cart[0]?.service_percentage }}%)
                         </td>
-                      </tr>
-                      <tr>
-                        <td>Service Fee ({{ cart[0]?.service_fee }}%)</td>
                         <td>{{ selectedCountry.currency_symbol }}</td>
                         <td class="text-end">
                           {{ cart[0]?.service_fee }}
@@ -1101,6 +1097,14 @@
                         <td>{{ selectedCountry.currency_symbol }}</td>
                         <td class="text-end">{{ platformFee?.toFixed(2) }}</td>
                       </tr>
+                      <tr>
+                        <td>Delivery Charges</td>
+                        <td>{{ selectedCountry.currency_symbol }}</td>
+                        <td class="text-end">
+                          {{ selectedDeliveryPrice.toFixed(2) }}
+                        </td>
+                      </tr>
+
                       <tr>
                         <td>
                           G.S.T
