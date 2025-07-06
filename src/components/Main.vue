@@ -77,6 +77,39 @@
           :countries="item?.countries"
         />
       </template>
+      <template v-if="productGift?.products.length > 0">
+        <Edition
+          :title="'Gift Items'"
+          :products="productGift?.products"
+          :countries="productGift?.country_list"
+          :categories="productGift?.category_list"
+        />
+      </template>
+      <template v-if="productLimited?.products.length > 0">
+        <Edition
+          :title="'Limited Edition'"
+          :products="productLimited?.products"
+          :countries="productLimited?.country_list"
+          :categories="productLimited?.category_list"
+        />
+      </template>
+      <template v-if="productSpecial?.products.length > 0">
+        <Edition
+          :title="'Special Edition'"
+          :products="productSpecial?.products"
+          :countries="productSpecial?.country_list"
+          :categories="productSpecial?.category_list"
+        />
+      </template>
+      <template v-if="productMiniatures?.products.length > 0">
+        <Edition
+          :title="'Miniatures'"
+          :products="productMiniatures?.products"
+          :countries="productMiniatures?.country_list"
+          :categories="productMiniatures?.category_list"
+        />
+      </template>
+      <HappyHour />
       <SelectCountry />
       <!-- <OurBrands /> -->
       <Partners />
@@ -102,6 +135,10 @@ const listData = ref([]);
 const listDataCommercial = ref([]);
 const listMainCategories = ref([]);
 const productCategories = ref([]);
+const productGift = ref(null);
+const productLimited = ref(null);
+const productSpecial = ref(null);
+const productMiniatures = ref(null);
 const isLoading = ref(true);
 
 const props = defineProps({
@@ -211,9 +248,111 @@ const getProductCategoryListData = async (cityId) => {
   }
 };
 
+const getProductEditionData = async (type, cityId) => {
+  isLoading.value = true;
+  try {
+    const response = await axios.get(
+      `/products-by-item-type/${type}/app/${appId}/${cityId}`,
+    );
+    const data = response.data.data;
+
+    if (type === "gift_item") {
+      productGift.value = data;
+    } else if (type === "limited_edition") {
+      productLimited.value = data;
+    } else if (type === "special_edition") {
+      productSpecial.value = data;
+    } else if (type === "miniature") {
+      productMiniatures.value = data;
+    }
+
+    // console.log("Transformed Data:", productCategories.value);
+  } catch (error) {
+    console.error("Error fetching product categories:", error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// const getProductGiftData = async (cityId) => {
+//   isLoading.value = true;
+//   try {
+//     const response = await axios.get(
+//       `/products-by-item-type/gift_item/app/${appId}/${cityId}`,
+//     );
+//     const data = response.data.data;
+
+//     productGift.value = data;
+
+//     // console.log("Transformed Data:", productCategories.value);
+//   } catch (error) {
+//     console.error("Error fetching product categories:", error);
+//   } finally {
+//     isLoading.value = false;
+//   }
+// };
+
+// const getProductLimitedData = async (cityId) => {
+//   isLoading.value = true;
+//   try {
+//     const response = await axios.get(
+//       `/products-by-item-type/limited_edition/app/${appId}/${cityId}`,
+//     );
+//     const data = response.data.data;
+//     productLimited.value = data;
+
+//     // console.log("Transformed Data:", productCategories.value);
+//   } catch (error) {
+//     console.error("Error fetching product categories:", error);
+//   } finally {
+//     isLoading.value = false;
+//   }
+// };
+
+// const getProductSpecialData = async (cityId) => {
+//   isLoading.value = true;
+//   try {
+//     const response = await axios.get(
+//       `/products-by-item-type/special_edition/app/${appId}/${cityId}`,
+//     );
+//     const data = response.data.data;
+//     productSpecial.value = data;
+//     // console.log("Transformed Data:", productCategories.value);
+//   } catch (error) {
+//     console.error("Error fetching product categories:", error);
+//   } finally {
+//     isLoading.value = false;
+//   }
+// };
+
+// const getProductMiniatureData = async (cityId) => {
+//   isLoading.value = true;
+//   try {
+//     const response = await axios.get(
+//       `/products-by-item-type/miniature/app/${appId}/${cityId}`,
+//     );
+//     const data = response.data.data;
+//     productMiniatures.value = data;
+//     // console.log("Transformed Data:", productCategories.value);
+//   } catch (error) {
+//     console.error("Error fetching product categories:", error);
+//   } finally {
+//     isLoading.value = false;
+//   }
+// };
+
 watch(selectedCountry, (newX) => {
   // console.log("country is", newX);
   getProductCategoryListData(newX.city_id);
+  getProductEditionData("gift_item", newX.city_id);
+  getProductEditionData("limited_edition", newX.city_id);
+  getProductEditionData("special_edition", newX.city_id);
+  getProductEditionData("miniature", newX.city_id);
+
+  // getProductGiftData(newX.city_id);
+  // getProductLimitedData(newX.city_id);
+  // getProductSpecialData(newX.city_id);
+  // getProductMiniatureData(newX.city_id);
 });
 
 onMounted(() => {
