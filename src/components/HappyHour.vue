@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-14 mt-md-10 mt-sm-2">
+  <div id="happyhour" class="mb-14 mt-md-10 mt-6">
     <v-row>
       <v-col cols="12">
         <div>

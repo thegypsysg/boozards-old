@@ -66,6 +66,7 @@
     :class="userName ? 'main-content-user' : 'main-content-guest'"
   >
     <ExploreOurMenu class="d-none d-md-block" />
+    <FilterMenu />
     <YourOrder v-if="userName" class="mb-4" />
     <div v-if="!isLoading" id="ourBooze" class="mx-auto px-2 px-md-10">
       <!-- style="max-width: 1200px" -->
