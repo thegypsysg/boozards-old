@@ -66,7 +66,7 @@
     :class="userName ? 'main-content-user' : 'main-content-guest'"
   >
     <ExploreOurMenu class="d-none d-md-block" />
-    <FilterMenu />
+    <FilterMenu v-if="!isLoading" :price-items="productPrice" />
     <YourOrder v-if="userName" class="mb-4" />
     <div v-if="!isLoading" id="ourBooze" class="mx-auto px-2 px-md-10">
       <!-- style="max-width: 1200px" -->
@@ -110,6 +110,22 @@
           :categories="productMiniatures?.category_list"
         />
       </template>
+      <v-row class="mt-8">
+        <v-col cols="12">
+          <p class="font-weight-black text-h5">
+            <span class="text-orange">Premium Booze </span>
+          </p>
+        </v-col>
+      </v-row>
+      <template v-for="(item, index) in productPrice" :key="index">
+        <Premium
+          v-if="item?.products.length > 0"
+          :title="item?.display_price_range"
+          :products="item?.products"
+          :countries="item?.country_list"
+          :categories="item?.category_list"
+        />
+      </template>
       <HappyHour />
       <SelectCountry />
       <!-- <OurBrands /> -->
@@ -136,6 +152,7 @@ const listData = ref([]);
 const listDataCommercial = ref([]);
 const listMainCategories = ref([]);
 const productCategories = ref([]);
+const productPrice = ref([]);
 const productGift = ref(null);
 const productLimited = ref(null);
 const productSpecial = ref(null);
@@ -249,6 +266,24 @@ const getProductCategoryListData = async (cityId) => {
   }
 };
 
+const getProductPriceRangeData = async (cityId) => {
+  isLoading.value = true;
+  try {
+    const response = await axios.get(
+      `/products-by-price-range/app/${appId}/${cityId}`,
+    );
+    const data = response.data.data;
+
+    productPrice.value = data;
+
+    // console.log("Transformed Data:", productCategories.value);
+  } catch (error) {
+    console.error("Error fetching product price price:", error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
 const getProductEditionData = async (type, cityId) => {
   isLoading.value = true;
   try {
@@ -345,6 +380,7 @@ const getProductEditionData = async (type, cityId) => {
 watch(selectedCountry, (newX) => {
   // console.log("country is", newX);
   getProductCategoryListData(newX.city_id);
+  getProductPriceRangeData(newX.city_id);
   getProductEditionData("gift_item", newX.city_id);
   getProductEditionData("limited_edition", newX.city_id);
   getProductEditionData("special_edition", newX.city_id);

@@ -1,7 +1,7 @@
 <template>
-  <div class="my-10">
+  <div class="my-4 py-4 bg-grey-lighten-4">
     <div
-      class="d-none my-6 d-md-flex ga-6 overflow-x-auto flex-row scroll-menu scroll-cont mx-14"
+      class="d-none my-6 d-md-flex ga-3 overflow-x-auto flex-row scroll-menu scroll-cont mx-14"
     >
       <v-btn
         v-for="(menu, index) in editionItems"
@@ -10,11 +10,12 @@
         variant="outlined"
         class="text-caption font-weight-bold"
         rounded
+        size="small"
         >{{ menu.label }}</v-btn
       >
     </div>
     <v-container
-      class="d-flex d-md-none ga-6 overflow-x-auto flex-row scroll-menu scroll-cont"
+      class="d-flex d-md-none ga-3 overflow-x-auto flex-row scroll-menu scroll-cont"
     >
       <v-btn
         v-for="(menu, index) in editionItems"
@@ -23,39 +24,42 @@
         variant="outlined"
         class="text-caption font-weight-bold"
         rounded
+        size="small"
         >{{ menu.label }}</v-btn
       >
     </v-container>
 
     <div
-      class="d-none my-6 d-md-flex ga-6 overflow-x-auto flex-row scroll-menu scroll-cont mx-14"
+      class="d-none my-6 d-md-flex ga-3 overflow-x-auto flex-row scroll-menu scroll-cont mx-14"
     >
       <v-btn
-        v-for="(menu, index) in priceItems"
+        v-for="(menu, index) in props.priceItems"
         :key="index"
-        @click="scrollToSection(formatName(menu.label), false)"
+        @click="scrollToSection(formatName(menu.display_price_range), false)"
         variant="outlined"
         class="text-caption font-weight-bold"
+        size="small"
         rounded
-        >{{ menu.label }}</v-btn
+        >{{ menu.display_price_range }}</v-btn
       >
     </div>
     <v-container
-      class="d-flex d-md-none ga-6 overflow-x-auto flex-row scroll-menu scroll-cont"
+      class="d-flex d-md-none ga-3 overflow-x-auto flex-row scroll-menu scroll-cont"
     >
       <v-btn
-        v-for="(menu, index) in priceItems"
+        v-for="(menu, index) in props.priceItems"
         :key="index"
-        @click="scrollToSection(formatName(menu.label), true)"
+        @click="scrollToSection(formatName(menu.display_price_range), true)"
         variant="outlined"
         class="text-caption font-weight-bold"
+        size="small"
         rounded
-        >{{ menu.label }}</v-btn
+        >{{ menu.display_price_range }}</v-btn
       >
     </v-container>
 
     <div
-      class="d-none my-6 d-md-flex ga-6 overflow-x-auto flex-row scroll-menu scroll-cont mx-14"
+      class="d-none my-6 d-md-flex ga-3 overflow-x-auto flex-row scroll-menu scroll-cont mx-14"
     >
       <v-btn
         v-for="(menu, index) in promoItems"
@@ -64,11 +68,12 @@
         variant="outlined"
         class="text-caption font-weight-bold"
         rounded
+        size="small"
         >{{ menu.label }}</v-btn
       >
     </div>
     <v-container
-      class="d-flex d-md-none ga-6 overflow-x-auto flex-row scroll-menu scroll-cont"
+      class="d-flex d-md-none ga-3 overflow-x-auto flex-row scroll-menu scroll-cont"
     >
       <v-btn
         v-for="(menu, index) in promoItems"
@@ -77,12 +82,13 @@
         variant="outlined"
         class="text-caption font-weight-bold"
         rounded
+        size="small"
         >{{ menu.label }}</v-btn
       >
     </v-container>
 
     <div
-      class="d-none my-6 d-md-flex ga-6 overflow-x-auto flex-row scroll-menu scroll-cont mx-14"
+      class="d-none my-6 d-md-flex ga-3 overflow-x-auto flex-row scroll-menu scroll-cont mx-14"
     >
       <v-btn
         v-for="(menu, index) in placeItems"
@@ -92,11 +98,12 @@
         class="text-caption font-weight-bold"
         style="min-width: 100px !important"
         rounded
+        size="small"
         >{{ menu.label }}</v-btn
       >
     </div>
     <v-container
-      class="d-flex d-md-none ga-6 overflow-x-auto flex-row scroll-menu scroll-cont"
+      class="d-flex d-md-none ga-3 overflow-x-auto flex-row scroll-menu scroll-cont"
     >
       <v-btn
         v-for="(menu, index) in placeItems"
@@ -106,6 +113,7 @@
         class="text-caption font-weight-bold"
         style="min-width: 100px !important"
         rounded
+        size="small"
         >{{ menu.label }}</v-btn
       >
     </v-container>
@@ -114,6 +122,10 @@
 
 <script setup>
 import { ref } from "vue";
+
+const props = defineProps({
+  priceItems: Array,
+});
 
 const editionItems = ref([
   {
@@ -127,30 +139,6 @@ const editionItems = ref([
   },
   {
     label: "Miniatures",
-  },
-]);
-
-const priceItems = ref([
-  {
-    label: "Upto S$ 500",
-  },
-  {
-    label: "S$ 500 to S$ 1000",
-  },
-  {
-    label: "S$ 1000 to S$ 2000",
-  },
-  {
-    label: "S$ 2000 to S$ 3000",
-  },
-  {
-    label: "S$ 3000 to S$ 5000",
-  },
-  {
-    label: "S$ 5000 to S$ 10000",
-  },
-  {
-    label: "Above S$ 10000",
   },
 ]);
 
