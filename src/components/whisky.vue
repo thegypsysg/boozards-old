@@ -2,7 +2,7 @@
 import { onMounted, ref, nextTick, onUnmounted, computed } from "vue";
 import { useCart } from "@/composables/useCart";
 import axios from "@/util/axios";
-import { fileURL } from "@/main";
+import { fileURL, appId } from "@/main";
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 import { useStore } from "vuex";
@@ -29,6 +29,9 @@ const props = defineProps({
 
 const store = useStore();
 const { isInCart, cartQuantity, addToCart, updateQuantity } = useCart();
+
+const loading = ref(false);
+const listFavorite = ref([]);
 const selected = ref(null);
 const splideRef = ref(null);
 const isBeginning = ref(true);
@@ -38,6 +41,10 @@ const isMobile = ref(false);
 
 const token = computed(() => {
   return localStorage.getItem("token");
+});
+
+const userName = computed(() => {
+  return store.state.userName;
 });
 
 const splideOptions = computed(() => ({
@@ -182,7 +189,51 @@ const addToCartData = (data) => {
   }
 };
 
+const addToFavorite = async (data) => {
+  const payload = {
+    app_id: appId,
+    range_id: data.rangeItems.filter((item) => item.selected.value)[0].range_id,
+  };
+  loading.value = true;
+
+  try {
+    const response = await axios.post(`/add-to-my-favorite`, payload);
+    getFavoriteListData();
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loading.value = false;
+  }
+};
+const removeFromFavorite = async (data) => {
+  loading.value = true;
+  try {
+    const response = await axios.delete(
+      `/my-favorite/range-id/${data.rangeItems.filter((item) => item.selected.value)[0].range_id}`,
+    );
+    getFavoriteListData();
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const getFavoriteListData = async (cityId) => {
+  try {
+    const response = await axios.get(
+      `/list-my-favorites-range-id/app/${appId}`,
+    );
+    const data = response.data.data;
+    listFavorite.value = data;
+    console.log("listFavorite", listFavorite.value);
+  } catch (error) {
+    console.error("Error fetching list favorites:", error);
+  }
+};
+
 onMounted(() => {
+  getFavoriteListData();
   checkMobile();
   window.addEventListener("resize", checkMobile);
   nextTick(() => {
@@ -290,111 +341,160 @@ onUnmounted(() => {
       >
         <span class="arrow-icon">←</span>
       </v-btn>
-
-      <Splide ref="splideRef" :options="splideOptions">
-        <SplideSlide v-for="menu in filteredProducts" :key="menu.product_id">
-          <!-- :key="menu?.product_id" -->
-          <v-card class="card-wrapper" height="420" elevation="3">
-            <router-link
+      <transition-group name="card-transition" mode="out-in">
+        <Splide ref="splideRef" :options="splideOptions">
+          <SplideSlide v-for="menu in filteredProducts" :key="menu.product_id">
+            <!-- :key="menu?.product_id" -->
+            <v-card class="card-wrapper" height="420" elevation="3">
+              <!-- <router-link
               class="text-decoration-none"
               :to="getProductDetailsLink(menu)"
-            >
-              <v-img
-                :src="fileURL + menu?.selectedImage.value"
-                height="200"
-              ></v-img>
-            </router-link>
-            <div
-              class="card-title d-flex flex-column justify-space-between"
-              style="height: 170px"
-            >
-              <router-link
-                class="text-decoration-none"
-                :to="getProductDetailsLink(menu)"
-              >
-                <p class="text-red-darken-4 font-weight-bold text-body-2">
-                  {{ menu?.brand_name }}
-                </p>
-                <p
-                  class="font-weight-bold text-black text-body-2 mt-1"
-                  style="height: 45px"
-                >
-                  {{ menu?.product_name }}
-                </p>
-              </router-link>
-              <div class="d-flex align-center ga-1 my-2">
-                <template v-for="item in menu?.rangeItems" :key="item.pq_id">
-                  <v-btn
-                    size="xs"
-                    color="black"
-                    class="text-caption pa-1 rounded-lg"
-                    @click="handleSelectRange(menu, item)"
-                    :variant="item.selected.value ? 'flat' : 'outlined'"
-                    >{{ item?.quantity?.quantity_name }}</v-btn
-                  >
-                  <!-- @click="item.selected.value = !item.selected.value" -->
-                </template>
-              </div>
-              <div
-                v-if="menu?.selectedPrice.value"
-                class="d-flex justify-space-between align-center"
-              >
-                <span class="text-red-darken-1 font-weight-bold">
-                  S$ {{ menu?.selectedPrice.value }}
-                </span>
-                <span>
-                  <v-btn
-                    v-if="!isInCart(menu)"
-                    @click="addToCartData(menu)"
-                    size="xs"
-                    color="black"
-                    class="text-caption py-1 px-8"
-                    variant="flat"
-                    >Add</v-btn
-                  >
-                  <div v-else="isInCart(menu)" class="d-flex align-center ga-2">
-                    <v-btn
-                      size="xs"
-                      color="black"
-                      class="text-caption pa-1 rounded-0"
-                      variant="flat"
-                      icon
-                      @click="updateQuantity(menu, 'decrease')"
-                    >
-                      <v-icon>mdi-minus</v-icon>
-                    </v-btn>
-
-                    <span>
-                      {{ cartQuantity(menu) }}
-                    </span>
-
-                    <v-btn
-                      size="xs"
-                      color="black"
-                      class="text-caption pa-1 rounded-0"
-                      variant="flat"
-                      icon
-                      @click="updateQuantity(menu, 'increase')"
-                    >
-                      <v-icon>mdi-plus</v-icon>
-                    </v-btn>
+            > -->
+              <div class="img-cont">
+                <div class="cart clearfix animate-effect" v-if="userName">
+                  <div class="action pr-8">
+                    <ul class="list-unstyled d-flex justify-end">
+                      <li class="wishlist">
+                        <!-- :class="
+                        listFavorite.includes(
+                          menu.rangeItems.filter(
+                            (item) => item.selected.value,
+                          )[0].range_id,
+                        )
+                          ? 'act'
+                          : 'def'
+                      " -->
+                        <v-btn
+                          v-if="
+                            listFavorite.includes(
+                              menu.rangeItems.filter(
+                                (item) => item.selected.value,
+                              )[0].range_id,
+                            )
+                          "
+                          :disabled="loading"
+                          @click="removeFromFavorite(menu)"
+                          rounded
+                          icon
+                          color="#ee4054"
+                        >
+                          <v-icon color="white"> mdi-heart </v-icon>
+                        </v-btn>
+                        <v-btn
+                          v-else
+                          :disabled="loading"
+                          @click="addToFavorite(menu)"
+                          rounded
+                          icon
+                          color="white"
+                        >
+                          <v-icon color="#ee4054"> mdi-heart </v-icon>
+                        </v-btn>
+                      </li>
+                    </ul>
                   </div>
-                </span>
+                </div>
+                <v-img
+                  :src="fileURL + menu?.selectedImage.value"
+                  height="200"
+                ></v-img>
               </div>
-              <hr />
-              <div class="mt-5">
-                <span class="mr-2 font-weight-bold text-grey">{{
-                  menu.percentage
-                }}</span>
-                <span class="text-blue">% |</span>
-                <span class="ml-2 text-orange font-weight-bold">{{
-                  menu?.country_name
-                }}</span>
+              <!-- </router-link> -->
+              <div
+                class="card-title d-flex flex-column justify-space-between"
+                style="height: 170px"
+              >
+                <router-link
+                  class="text-decoration-none"
+                  :to="getProductDetailsLink(menu)"
+                >
+                  <p class="text-red-darken-4 font-weight-bold text-body-2">
+                    {{ menu?.brand_name }}
+                  </p>
+                  <p
+                    class="font-weight-bold text-black text-body-2 mt-1"
+                    style="height: 45px"
+                  >
+                    {{ menu?.product_name }}
+                  </p>
+                </router-link>
+                <div class="d-flex align-center ga-1 my-2">
+                  <template v-for="item in menu?.rangeItems" :key="item.pq_id">
+                    <v-btn
+                      size="xs"
+                      color="black"
+                      class="text-caption pa-1 rounded-lg"
+                      @click="handleSelectRange(menu, item)"
+                      :variant="item.selected.value ? 'flat' : 'outlined'"
+                      >{{ item?.quantity?.quantity_name }}</v-btn
+                    >
+                    <!-- @click="item.selected.value = !item.selected.value" -->
+                  </template>
+                </div>
+                <div
+                  v-if="menu?.selectedPrice.value"
+                  class="d-flex justify-space-between align-center"
+                >
+                  <span class="text-red-darken-1 font-weight-bold">
+                    S$ {{ menu?.selectedPrice.value }}
+                  </span>
+                  <span>
+                    <v-btn
+                      v-if="!isInCart(menu)"
+                      @click="addToCartData(menu)"
+                      size="xs"
+                      color="black"
+                      class="text-caption py-1 px-8"
+                      variant="flat"
+                      >Add</v-btn
+                    >
+                    <div
+                      v-else="isInCart(menu)"
+                      class="d-flex align-center ga-2"
+                    >
+                      <v-btn
+                        size="xs"
+                        color="black"
+                        class="text-caption pa-1 rounded-0"
+                        variant="flat"
+                        icon
+                        @click="updateQuantity(menu, 'decrease')"
+                      >
+                        <v-icon>mdi-minus</v-icon>
+                      </v-btn>
+
+                      <span>
+                        {{ cartQuantity(menu) }}
+                      </span>
+
+                      <v-btn
+                        size="xs"
+                        color="black"
+                        class="text-caption pa-1 rounded-0"
+                        variant="flat"
+                        icon
+                        @click="updateQuantity(menu, 'increase')"
+                      >
+                        <v-icon>mdi-plus</v-icon>
+                      </v-btn>
+                    </div>
+                  </span>
+                </div>
+                <hr />
+                <div class="mt-5">
+                  <span class="mr-2 font-weight-bold text-grey">{{
+                    menu.percentage
+                  }}</span>
+                  <span class="text-blue">% |</span>
+                  <span class="ml-2 text-orange font-weight-bold">{{
+                    menu?.country_name
+                  }}</span>
+                </div>
               </div>
-            </div>
-          </v-card>
-        </SplideSlide>
-      </Splide>
+            </v-card>
+          </SplideSlide>
+        </Splide>
+      </transition-group>
 
       <v-btn
         v-if="!isMobile && !isEnd"
@@ -417,7 +517,19 @@ onUnmounted(() => {
     </v-card>
   </v-dialog>
 </template>
+<!-- .def:hover button {
+      background-color: rgb(238, 64, 84) !important;
+    }
+    .def:hover button i {
+      color: white !important;
+    }
 
+    .act:hover button {
+      background-color: white !important;
+    }
+    .act:hover button i {
+      color: rgb(238, 64, 84) !important;
+    } -->
 <style scoped>
 .nursing-section {
   padding: 1rem 0;
@@ -515,5 +627,67 @@ onUnmounted(() => {
 .arrow-hidden {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.img-cont {
+  position: relative;
+  overflow: hidden;
+
+  .cart {
+    margin-top: 5px;
+    opacity: 0;
+    -webkit-transition: all 0.5s linear 0s;
+    -moz-transition: all 0.5s linear 0s;
+    -o-transition: all 0.5s linear 0s;
+    transition: all 0.5s linear 0s;
+    z-index: 666;
+    right: 30%;
+    position: absolute;
+    top: 0;
+  }
+
+  .action ul li {
+    float: left;
+  }
+  .action ul li button {
+    font-size: 16px !important;
+    height: 40px;
+    width: 40px;
+  }
+
+  .action ul li button i {
+    font-size: 16px !important;
+  }
+}
+
+.img-cont:hover .cart {
+  opacity: 1;
+  top: 20px;
+}
+.cart {
+  margin-top: 5px;
+  -webkit-transition: all 0.2s linear 0s;
+  -moz-transition: all 0.2s linear 0s;
+  -o-transition: all 0.2s linear 0s;
+  transition: all 0.2s linear 0s;
+  z-index: 666;
+  right: 0px;
+}
+
+.card-transition-enter-active,
+.card-transition-leave-active {
+  transition:
+    transform 0.5s,
+    opacity 0.3s;
+}
+
+.card-transition-enter {
+  opacity: 0;
+  transform: translateX(-50%);
+}
+
+.card-transition-leave-to {
+  opacity: 0;
+  transform: scale(0.8);
 }
 </style>
