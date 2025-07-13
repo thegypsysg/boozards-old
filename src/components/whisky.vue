@@ -6,6 +6,7 @@ import { fileURL, appId } from "@/main";
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 const props = defineProps({
   desktop: Boolean,
@@ -27,6 +28,7 @@ const props = defineProps({
   },
 });
 
+const router = useRouter();
 const store = useStore();
 const { isInCart, cartQuantity, addToCart, updateQuantity } = useCart();
 
@@ -98,12 +100,35 @@ const filteredProducts = computed(() => {
       }),
       selectedPrice: computed(() => {
         const selectedRange = rangeItems.find((range) => range.selected.value);
-        return selectedRange?.price_list?.rate || null;
+        // return selectedRange?.price_list;
+        return selectedRange?.price_list?.rate
+          ? selectedRange?.price_list?.rate
+          : rangeItems[0]?.price_list?.rate
+            ? rangeItems[0]?.price_list?.rate
+            : null;
+      }),
+      selectedPrice2: computed(() => {
+        const selectedRange = rangeItems.find((range) => range.selected.value);
+        return selectedRange?.price_list;
         // return selectedRange?.price_list?.rate
         //   ? selectedRange?.price_list?.rate
         //   : rangeItems[0]?.price_list?.rate
         //     ? rangeItems[0]?.price_list?.rate
         //     : null;
+      }),
+      selectedAlso: computed(() => {
+        const selectedRange = rangeItems.find((range) => range.selected.value);
+        const result =
+          selectedRange?.price_list?.miniature == "Y"
+            ? "Miniatures"
+            : selectedRange?.price_list?.limited_edition == "Y"
+              ? "Limited Edition"
+              : selectedRange?.price_list?.special_edition == "Y"
+                ? "Special Edition"
+                : selectedRange?.price_list?.gift_item == "Y"
+                  ? "Gift Items"
+                  : "";
+        return result;
       }),
       isCount: ref(false),
       count: ref(1),
@@ -121,6 +146,26 @@ const filteredProducts = computed(() => {
 });
 
 const formatName = (name) => name.toLowerCase().replace(/\s+/g, "");
+
+function scrollToSection(sectionId, mobile) {
+  const cardSection = document.getElementById(sectionId);
+
+  // this.$nextTick(() => {
+  if (cardSection) {
+    const cardRect = cardSection.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const offset = mobile
+      ? cardRect.top + scrollTop - 300
+      : cardRect.top + scrollTop - 100; // Nilai offset yang diinginkan, dalam piksel
+
+    window.scrollTo({
+      top: offset,
+      behavior: "smooth",
+    });
+  }
+  // });
+  // window.scrollBy(0, -scrollOffset);
+}
 
 const goNext = () => {
   splideRef.value?.splide?.go("+1");
@@ -153,11 +198,24 @@ const handleMoved = () => {
   }
 };
 
-const getProductDetailsLink = (product) => {
+const getProductDetailsLink = async (product) => {
   const selectedRange = product.rangeItems.find(
     (range) => range.selected?.value,
   );
-  return `/product/${product.encrypted_id}?range_id=${selectedRange?.range_id}`;
+
+  try {
+    const response = await axios.post(
+      `/increment-product-view-count/products/${product.product_id}/ranges/${selectedRange?.range_id}`,
+      {},
+    );
+    if (response.status == 200) {
+      router.push(
+        `/product/${product.encrypted_id}?range_id=${selectedRange?.range_id}`,
+      );
+    }
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 function handleSelectRange(menu, selectedItem) {
@@ -345,11 +403,10 @@ onUnmounted(() => {
         <Splide ref="splideRef" :options="splideOptions">
           <SplideSlide v-for="menu in filteredProducts" :key="menu.product_id">
             <!-- :key="menu?.product_id" -->
+            <p class="text-grey-darken-1 pl-4 text-caption font-weight-black">
+              View: {{ menu?.selectedPrice2.value?.views || 0 }}
+            </p>
             <v-card class="card-wrapper" height="420" elevation="3">
-              <!-- <router-link
-              class="text-decoration-none"
-              :to="getProductDetailsLink(menu)"
-            > -->
               <div class="img-cont">
                 <div class="cart clearfix animate-effect" v-if="userName">
                   <div class="action pr-8">
@@ -394,20 +451,18 @@ onUnmounted(() => {
                     </ul>
                   </div>
                 </div>
-                <v-img
-                  :src="fileURL + menu?.selectedImage.value"
-                  height="200"
-                ></v-img>
+                <div @click="getProductDetailsLink(menu)">
+                  <v-img
+                    :src="fileURL + menu?.selectedImage.value"
+                    height="200"
+                  ></v-img>
+                </div>
               </div>
-              <!-- </router-link> -->
               <div
                 class="card-title d-flex flex-column justify-space-between"
                 style="height: 170px"
               >
-                <router-link
-                  class="text-decoration-none"
-                  :to="getProductDetailsLink(menu)"
-                >
+                <div @click="getProductDetailsLink(menu)">
                   <p class="text-red-darken-4 font-weight-bold text-body-2">
                     {{ menu?.brand_name }}
                   </p>
@@ -417,7 +472,7 @@ onUnmounted(() => {
                   >
                     {{ menu?.product_name }}
                   </p>
-                </router-link>
+                </div>
                 <div class="d-flex align-center ga-1 my-2">
                   <template v-for="item in menu?.rangeItems" :key="item.pq_id">
                     <v-btn
@@ -481,7 +536,7 @@ onUnmounted(() => {
                   </span>
                 </div>
                 <hr />
-                <div class="mt-5">
+                <div class="mt-3">
                   <span class="mr-2 font-weight-bold text-grey">{{
                     menu.percentage
                   }}</span>
@@ -490,8 +545,55 @@ onUnmounted(() => {
                     menu?.country_name
                   }}</span>
                 </div>
+                <p
+                  v-if="menu?.selectedAlso.value"
+                  class="font-weight-black text-caption"
+                >
+                  Also in :
+                  <span
+                    @click="
+                      scrollToSection(
+                        formatName(menu?.selectedAlso.value),
+                        isMobile ? true : false,
+                      )
+                    "
+                    class="text-blue-darken-4 cursor-pointer"
+                  >
+                    {{ menu?.selectedAlso.value }}
+                  </span>
+                </p>
               </div>
             </v-card>
+            <div
+              class="d-flex flex-md-row flex-column justify-space-between px-4 font-weight-bold text-caption"
+            >
+              <p
+                v-if="
+                  menu.rangeItems.filter((item) => item.selected.value)[0]
+                    ?.total_purchased
+                "
+              >
+                Others who purchased :
+                <span class="text-blue-darken-4">{{
+                  menu.rangeItems.filter((item) => item.selected.value)[0]
+                    ?.total_purchased
+                }}</span>
+              </p>
+              <template v-if="userName">
+                <p
+                  v-if="
+                    menu.rangeItems.filter((item) => item.selected.value)[0]
+                      ?.user_purchased_count
+                  "
+                >
+                  <span class="text-grey-darken-1"> You purchased : </span>
+                  <span class="text-blue-darken-4">{{
+                    menu.rangeItems.filter((item) => item.selected.value)[0]
+                      ?.user_purchased_count
+                  }}</span>
+                </p>
+              </template>
+            </div>
           </SplideSlide>
         </Splide>
       </transition-group>

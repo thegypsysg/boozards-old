@@ -421,6 +421,19 @@ export default {
         console.log(error);
       }
     },
+    async getProductDetailsLink(productId, encId, rangeId) {
+      try {
+        const response = await axios.post(
+          `/increment-product-view-count/products/${productId}/ranges/${rangeId}`,
+          {},
+        );
+        if (response.status == 200) {
+          this.$router.push(`/product/${encId}?range_id=${rangeId}`);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
     async getPlatformFee() {
       let data = null;
       try {
@@ -1044,10 +1057,17 @@ watch(() => {
                 style="font-size: 12px; width: 85%"
               >
                 <div class="w-100">
-                  <a
+                  <div
                     class="text-decoration-none text-black font-weight-bold"
-                    :href="`/product/${item.raw.encrypted_id}?range_id=${range.range_id}`"
+                    @click="
+                      getProductDetailsLink(
+                        item.raw.product_id,
+                        item.raw.encrypted_id,
+                        range.range_id,
+                      )
+                    "
                   >
+                    <!-- :href="`/product/${item.raw.encrypted_id}?range_id=${range.range_id}`" -->
                     <p class="mb-1 font-weight-regular">
                       {{
                         `${item?.raw?.product_name} ${range?.quantity?.quantity_name}`
@@ -1064,7 +1084,7 @@ watch(() => {
                               : ""
                       }}</span>
                     </p>
-                  </a>
+                  </div>
                   <div class="d-flex justify-space-between align-center">
                     <span class="text-red-darken-1 font-weight-bold">
                       <template v-if="range?.price_list?.rate">
@@ -1224,10 +1244,17 @@ watch(() => {
                 style="font-size: 12px; width: 85%"
               >
                 <div class="w-100">
-                  <a
+                  <div
                     class="text-decoration-none text-black font-weight-bold"
-                    :href="`/product/${item.raw.encrypted_id}?range_id=${range.range_id}`"
+                    @click="
+                      getProductDetailsLink(
+                        item.raw.product_id,
+                        item.raw.encrypted_id,
+                        range.range_id,
+                      )
+                    "
                   >
+                    <!-- :href="`/product/${item.raw.encrypted_id}?range_id=${range.range_id}`" -->
                     <p class="mb-1 font-weight-regular">
                       {{
                         `${item?.raw?.product_name} ${range?.quantity?.quantity_name}`
@@ -1245,7 +1272,7 @@ watch(() => {
                               : ""
                       }}</span>
                     </p>
-                  </a>
+                  </div>
                   <div class="d-flex justify-space-between align-center">
                     <span class="text-red-darken-1 font-weight-bold">
                       <template v-if="range?.price_list?.rate">
@@ -1571,10 +1598,17 @@ watch(() => {
                     style="font-size: 12px; width: 85%"
                   >
                     <div class="w-100">
-                      <a
+                      <div
                         class="text-decoration-none text-black font-weight-bold"
-                        :href="`/product/${item.raw.encrypted_id}?range_id=${range.range_id}`"
+                        @click="
+                          getProductDetailsLink(
+                            item.raw.product_id,
+                            item.raw.encrypted_id,
+                            range.range_id,
+                          )
+                        "
                       >
+                        <!-- :href="`/product/${item.raw.encrypted_id}?range_id=${range.range_id}`" -->
                         <p class="mb-1 font-weight-regular">
                           {{
                             `${item?.raw?.product_name} ${range?.quantity?.quantity_name}`
@@ -1591,7 +1625,7 @@ watch(() => {
                                   : ""
                           }}</span>
                         </p>
-                      </a>
+                      </div>
                       <div class="d-flex justify-space-between align-center">
                         <span class="text-red-darken-1 font-weight-bold">
                           <template v-if="range?.price_list?.rate">
@@ -1731,10 +1765,17 @@ watch(() => {
                       style="font-size: 12px; width: 85%"
                     >
                       <div class="w-100">
-                        <a
+                        <div
                           class="text-decoration-none text-black font-weight-bold"
-                          :href="`/product/${item.raw.encrypted_id}?range_id=${range.range_id}`"
+                          @click="
+                            getProductDetailsLink(
+                              item.raw.product_id,
+                              item.raw.encrypted_id,
+                              range.range_id,
+                            )
+                          "
                         >
+                          <!-- :href="`/product/${item.raw.encrypted_id}?range_id=${range.range_id}`" -->
                           <p class="mb-1 font-weight-regular">
                             {{
                               `${item?.raw?.product_name} ${range?.quantity?.quantity_name}`
@@ -1751,7 +1792,7 @@ watch(() => {
                                     : ""
                             }}</span>
                           </p>
-                        </a>
+                        </div>
                         <div class="d-flex justify-space-between align-center">
                           <span class="text-red-darken-1 font-weight-bold">
                             <template v-if="range?.price_list?.rate">

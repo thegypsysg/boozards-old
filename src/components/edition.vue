@@ -2,10 +2,11 @@
 import { onMounted, ref, nextTick, onUnmounted, computed } from "vue";
 import { useCart } from "@/composables/useCart";
 import axios from "@/util/axios";
-import { fileURL } from "@/main";
+import { fileURL, appId } from "@/main";
 import { Splide, SplideSlide } from "@splidejs/vue-splide";
 import "@splidejs/vue-splide/css";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 const props = defineProps({
   desktop: Boolean,
@@ -31,8 +32,12 @@ const props = defineProps({
   },
 });
 
+const router = useRouter();
 const store = useStore();
 const { isInCart, cartQuantity, addToCart, updateQuantity } = useCart();
+
+const loading = ref(false);
+const listFavorite = ref([]);
 const selected = ref(null);
 const category = ref(null);
 const splideRef = ref(null);
@@ -43,6 +48,10 @@ const isMobile = ref(false);
 
 const token = computed(() => {
   return localStorage.getItem("token");
+});
+
+const userName = computed(() => {
+  return store.state.userName;
 });
 
 const splideOptions = computed(() => ({
@@ -87,6 +96,23 @@ const filteredProducts = computed(() => {
     //   ...range,
     //   selected: ref(index === 0), // Set selected true hanya untuk item pertama
     // }));
+    const rangeItems = [
+      {
+        range_id: item?.range_id,
+        product_id: item?.product_id,
+        pq_id: item?.pq_id,
+        image_1: item?.image_1,
+        quantity: {
+          pq_id: item?.pq_id,
+          quantity_name: item?.quantity_name,
+        },
+        price_list: {
+          range_id: item?.range_id,
+          rate: item?.rate,
+        },
+        selected: ref(true),
+      },
+    ];
 
     return {
       ...item,
@@ -94,18 +120,13 @@ const filteredProducts = computed(() => {
       //   const selectedRange = rangeItems.find((range) => range.selected.value);
       //   return selectedRange?.image_1 || item.image;
       // }),
-      // selectedPrice: computed(() => {
-      //   const selectedRange = rangeItems.find((range) => range.selected.value);
-      //   return selectedRange?.price_list?.rate || null;
-      //   // return selectedRange?.price_list?.rate
-      //   //   ? selectedRange?.price_list?.rate
-      //   //   : rangeItems[0]?.price_list?.rate
-      //   //     ? rangeItems[0]?.price_list?.rate
-      //   //     : null;
-      // }),
+      selectedPrice: computed(() => {
+        return item?.rate || null;
+      }),
+
       isCount: ref(false),
       count: ref(1),
-      // rangeItems,
+      rangeItems,
     };
   };
 
@@ -163,32 +184,21 @@ const handleMoved = () => {
   }
 };
 
-// const getProductDetailsLink = (product) => {
-//   const selectedRange = product.rangeItems.find(
-//     (range) => range.selected?.value,
-//   );
-//   return `/product/${product.encrypted_id}?range_id=${selectedRange?.range_id}`;
-// };
-
-// function handleSelectRange(menu, selectedItem) {
-//   const isAlreadySelected = selectedItem.selected.value;
-
-//   // Set semua rangeItems menjadi tidak terpilih
-//   menu.rangeItems.forEach((item) => {
-//     item.selected.value = false;
-//   });
-
-//   // Undone the unselect quantity here
-//   selectedItem.selected.value = true;
-
-//   // Jika belum dipilih sebelumnya, jadikan selected
-//   /* if (!isAlreadySelected) {
-//     selectedItem.selected.value = true;
-//   }
-//   else {
-//     selectedItem.selected.value = true;
-//   } */
-// }
+const getProductDetailsLink = async (product) => {
+  try {
+    const response = await axios.post(
+      `/increment-product-view-count/products/${product.product_id}/ranges/${product?.range_id}`,
+      {},
+    );
+    if (response.status == 200) {
+      router.push(
+        `/product/${product?.encrypted_id}?range_id=${product?.range_id}`,
+      );
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 const addToCartData = (data) => {
   // console.log(token.value);
@@ -199,7 +209,51 @@ const addToCartData = (data) => {
   }
 };
 
+const addToFavorite = async (data) => {
+  const payload = {
+    app_id: appId,
+    range_id: data.range_id,
+  };
+  loading.value = true;
+
+  try {
+    const response = await axios.post(`/add-to-my-favorite`, payload);
+    getFavoriteListData();
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loading.value = false;
+  }
+};
+const removeFromFavorite = async (data) => {
+  loading.value = true;
+  try {
+    const response = await axios.delete(
+      `/my-favorite/range-id/${data.range_id}`,
+    );
+    getFavoriteListData();
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const getFavoriteListData = async () => {
+  try {
+    const response = await axios.get(
+      `/list-my-favorites-range-id/app/${appId}`,
+    );
+    const data = response.data.data;
+    listFavorite.value = data;
+    console.log("listFavorite", listFavorite.value);
+  } catch (error) {
+    console.error("Error fetching list favorites:", error);
+  }
+};
+
 onMounted(() => {
+  getFavoriteListData();
   checkMobile();
   window.addEventListener("resize", checkMobile);
   nextTick(() => {
@@ -322,119 +376,174 @@ onUnmounted(() => {
         <span class="arrow-icon">←</span>
       </v-btn>
 
-      <Splide ref="splideRef" :options="splideOptions">
-        <SplideSlide v-for="menu in filteredProducts" :key="menu.product_id">
-          <!-- :key="menu?.product_id" -->
-          <v-card class="card-wrapper" height="420" elevation="3">
-            <!-- <router-link
-              class="text-decoration-none"
-              :to="getProductDetailsLink(menu)"
-            > -->
-            <div class="text-decoration-none">
-              <v-img
-                :src="
-                  menu?.image
-                    ? fileURL + menu?.image
-                    : menu?.image_1
-                      ? fileURL + menu?.image_1
-                      : ''
-                "
-                height="200"
-              ></v-img>
-            </div>
-            <!-- </router-link> -->
-            <div
-              class="card-title d-flex flex-column justify-space-between"
-              style="height: 170px"
-            >
-              <!-- <router-link
-              class="text-decoration-none"
-              :to="getProductDetailsLink(menu)"
-            > -->
-              <div class="text-decoration-none">
-                <p class="text-red-darken-4 font-weight-bold text-body-2">
-                  {{ menu?.brand_name }}
-                </p>
-                <p
-                  class="font-weight-bold text-black text-body-2 mt-1"
-                  style="height: 45px"
-                >
-                  {{ menu?.product_name }}
-                </p>
-              </div>
-              <!-- </router-link> -->
-              <div class="d-flex align-center ga-1 my-2">
-                <!-- <template v-for="item in menu?.rangeItems" :key="item.pq_id"> -->
-                <v-btn
-                  size="xs"
-                  color="black"
-                  class="text-caption pa-1 rounded-lg"
-                  >{{ menu?.quantity_name }}</v-btn
-                >
-                <!-- @click="handleSelectRange(menu, item)"
-                    :variant="item.selected.value ? 'flat' : 'outlined'" -->
-                <!-- </template> -->
+      <transition-group name="card-transition" mode="out-in">
+        <Splide ref="splideRef" :options="splideOptions">
+          <SplideSlide v-for="menu in filteredProducts" :key="menu.product_id">
+            <!-- :key="menu?.product_id" -->
+            <p class="text-grey-darken-1 pl-4 text-caption font-weight-black">
+              View: {{ menu?.views || 0 }}
+            </p>
+            <v-card class="card-wrapper" height="420" elevation="3">
+              <div class="img-cont">
+                <div class="cart clearfix animate-effect" v-if="userName">
+                  <div class="action pr-8">
+                    <ul class="list-unstyled d-flex justify-end">
+                      <li class="wishlist">
+                        <!-- :class="
+                        listFavorite.includes(
+                          menu.rangeItems.filter(
+                            (item) => item.selected.value,
+                          )[0].range_id,
+                        )
+                          ? 'act'
+                          : 'def'
+                      " -->
+                        <v-btn
+                          v-if="listFavorite.includes(menu?.range_id)"
+                          :disabled="loading"
+                          @click="removeFromFavorite(menu)"
+                          rounded
+                          icon
+                          color="#ee4054"
+                        >
+                          <v-icon color="white"> mdi-heart </v-icon>
+                        </v-btn>
+                        <v-btn
+                          v-else
+                          :disabled="loading"
+                          @click="addToFavorite(menu)"
+                          rounded
+                          icon
+                          color="white"
+                        >
+                          <v-icon color="#ee4054"> mdi-heart </v-icon>
+                        </v-btn>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div @click="getProductDetailsLink(menu)">
+                  <v-img
+                    :src="
+                      menu?.image
+                        ? fileURL + menu?.image
+                        : menu?.image_1
+                          ? fileURL + menu?.image_1
+                          : ''
+                    "
+                    height="200"
+                  ></v-img>
+                </div>
               </div>
               <div
-                v-if="menu?.rate"
-                class="d-flex justify-space-between align-center"
+                class="card-title d-flex flex-column justify-space-between"
+                style="height: 170px"
               >
-                <span class="text-red-darken-1 font-weight-bold">
-                  S$ {{ menu?.rate }}
-                </span>
-                <span>
-                  <!-- v-if="!isInCart(menu)"
-                  @click="addToCartData(menu)" -->
+                <div @click="getProductDetailsLink(menu)">
+                  <p class="text-red-darken-4 font-weight-bold text-body-2">
+                    {{ menu?.brand_name }}
+                  </p>
+                  <p
+                    class="font-weight-bold text-black text-body-2 mt-1"
+                    style="height: 45px"
+                  >
+                    {{ menu?.product_name }}
+                  </p>
+                </div>
+                <div class="d-flex align-center ga-1 my-2">
+                  <!-- <template v-for="item in menu?.rangeItems" :key="item.pq_id"> -->
                   <v-btn
                     size="xs"
                     color="black"
-                    class="text-caption py-1 px-8"
-                    variant="flat"
-                    >Add</v-btn
+                    class="text-caption pa-1 rounded-lg"
+                    >{{ menu?.quantity_name }}</v-btn
                   >
-                  <!-- <div v-else="isInCart(menu)" class="d-flex align-center ga-2">
+                  <!-- @click="handleSelectRange(menu, item)"
+                    :variant="item.selected.value ? 'flat' : 'outlined'" -->
+                  <!-- </template> -->
+                </div>
+                <div
+                  v-if="menu?.rate"
+                  class="d-flex justify-space-between align-center"
+                >
+                  <span class="text-red-darken-1 font-weight-bold">
+                    S$ {{ menu?.rate }}
+                  </span>
+                  <span>
                     <v-btn
+                      v-if="!isInCart(menu)"
+                      @click="addToCartData(menu)"
                       size="xs"
                       color="black"
-                      class="text-caption pa-1 rounded-0"
+                      class="text-caption py-1 px-8"
                       variant="flat"
-                      icon
-                      @click="updateQuantity(menu, 'decrease')"
+                      >Add</v-btn
                     >
-                      <v-icon>mdi-minus</v-icon>
-                    </v-btn>
-
-                    <span>
-                      {{ cartQuantity(menu) }}
-                    </span>
-
-                    <v-btn
-                      size="xs"
-                      color="black"
-                      class="text-caption pa-1 rounded-0"
-                      variant="flat"
-                      icon
-                      @click="updateQuantity(menu, 'increase')"
+                    <div
+                      v-else="isInCart(menu)"
+                      class="d-flex align-center ga-2"
                     >
-                      <v-icon>mdi-plus</v-icon>
-                    </v-btn>
-                  </div> -->
-                </span>
+                      <v-btn
+                        size="xs"
+                        color="black"
+                        class="text-caption pa-1 rounded-0"
+                        variant="flat"
+                        icon
+                        @click="updateQuantity(menu, 'decrease')"
+                      >
+                        <v-icon>mdi-minus</v-icon>
+                      </v-btn>
+
+                      <span>
+                        {{ cartQuantity(menu) }}
+                      </span>
+
+                      <v-btn
+                        size="xs"
+                        color="black"
+                        class="text-caption pa-1 rounded-0"
+                        variant="flat"
+                        icon
+                        @click="updateQuantity(menu, 'increase')"
+                      >
+                        <v-icon>mdi-plus</v-icon>
+                      </v-btn>
+                    </div>
+                  </span>
+                </div>
+                <hr />
+                <div class="mt-5">
+                  <span class="mr-2 font-weight-bold text-grey">{{
+                    menu.percentage
+                  }}</span>
+                  <span class="text-blue" v-if="menu.percentage">% |</span>
+                  <span class="ml-2 text-orange font-weight-bold">{{
+                    menu?.country_name
+                  }}</span>
+                </div>
               </div>
-              <hr />
-              <div class="mt-5">
-                <span class="mr-2 font-weight-bold text-grey">{{
-                  menu.percentage
+            </v-card>
+            <div
+              class="d-flex flex-md-row flex-column justify-space-between px-4 font-weight-bold text-caption"
+            >
+              <p v-if="menu?.total_purchased">
+                Others who purchased :
+                <span class="text-blue-darken-4">{{
+                  menu?.total_purchased
                 }}</span>
-                <span class="text-blue" v-if="menu.percentage">% |</span>
-                <span class="ml-2 text-orange font-weight-bold">{{
-                  menu?.country_name
-                }}</span>
-              </div>
+              </p>
+              <template v-if="userName">
+                <p v-if="menu?.user_purchased_count">
+                  <span class="text-grey-darken-1"> You purchased : </span>
+                  <span class="text-blue-darken-4">{{
+                    menu?.user_purchased_count
+                  }}</span>
+                </p>
+              </template>
             </div>
-          </v-card>
-        </SplideSlide>
-      </Splide>
+          </SplideSlide>
+        </Splide>
+      </transition-group>
 
       <v-btn
         v-if="!isMobile && !isEnd"
@@ -555,5 +664,67 @@ onUnmounted(() => {
 .arrow-hidden {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.img-cont {
+  position: relative;
+  overflow: hidden;
+
+  .cart {
+    margin-top: 5px;
+    opacity: 0;
+    -webkit-transition: all 0.5s linear 0s;
+    -moz-transition: all 0.5s linear 0s;
+    -o-transition: all 0.5s linear 0s;
+    transition: all 0.5s linear 0s;
+    z-index: 666;
+    right: 30%;
+    position: absolute;
+    top: 0;
+  }
+
+  .action ul li {
+    float: left;
+  }
+  .action ul li button {
+    font-size: 16px !important;
+    height: 40px;
+    width: 40px;
+  }
+
+  .action ul li button i {
+    font-size: 16px !important;
+  }
+}
+
+.img-cont:hover .cart {
+  opacity: 1;
+  top: 20px;
+}
+.cart {
+  margin-top: 5px;
+  -webkit-transition: all 0.2s linear 0s;
+  -moz-transition: all 0.2s linear 0s;
+  -o-transition: all 0.2s linear 0s;
+  transition: all 0.2s linear 0s;
+  z-index: 666;
+  right: 0px;
+}
+
+.card-transition-enter-active,
+.card-transition-leave-active {
+  transition:
+    transform 0.5s,
+    opacity 0.3s;
+}
+
+.card-transition-enter {
+  opacity: 0;
+  transform: translateX(-50%);
+}
+
+.card-transition-leave-to {
+  opacity: 0;
+  transform: scale(0.8);
 }
 </style>
