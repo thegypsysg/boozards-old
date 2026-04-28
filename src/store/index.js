@@ -173,11 +173,15 @@ export default (app) =>
 
       async getCartItems({ commit, state }) {
         await axios
-          .get(`/get-cart-items`, null, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+          .get(
+            `/get-cart-items/3/${state.selectedCountry?.city_id || 1}`,
+            null,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
             },
-          })
+          )
           .then((response) => {
             if (response?.data.length > 0) {
               commit("isEmptyCart", false);
@@ -202,11 +206,15 @@ export default (app) =>
           })
           .then((response) => {
             axios
-              .get(`/get-cart-items`, null, {
-                headers: {
-                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+              .get(
+                `/get-cart-items/3/${state.selectedCountry?.city_id || 1}`,
+                null,
+                {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
                 },
-              })
+              )
               .then((response) => {
                 if (response?.data.length > 0) {
                   commit("isEmptyCart", false);
@@ -241,11 +249,15 @@ export default (app) =>
           })
           .then(() => {
             axios
-              .get(`/get-cart-items`, null, {
-                headers: {
-                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+              .get(
+                `/get-cart-items/3/${state.selectedCountry?.city_id || 1}`,
+                null,
+                {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
                 },
-              })
+              )
               .then((response) => {
                 if (response?.data.length > 0) {
                   commit("isEmptyCart", false);
@@ -283,11 +295,15 @@ export default (app) =>
             // this.getCartItems();
 
             axios
-              .get(`/get-cart-items`, null, {
-                headers: {
-                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+              .get(
+                `/get-cart-items/3/${state.selectedCountry?.city_id || 1}`,
+                null,
+                {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
                 },
-              })
+              )
               .then((response) => {
                 if (response?.data.length > 0) {
                   commit("isEmptyCart", false);

@@ -436,7 +436,7 @@
 
                       <!--  -->
 
-                      <!-- <v-row>
+                      <v-row>
                         <v-col>
                           <div>
                             <label class="text-grey-darken-1 font-weight-bold"
@@ -535,7 +535,7 @@
                             placeholder="Any Landmarks"
                           />
                         </v-col>
-                      </v-row> -->
+                      </v-row>
 
                       <!--  -->
 
@@ -1370,18 +1370,18 @@ const platformFee = ref(null);
 const timeSlots = ref([]);
 
 const addressForm = reactive({
-  //main_address: "",
+  main_address: "",
   full_address: "",
-  //unit: "",
-  //postal_code: "",
-  //town: "",
-  //city: "",
-  //country: "",
-  //condo_name: "",
-  //landmark: "",
+  unit: "",
+  postal_code: "",
+  town: "",
+  city: "",
+  country: "",
+  condo_name: "",
+  landmark: "",
   location_name: "",
-  //latitude: "",
-  //longitude: "",
+  // latitude: "",
+  // longitude: "",
 });
 const selectedDate = ref(null);
 const selectedTimeSlot = ref(null);
@@ -1391,8 +1391,8 @@ const addressesOptions = computed(() => {
   return addresses.value.map((address) => ({
     value: address.ga_id,
     full_address: address.full_address,
-    // main_address: address.main_address,
-    // landmark: address.landmark,
+    main_address: address.main_address,
+    landmark: address.landmark,
     location_name: address.location_name,
     primary_address: address.primary_address,
   }));
@@ -1607,15 +1607,15 @@ const initAutocomplete = async () => {
 };
 
 const resetForm = () => {
-  // addressForm.main_address = "";
+  addressForm.main_address = "";
   addressForm.full_address = "";
-  // addressForm.unit = "";
-  // addressForm.postal_code = "";
-  // addressForm.town = "";
-  // addressForm.city = "";
-  // addressForm.country = "";
-  // addressForm.condo_name = "";
-  // addressForm.landmark = "";
+  addressForm.unit = "";
+  addressForm.postal_code = "";
+  addressForm.town = "";
+  addressForm.city = "";
+  addressForm.country = "";
+  addressForm.condo_name = "";
+  addressForm.landmark = "";
   addressForm.location_name = "";
 };
 
@@ -1839,15 +1839,15 @@ const handleEditLocation = async (address_id) => {
     .get("/get-address/" + address_id)
     .then((response) => {
       let formData = response.data.data;
-      // (addressForm.main_address = formData.address_master?.street_address),
-      (addressForm.full_address = formData.full_address),
-        // (addressForm.unit = formData.unit_number),
-        // (addressForm.postal_code = formData.address_master?.postal_code),
-        // (addressForm.town = formData.address_master?.town.town_name),
-        // (addressForm.city = formData.address_master?.city.city_name),
-        // (addressForm.country = formData.address_master?.country.country_name),
-        // (addressForm.condo_name = formData?.condo_name || ""),
-        // (addressForm.landmark = formData.landmark),
+      (addressForm.main_address = formData.address_master?.street_address),
+        (addressForm.full_address = formData.full_address),
+        (addressForm.unit = formData.unit_number),
+        (addressForm.postal_code = formData.address_master?.postal_code),
+        (addressForm.town = formData.address_master?.town.town_name),
+        (addressForm.city = formData.address_master?.city.city_name),
+        (addressForm.country = formData.address_master?.country.country_name),
+        (addressForm.condo_name = formData?.condo_name || ""),
+        (addressForm.landmark = formData.landmark),
         (addressForm.location_name = formData.location_name);
       addressDialog.value = true;
     })
@@ -2288,6 +2288,14 @@ watch(selectedCountry, async () => {
   await getTaxAmount();
   await getPaymentTypes();
   getDeliveryCharges();
+  if (
+    authToken &&
+    authToken != null &&
+    authToken != "" &&
+    authToken != "null"
+  ) {
+    getCartData();
+  }
 });
 
 watch(addressDialog, (isOpen) => {
@@ -2361,7 +2369,7 @@ onMounted(() => {
     // getPaymentTypes();
     getTimeSlots();
     getPlatformFee();
-    getCartData();
+    // getCartData();
   }
 
   updateTime();
